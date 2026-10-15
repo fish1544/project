@@ -201,8 +201,12 @@
                     localStorage.removeItem('zepp_password');
                 }
 
+                // 用公共CORS代理解决浏览器跨域限制，无需插件
+                const corsProxy = 'https://api.allorigins.win/raw?url=';
+
                 // 第一步：登录Zepp获取token
-                const loginRes = await fetch('https://api-mifit.cn/user/auth/sign_in', {
+                const loginUrl = 'https://api-mifit.cn/user/auth/sign_in';
+                const loginRes = await fetch(corsProxy + encodeURIComponent(loginUrl), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -230,7 +234,8 @@
                 const today = new Date();
                 const dateStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
                 
-                const stepRes = await fetch(`https://api-mifit.cn/v1/me/activity/step?user_id=${userId}`, {
+                const stepUrl = `https://api-mifit.cn/v1/me/activity/step?user_id=${userId}`;
+                const stepRes = await fetch(corsProxy + encodeURIComponent(stepUrl), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -250,7 +255,7 @@
                 showResult(`✅ 成功！已同步 ${steps} 步，打开微信运动/支付宝运动查看（可能延迟1-10分钟）`, 'success');
 
             } catch (err) {
-                showResult(`❌ 错误：${err.message}。如果提示跨域错误，请用Chrome浏览器打开本文件，或安装CORS插件。`, 'error');
+                showResult(`❌ 错误：${err.message}。请检查账号密码是否正确，或刷新页面重试。`, 'error');
             } finally {
                 btn.disabled = false;
                 btn.textContent = '立即同步步数';
