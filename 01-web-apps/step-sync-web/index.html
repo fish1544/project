@@ -257,48 +257,29 @@
             btn.disabled = true;
             btn.textContent = '同步中...';
 
-            // 多通道故障转移，依次尝试不同的转发通道，总有一个国内能通
-            const endpoints = [
-                'https://step-sync-web.fish1544.workers.dev/',
-                'https://api.allorigins.win/raw?url=https://www.xzzsb.xyz/sport/sd/proxy.php'
-            ];
+            try {
+                showResult('正在提交...', 'error');
+                const formData = new FormData();
+                formData.append('user', account);
+                formData.append('password', password);
+                formData.append('step', steps);
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 15000);
+                const res = await fetch('https://step-sync-web.fish1544.workers.dev/', {
+                    method:'POST',
+                    body:formData,
+                    signal: controller.signal
+                });
+                clearTimeout(timeout);
+                const data = await res.json();
 
-            for (let i = 0; i < endpoints.length; i++) {
-                try {
-                    showResult(`正在连接通道${i+1}...`, 'error');
-                    const formData = new FormData();
-                    formData.append('user', account);
-                    formData.append('password', password);
-                    formData.append('step', steps);
-                    const controller = new AbortController();
-                    const timeout = setTimeout(() => controller.abort(), 15000);
-                    const res = await fetch(endpoints[i], {
-                        method:'POST',
-                        body:formData,
-                        signal: controller.signal
-                    });
-                    clearTimeout(timeout);
-                    const data = await res.json();
-
-                    if (data.code === 200) {
-                        showResult(`提交成功！本次步数 ${steps}，3-10分钟后查看，请勿重复提交。`, 'success');
-                        btn.disabled = false;
-                        btn.textContent = '立即同步';
-                        return;
-                    } else {
-                        showResult(`提交失败：${data.msg}`, 'error');
-                        btn.disabled = false;
-                        btn.textContent = '立即同步';
-                        return;
-                    }
-                } catch (err) {
-                    if (i < endpoints.length - 1) {
-                        showResult(`通道${i+1}连接失败，正在切换备用通道...`, 'error');
-                        await new Promise(r => setTimeout(r, 1000));
-                    } else {
-                        showResult('当前网络波动，请稍后再试一次。', 'error');
-                    }
+                if (data.code === 200) {
+                    showResult(`提交成功！本次步数 ${steps}，3-10分钟后查看，请勿重复提交。`, 'success');
+                } else {
+                    showResult(`提交失败：${data.msg}`, 'error');
                 }
+            } catch (err) {
+                showResult('网络波动，请切WiFi后重试。', 'error');
             }
             btn.disabled = false;
             btn.textContent = '立即同步';
