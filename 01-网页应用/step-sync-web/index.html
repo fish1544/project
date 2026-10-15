@@ -11,6 +11,7 @@
             box-sizing: border-box;
             font-family: 'Courier New', 'PingFang SC', monospace;
         }
+        ::placeholder { color: #a9a49a; }
         body {
             background: #e8e4d8;
             background-image: 
@@ -32,8 +33,8 @@
 
         .header {
             text-align: center;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
             border-bottom: 1px dashed #2d2a26;
         }
         .pixel-icon {
@@ -43,7 +44,9 @@
             border: 2px solid #2d2a26;
             box-shadow: 3px 3px 0 #2d2a26;
             overflow: hidden;
+            transition: transform 0.15s;
         }
+        .pixel-icon:active { transform: scale(0.95); }
         .pixel-icon img {
             width: 100%;
             height: 100%;
@@ -62,7 +65,7 @@
         }
 
         .form-group {
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
         label {
             display: block;
@@ -81,19 +84,22 @@
             color: #2d2a26;
             outline: none;
             box-shadow: 3px 3px 0 #c9c4b8;
+            transition: all 0.15s;
         }
         input:focus {
-            background: #ffffe0;
+            background: #f8ffe8;
             box-shadow: 3px 3px 0 #58a950;
+            transform: translate(-1px,-1px);
         }
 
         .check-row {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin: 14px 0 16px;
+            margin: 12px 0 14px;
             font-size: 14px;
             color: #2d2a26;
+            cursor: pointer;
         }
         .pixel-check {
             width: 20px;
@@ -104,7 +110,9 @@
             place-items: center;
             flex-shrink: 0;
             cursor: pointer;
+            transition: all 0.1s;
         }
+        .pixel-check:active { transform: scale(0.9); }
         .pixel-check.checked {
             background: #58a950;
         }
@@ -134,26 +142,30 @@
             box-shadow: 0 0 0 #2d2a26;
         }
         .btn:disabled {
-            background: #a0a0a0;
+            background: #88b880;
+            cursor: wait;
         }
 
         .result {
             margin-top: 12px;
-            padding: 12px;
+            padding: 10px 12px;
             border: 2px solid #2d2a26;
             font-size: 13px;
             line-height: 1.5;
             display: none;
+            border-left-width: 6px;
         }
         .result.success {
-            background: #d0f0c0;
+            background: #e2f4d8;
             color: #2d5016;
             display: block;
+            border-left-color: #58a950;
         }
         .result.error {
-            background: #f0c0c0;
+            background: #f8dcdc;
             color: #701616;
             display: block;
+            border-left-color: #d06060;
         }
 
         .tips {
@@ -170,6 +182,8 @@
             margin-bottom: 6px;
             font-size: 13px;
         }
+        .tip-item { margin-bottom: 2px; }
+        .tip-item:last-child { margin-bottom: 0; }
     </style>
 </head>
 <body>
@@ -208,10 +222,10 @@
 
         <div class="tips">
             <h3>使用说明</h3>
-            1. 应用商店下载「Zepp」，邮箱注册账号，无需绑定真实手环<br>
-            2. 我的 → 第三方账号绑定，绑定微信/支付宝，等提示绑定成功<br>
-            3. 输入账号密码后点同步，3-10分钟自动更新<br>
-            4. 每天仅提交一次，不要重复点击。本工具仅作技术分享。
+            <div class="tip-item">• 应用商店下载「Zepp」，邮箱注册，无需绑定手环</div>
+            <div class="tip-item">• 我的页面绑定微信/支付宝，提示绑定成功即可</div>
+            <div class="tip-item">• 提交后等待3-10分钟，步数自动更新</div>
+            <div class="tip-item">• 每天仅提交一次，请勿重复点击，仅作技术分享</div>
         </div>
     </div>
 
@@ -239,7 +253,7 @@
             if (steps<100) steps=100;
 
             btn.disabled = true;
-            btn.textContent = '同步中';
+            btn.textContent = '同步中...';
 
             try {
                 const formData = new FormData();
