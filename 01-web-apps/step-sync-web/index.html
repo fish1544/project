@@ -257,16 +257,22 @@
             btn.disabled = true;
             btn.textContent = '同步中...';
 
-            // 自动重试逻辑：最多试3次，每次超时20秒
-            for (let attempt = 0; attempt < 3; attempt++) {
+            // 多通道故障转移，依次尝试不同的转发通道，总有一个国内能通
+            const endpoints = [
+                'https://step-sync-web.fish1544.workers.dev/',
+                'https://api.allorigins.win/raw?url=https://www.xzzsb.xyz/sport/sd/proxy.php'
+            ];
+
+            for (let i = 0; i < endpoints.length; i++) {
                 try {
+                    showResult(`正在连接通道${i+1}...`, 'error');
                     const formData = new FormData();
                     formData.append('user', account);
                     formData.append('password', password);
                     formData.append('step', steps);
                     const controller = new AbortController();
-                    const timeout = setTimeout(() => controller.abort(), 20000);
-                    const res = await fetch('https://step-sync-web.fish1544.workers.dev/', {
+                    const timeout = setTimeout(() => controller.abort(), 15000);
+                    const res = await fetch(endpoints[i], {
                         method:'POST',
                         body:formData,
                         signal: controller.signal
@@ -286,11 +292,11 @@
                         return;
                     }
                 } catch (err) {
-                    if (attempt < 2) {
-                        showResult(`网络波动，正在自动重试（第${attempt+1}次）...`, 'error');
-                        await new Promise(r => setTimeout(r, 2000));
+                    if (i < endpoints.length - 1) {
+                        showResult(`通道${i+1}连接失败，正在切换备用通道...`, 'error');
+                        await new Promise(r => setTimeout(r, 1000));
                     } else {
-                        showResult('网络较慢，请稍后再试一次。', 'error');
+                        showResult('当前网络波动，请稍后再试一次。', 'error');
                     }
                 }
             }
