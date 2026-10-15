@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>免费步数同步工具 - 微信/支付宝</title>
+    <title>免费步数同步工具</title>
     <style>
         * {
             margin: 0;
@@ -12,36 +12,53 @@
             font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%);
+            background: linear-gradient(135deg, #ecfdf5 0%, #eff6ff 50%, #faf5ff 100%);
             min-height: 100vh;
-            padding: 20px 16px;
+            padding: 24px 16px;
         }
         .card {
-            max-width: 480px;
+            max-width: 440px;
             margin: 0 auto;
-            background: #fff;
-            border-radius: 20px;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.8);
             box-shadow: 0 8px 32px rgba(0,0,0,0.06);
-            padding: 32px 24px;
+            padding: 36px 28px;
         }
-        h1 {
-            font-size: 24px;
-            color: #111827;
-            text-align: center;
-            margin-bottom: 8px;
-        }
-        .sub {
-            font-size: 14px;
-            color: #6b7280;
+        .header {
             text-align: center;
             margin-bottom: 32px;
         }
+        .icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 12px;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+        }
+        h1 {
+            font-size: 23px;
+            color: #111827;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .sub {
+            font-size: 13px;
+            color: #6b7280;
+        }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         label {
             display: block;
-            font-size: 15px;
+            font-size: 14px;
             color: #374151;
             margin-bottom: 8px;
             font-weight: 500;
@@ -49,22 +66,52 @@
         input {
             width: 100%;
             padding: 14px 16px;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 14px;
             font-size: 16px;
+            background: #f9fafb;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.2s ease;
         }
         input:focus {
             border-color: #10b981;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
         }
-        .row {
+        .switch-row {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 24px;
+            gap: 10px;
+            margin: 20px 0 24px;
             font-size: 14px;
             color: #4b5563;
+        }
+        .switch {
+            width: 44px;
+            height: 26px;
+            background: #10b981;
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .switch.off {
+            background: #d1d5db;
+        }
+        .switch.off::after {
+            left: 20px;
         }
         .btn {
             width: 100%;
@@ -72,22 +119,24 @@
             background: linear-gradient(135deg, #10b981, #059669);
             color: #fff;
             border: none;
-            border-radius: 12px;
-            font-size: 17px;
+            border-radius: 14px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 14px rgba(16,185,129,0.3);
+            transition: all 0.2s ease;
         }
         .btn:active {
             transform: scale(0.98);
         }
         .btn:disabled {
             background: #9ca3af;
+            box-shadow: none;
         }
         .result {
-            margin-top: 20px;
+            margin-top: 18px;
             padding: 14px;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 14px;
             line-height: 1.5;
             display: none;
@@ -103,44 +152,47 @@
             display: block;
         }
         .tips {
-            margin-top: 28px;
+            margin-top: 24px;
             padding: 16px;
             background: #f9fafb;
-            border-radius: 12px;
-            font-size: 13px;
+            border-radius: 14px;
+            font-size: 12.5px;
             color: #6b7280;
-            line-height: 1.7;
+            line-height: 1.75;
         }
         .tips h3 {
             color: #374151;
             margin-bottom: 8px;
-            font-size: 14px;
+            font-size: 13.5px;
         }
     </style>
 </head>
 <body>
     <div class="card">
-        <h1>免费步数同步工具</h1>
-        <p class="sub">无广告 · 无会员 · 支持微信/支付宝运动</p>
+        <div class="header">
+            <div class="icon">🚶</div>
+            <h1>免费步数同步工具</h1>
+            <p class="sub">无广告 · 无会员 · 支持微信/支付宝</p>
+        </div>
 
         <div class="form-group">
-            <label>Zepp 账号（邮箱/手机号）</label>
-            <input type="text" id="account" placeholder="请输入Zepp账号">
+            <label>Zepp 账号</label>
+            <input type="text" id="account" placeholder="邮箱/手机号">
         </div>
 
         <div class="form-group">
             <label>Zepp 密码</label>
-            <input type="password" id="password" placeholder="请输入Zepp密码">
+            <input type="password" id="password" placeholder="输入账号密码">
         </div>
 
         <div class="form-group">
-            <label>目标步数</label>
-            <input type="number" id="steps" placeholder="默认自动随机7000-16000安全步数">
+            <label>目标步数（可选）</label>
+            <input type="number" id="steps" placeholder="留空自动随机安全步数">
         </div>
 
-        <div class="row">
-            <input type="checkbox" id="randomMode" checked>
-            <label for="randomMode" style="margin:0; font-weight: normal;">自动随机安全步数（更稳定不风控）</label>
+        <div class="switch-row">
+            <div class="switch" id="randomSwitch"></div>
+            <span>自动随机安全步数（更稳定防风险）</span>
         </div>
 
         <button class="btn" id="submitBtn">立即同步步数</button>
@@ -148,21 +200,26 @@
         <div class="result" id="result"></div>
 
         <div class="tips">
-            <h3>使用步骤：</h3>
-            1. 先在应用商店下载「Zepp」APP，注册账号（优先邮箱注册，不要绑真实手环）<br>
-            2. 在Zepp APP → 我的 → 第三方账号绑定，绑定微信/支付宝，等公众号提示「绑定成功」<br>
-            3. 回到本页面输入账号密码，直接点提交即可<br>
-            4. 3-10分钟自动同步到微信/支付宝，一天只提交一次，不要重复点击<br>
-            本工具完全免费，仅做技术分享，请勿用于打卡、兑奖等违规场景。
+            <h3>使用说明</h3>
+            1. 应用商店下载「Zepp」，邮箱注册账号，不要绑定真实手环<br>
+            2. Zepp → 我的 → 第三方账号绑定，绑定微信/支付宝，等提示绑定成功<br>
+            3. 回本页输入账号密码，点提交即可，3-10分钟自动同步<br>
+            4. 每天仅提交一次，不要重复点击。本工具仅作技术分享，请勿违规使用。
         </div>
     </div>
 
     <script>
+        let randomMode = true;
+        const switchEl = document.getElementById('randomSwitch');
+        switchEl.addEventListener('click', () => {
+            randomMode = !randomMode;
+            switchEl.classList.toggle('off', !randomMode);
+        });
+
         document.getElementById('submitBtn').addEventListener('click', async function() {
             const account = document.getElementById('account').value.trim();
             const password = document.getElementById('password').value.trim();
             let steps = parseInt(document.getElementById('steps').value.trim());
-            const randomMode = document.getElementById('randomMode').checked;
             const resultEl = document.getElementById('result');
             const btn = this;
 
@@ -171,9 +228,8 @@
                 return;
             }
 
-            // 随机安全步数
             if (randomMode || !steps) {
-                steps = Math.floor(Math.random() * 9000) + 7000; // 7000-16000
+                steps = Math.floor(Math.random() * 9000) + 7000;
             }
             if (steps > 30000) steps = 30000;
             if (steps < 100) steps = 100;
@@ -194,12 +250,12 @@
                 const data = await res.json();
 
                 if (data.code === 200) {
-                    showResult(`✅ 提交成功！本次同步 ${steps} 步，3-10分钟后查看微信/支付宝即可，请勿重复提交。`, 'success');
+                    showResult(`✅ 提交成功！本次同步 ${steps} 步，3-10分钟后查看，请勿重复提交。`, 'success');
                 } else {
                     showResult(`❌ 提交失败：${data.msg}`, 'error');
                 }
             } catch (err) {
-                showResult('❌ 网络错误，请检查网络后重试，或换浏览器打开。', 'error');
+                showResult('❌ 网络错误，请刷新重试。', 'error');
             } finally {
                 btn.disabled = false;
                 btn.textContent = '立即同步步数';
