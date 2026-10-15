@@ -9,148 +9,161 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+            font-family: 'Courier New', 'PingFang SC', monospace;
         }
         body {
-            background: linear-gradient(180deg, #f7f9fc 0%, #eef2f7 100%);
+            background: #e8e4d8;
+            background-image: 
+                linear-gradient(#d8d4c8 1px, transparent 1px),
+                linear-gradient(90deg, #d8d4c8 1px, transparent 1px);
+            background-size: 8px 8px;
             min-height: 100vh;
-            padding: 32px 20px;
+            padding: 28px 16px;
         }
 
         .card {
-            max-width: 420px;
+            max-width: 440px;
             margin: 0 auto;
-            background: #ffffff;
-            border-radius: 24px;
-            box-shadow: 0 12px 40px rgba(100, 120, 150, 0.1);
-            padding: 36px 28px;
+            background: #f8f6f0;
+            border: 3px solid #2d2a26;
+            box-shadow: 8px 8px 0 #2d2a26;
+            padding: 32px 24px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 36px;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 2px dashed #2d2a26;
         }
-        .icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 14px;
-            background: linear-gradient(135deg, #e0f2fe, #dcfce7);
-            border-radius: 20px;
+        .pixel-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            background: #58a950;
+            border: 3px solid #2d2a26;
             display: grid;
             place-items: center;
-        }
-        .icon svg {
-            width: 36px;
-            height: 36px;
-            stroke: #0284c7;
-            stroke-width: 2;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+            font-size: 24px;
+            color: #fff;
         }
         h1 {
             font-size: 22px;
-            color: #1e293b;
-            font-weight: 600;
+            color: #2d2a26;
+            font-weight: bold;
+            letter-spacing: 2px;
             margin-bottom: 6px;
         }
         .sub {
-            font-size: 13px;
-            color: #94a3b8;
+            font-size: 12px;
+            color: #6b6660;
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
         label {
             display: block;
             font-size: 14px;
-            color: #475569;
+            color: #2d2a26;
             margin-bottom: 8px;
-            font-weight: 500;
+            font-weight: bold;
         }
         input {
             width: 100%;
-            padding: 14px 16px;
-            background: #f8fafc;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 14px;
+            padding: 12px 14px;
+            background: #fff;
+            border: 2px solid #2d2a26;
+            border-radius: 0;
             font-size: 15px;
-            color: #1e293b;
+            color: #2d2a26;
             outline: none;
-            transition: all 0.2s;
+            box-shadow: 4px 4px 0 #c9c4b8;
         }
         input:focus {
-            background: #fff;
-            border-color: #7dd3fc;
-            box-shadow: 0 0 0 4px rgba(125, 211, 252, 0.15);
+            background: #ffffe0;
+            box-shadow: 4px 4px 0 #58a950;
         }
 
-        .row {
+        .check-row {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin: 22px 0 28px;
+            margin: 22px 0 26px;
             font-size: 14px;
-            color: #64748b;
+            color: #2d2a26;
         }
-        input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #0ea5e9;
+        .pixel-check {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #2d2a26;
+            background: #fff;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .pixel-check.checked {
+            background: #58a950;
+        }
+        .pixel-check.checked::after {
+            content: '✓';
+            color: #fff;
+            font-weight: bold;
         }
 
         .btn {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
-            border: none;
-            border-radius: 14px;
+            padding: 14px;
+            background: #58a950;
+            border: 3px solid #2d2a26;
+            border-radius: 0;
             color: #fff;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: bold;
+            letter-spacing: 2px;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.25);
-            transition: all 0.2s;
+            box-shadow: 4px 4px 0 #2d2a26;
+            transition: all 0.1s;
         }
         .btn:active {
-            transform: scale(0.98);
+            transform: translate(4px,4px);
+            box-shadow: 0 0 0 #2d2a26;
         }
         .btn:disabled {
-            background: #94a3b8;
-            box-shadow: none;
+            background: #a0a0a0;
         }
 
         .result {
             margin-top: 20px;
-            padding: 14px 16px;
-            border-radius: 14px;
-            font-size: 14px;
-            line-height: 1.5;
+            padding: 14px;
+            border: 2px solid #2d2a26;
+            font-size: 13px;
+            line-height: 1.6;
             display: none;
         }
         .result.success {
-            background: #f0fdf4;
-            color: #166534;
+            background: #d0f0c0;
+            color: #2d5016;
             display: block;
         }
         .result.error {
-            background: #fef2f2;
-            color: #991b1b;
+            background: #f0c0c0;
+            color: #701616;
             display: block;
         }
 
         .tips {
             margin-top: 28px;
-            padding: 18px;
-            background: #f8fafc;
-            border-radius: 14px;
-            font-size: 12.5px;
-            color: #64748b;
+            padding: 16px;
+            background: #fff;
+            border: 2px solid #2d2a26;
+            font-size: 12px;
+            color: #5a5650;
             line-height: 1.8;
         }
         .tips h3 {
-            color: #334155;
+            color: #2d2a26;
             margin-bottom: 8px;
             font-size: 14px;
         }
@@ -159,14 +172,7 @@
 <body>
     <div class="card">
         <div class="header">
-            <div class="icon">
-                <svg viewBox="0 0 24 24">
-                    <circle cx="13" cy="4" r="2"/>
-                    <path d="M10 21l2-5 3 2v5"/>
-                    <path d="M10 8l-3 4 3 2 1-4"/>
-                    <path d="M14 8l3 3-2 4-3-2"/>
-                </svg>
-            </div>
+            <div class="pixel-icon">🚶</div>
             <h1>步数同步工具</h1>
             <p class="sub">支持微信 / 支付宝运动</p>
         </div>
@@ -186,9 +192,9 @@
             <input type="number" id="steps" placeholder="留空自动生成安全步数">
         </div>
 
-        <div class="row">
-            <input type="checkbox" id="randomMode" checked>
-            <label for="randomMode" style="margin:0; font-weight: normal;">自动生成安全步数，降低风险</label>
+        <div class="check-row">
+            <div class="pixel-check checked" id="checkBox"></div>
+            <span>自动生成安全步数，降低风险</span>
         </div>
 
         <button class="btn" id="submitBtn">立即同步</button>
@@ -197,19 +203,26 @@
 
         <div class="tips">
             <h3>使用说明</h3>
-            1. 应用商店下载「Zepp」，邮箱注册，无需绑定真实手环<br>
+            1. 应用商店下载「Zepp」，邮箱注册账号，无需绑定真实手环<br>
             2. 我的 → 第三方账号绑定，绑定微信/支付宝，等提示绑定成功<br>
-            3. 输入账号密码点同步，3-10分钟自动更新<br>
+            3. 输入账号密码后点同步，3-10分钟自动更新<br>
             4. 每天仅提交一次，不要重复点击。本工具仅作技术分享。
         </div>
     </div>
 
     <script>
+        let randomMode = true;
+        const checkBox = document.getElementById('checkBox');
+        checkBox.addEventListener('click', () => {
+            randomMode = !randomMode;
+            checkBox.classList.toggle('checked', randomMode);
+        });
+
         document.getElementById('submitBtn').addEventListener('click', async function() {
             const account = document.getElementById('account').value.trim();
             const password = document.getElementById('password').value.trim();
             let steps = parseInt(document.getElementById('steps').value.trim());
-            const randomMode = document.getElementById('randomMode').checked;
+            const resultEl = document.getElementById('result');
             const btn = this;
 
             if (!account || !password) {
@@ -221,7 +234,7 @@
             if (steps<100) steps=100;
 
             btn.disabled = true;
-            btn.textContent = '同步中...';
+            btn.textContent = '同步中';
 
             try {
                 const formData = new FormData();
