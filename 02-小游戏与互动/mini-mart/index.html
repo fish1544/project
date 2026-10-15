@@ -1,0 +1,2407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#faf7f2">
+<meta name="description" content="小小便利店 · 模拟经营小游戏：进货、定价、雇人、扩建，打造你的便利店帝国。支持离线游玩。">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>小小便利店 · 模拟经营</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #f6f1ea; --bg2: #efe8dd;
+    --panel: rgba(255,255,255,0.92); --card: #ffffff; --card-light: #f4efe7;
+    --line: rgba(60,45,25,0.10);
+    --accent: #ff7a45; --accent-deep: #e8622a; --accent2: #ffb347;
+    --gold: #c98a1b; --green: #1f9e6e; --blue: #3b8fd9; --purple: #7c6fd0; --red: #e05b4f;
+    --text: #33333f; --text-dim: #8f8d97;
+    --radius: 16px; --radius-sm: 12px;
+    --shadow: 0 10px 30px rgba(90,70,40,0.10);
+    --shadow-sm: 0 4px 14px rgba(90,70,40,0.07);
+  }
+  html, body { height: 100%; }
+  body {
+    background:
+      radial-gradient(900px 560px at 88% -12%, rgba(255,183,107,0.18) 0%, transparent 60%),
+      radial-gradient(760px 520px at 4% 112%, rgba(255,122,69,0.08) 0%, transparent 55%),
+      linear-gradient(165deg, #fbf8f3 0%, #f4ede2 100%);
+    color: var(--text);
+    font-family: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+    overflow: hidden;
+    user-select: none; -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  #app {
+    position: relative; z-index: 1;
+    display: grid; grid-template-rows: auto minmax(0,1fr) auto;
+    height: 100vh; height: 100dvh;
+    max-width: 1280px; margin: 0 auto;
+    gap: 10px; padding: 10px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+  #topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--panel); border-radius: var(--radius);
+    padding: 10px 20px; flex-wrap: wrap; gap: 8px 14px;
+    box-shadow: var(--shadow); border: 1px solid var(--line);
+  }
+  .stat { display: flex; align-items: center; gap: 9px; padding: 4px 10px; border-radius: 12px; transition: background 0.3s; }
+  .stat:hover { background: rgba(255,122,69,0.06); }
+  .stat-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 9px; }
+  .stat-icon svg { width: 20px; height: 20px; }
+  .stat-info { display: flex; flex-direction: column; line-height: 1.2; }
+  .stat .label { color: var(--text-dim); font-size: 10px; letter-spacing: 0.6px; font-weight: 600; }
+  .stat .value { font-weight: 800; font-size: 18px; letter-spacing: 0.2px; font-variant-numeric: tabular-nums; color: var(--text); }
+  .stat .value.flash { animation: flashPop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes flashPop { 0%{ transform: scale(1); } 30%{ transform: scale(1.16); } 100%{ transform: scale(1); } }
+  .gold-text { color: var(--gold) !important; }
+  .green-text { color: var(--green) !important; }
+  .accent-text { color: var(--accent-deep) !important; }
+  .blue-text { color: var(--blue) !important; }
+  .red-text { color: var(--red) !important; }
+  #rep-title {
+    background: linear-gradient(135deg, #fff3e6, #ffe8d2);
+    border: 1px solid rgba(255,122,69,0.25);
+    color: var(--accent-deep);
+    padding: 5px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.4px; white-space: nowrap;
+  }
+  #main { display: grid; grid-template-columns: 1fr 330px; gap: 10px; min-height: 0; }
+  @media (max-width: 900px) {
+    #main { display: flex; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    #canvas-wrap { flex-shrink: 0; }
+    canvas { width: 100% !important; height: auto !important; max-height: none; }
+    #topbar { padding: 8px 12px; gap: 6px 10px; }
+    .stat { padding: 2px 6px; } .stat .value { font-size: 15px; }
+    .stat-icon { width: 18px; height: 18px; } .stat-icon svg { width: 17px; height: 17px; }
+    #rep-title { padding: 3px 10px; font-size: 11px; }
+    #app { padding: 8px; gap: 8px; }
+  }
+  @media (max-width: 480px) {
+    #topbar { justify-content: space-around; }
+    .stat { gap: 5px; } .stat .label { display: none; }
+  }
+  #canvas-wrap {
+    background: var(--panel); border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; position: relative;
+    box-shadow: var(--shadow); cursor: pointer; border: 1px solid var(--line);
+  }
+  canvas { max-width: 100%; max-height: 100%; display: block; touch-action: none; }
+  #side {
+    background: var(--panel); border-radius: var(--radius);
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: var(--shadow); border: 1px solid var(--line); min-height: 0;
+  }
+  #tabs { display: flex; gap: 4px; padding: 8px; border-bottom: 1px solid var(--line); background: rgba(120,100,70,0.05); }
+  .tab {
+    flex: 1; padding: 10px 2px; text-align: center; cursor: pointer;
+    font-size: 12.5px; font-weight: 700; color: var(--text-dim);
+    border-radius: 11px; transition: all 0.25s ease; letter-spacing: 0.2px;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .tab .tab-ic { display: flex; align-items: center; justify-content: center; }
+  .tab .tab-ic svg { width: 16px; height: 16px; }
+  .tab:hover { color: var(--text); background: rgba(0,0,0,0.04); }
+  .tab.active {
+    color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    box-shadow: 0 3px 12px rgba(255,122,69,0.32);
+  }
+  #tab-content { flex: 1; overflow-y: auto; padding: 14px; scrollbar-width: thin; scrollbar-color: #d8cfc0 transparent; }
+  #tab-content::-webkit-scrollbar { width: 5px; }
+  #tab-content::-webkit-scrollbar-thumb { background: #d8cfc0; border-radius: 3px; }
+  .section-title { font-size: 11px; color: var(--text-dim); letter-spacing: 1.2px; margin-bottom: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+  .item-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 14px; background: var(--card); border-radius: var(--radius-sm);
+    margin-bottom: 9px; transition: all 0.2s ease; cursor: pointer;
+    border: 1px solid var(--line); position: relative; overflow: hidden; box-shadow: var(--shadow-sm);
+  }
+  .item-row::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, transparent, var(--item-c, var(--accent)), transparent); opacity: 0.8; }
+  .item-row:hover { transform: translateY(-2px); border-color: rgba(255,122,69,0.3); box-shadow: 0 8px 22px rgba(90,70,40,0.12); }
+  .item-info { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .item-icon {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    background: var(--card-light); box-shadow: inset 0 0 0 1px var(--line);
+    position: relative; overflow: hidden;
+  }
+  .item-icon svg { width: 36px; height: 36px; }
+  .item-icon img { max-width: 86%; max-height: 86%; object-fit: contain; border-radius: 8px; }
+  .item-details { min-width: 0; flex: 1; }
+  .item-details .name { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-details .meta { font-size: 11px; color: var(--text-dim); margin-top: 3px; display: flex; align-items: center; gap: 6px; }
+  .item-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  .stock-bar { height: 4px; background: #efe9df; border-radius: 2px; margin-top: 6px; overflow: hidden; width: 100%; }
+  .stock-bar i { display: block; height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--green), #6cc9a4); transition: width 0.4s ease; }
+  .stock-bar i.warn { background: linear-gradient(90deg, var(--accent2), #ffce8a); }
+  .stock-bar i.danger { background: linear-gradient(90deg, var(--red), #f09287); }
+  .btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    color: #fff; border: none; padding: 10px 20px; border-radius: 12px;
+    cursor: pointer; font-size: 13px; font-weight: 700;
+    transition: all 0.2s ease; box-shadow: 0 3px 12px rgba(255,122,69,0.28);
+    font-family: inherit; letter-spacing: 0.2px;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(255,122,69,0.38); }
+  .btn:active { transform: translateY(0) scale(0.97); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; box-shadow: none; }
+  .btn.small { padding: 8px 14px; font-size: 12px; border-radius: 9px; }
+  .btn.secondary { background: var(--card-light); color: var(--text); box-shadow: none; border: 1px solid var(--line); }
+  .btn.secondary:hover { box-shadow: var(--shadow-sm); }
+  .btn.green { background: linear-gradient(135deg, var(--green), #178a5e); box-shadow: 0 3px 12px rgba(31,158,110,0.28); }
+  .btn.blue { background: linear-gradient(135deg, var(--blue), #2f79bd); box-shadow: 0 3px 12px rgba(59,143,217,0.28); }
+  .btn.orange { background: linear-gradient(135deg, var(--accent2), #f29b2e); box-shadow: 0 3px 12px rgba(255,179,71,0.3); }
+  .btn.purple { background: linear-gradient(135deg, var(--purple), #6558bd); box-shadow: 0 3px 12px rgba(124,111,208,0.3); }
+  #bottombar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--panel); border-radius: var(--radius);
+    padding: 10px 18px; gap: 12px; box-shadow: var(--shadow); border: 1px solid var(--line);
+  }
+  .speed-controls { display: flex; gap: 7px; }
+  .speed-btn {
+    background: var(--card-light); border: 1px solid var(--line); color: var(--text-dim);
+    padding: 9px 16px; border-radius: 11px; cursor: pointer;
+    font-size: 13px; font-weight: 700; transition: all 0.25s ease; font-family: inherit; min-width: 46px;
+  }
+  .speed-btn:hover { color: var(--text); border-color: rgba(60,45,25,0.25); }
+  .speed-btn.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    color: #fff; border-color: transparent;
+    box-shadow: 0 3px 12px rgba(255,122,69,0.35);
+  }
+  .hint-text { font-size: 11px; color: var(--text-dim); text-align: right; line-height: 1.6; }
+  .overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(251,248,243,0.97), rgba(244,237,226,0.97));
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 30; border-radius: var(--radius); text-align: center;
+    padding: 28px; animation: fadeIn 0.4s ease; overflow-y: auto;
+  }
+  #start-overlay {
+    background: linear-gradient(rgba(253,250,243,0.88), rgba(247,240,229,0.9)), url('assets/bg.jpg') center/cover no-repeat;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .logo-wrap { margin-bottom: 4px; }
+  .logo-wrap svg { width: 132px; height: 132px; filter: drop-shadow(0 10px 22px rgba(90,70,40,0.16)); animation: logoFloat 3.4s ease-in-out infinite; }
+  @keyframes logoFloat { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-6px); } }
+  .overlay h1 { position: relative; font-size: 44px; margin-bottom: 4px; color: var(--text); letter-spacing: 4px; font-weight: 900; animation: titleIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+  .overlay h1 .dot { color: var(--accent); }
+  @keyframes titleIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .overlay .subtitle { color: var(--text-dim); font-size: 13px; letter-spacing: 3px; margin-bottom: 16px; font-weight: 600; }
+  .overlay .subtitle .ver { display: inline-block; background: var(--card-light); border: 1px solid var(--line); padding: 2px 10px; border-radius: 999px; font-size: 10px; letter-spacing: 1px; margin-left: 10px; color: var(--accent-deep); }
+  .overlay p { color: var(--text-dim); margin-bottom: 20px; max-width: 500px; line-height: 1.8; font-size: 14px; }
+  .hidden { display: none !important; }
+  .howto { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; max-width: 560px; width: 100%; }
+  .howto-item {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 13px; font-size: 12px; color: var(--text-dim); line-height: 1.6;
+    box-shadow: var(--shadow-sm); transition: all 0.25s ease;
+  }
+  .howto-item .ht-ic { width: 34px; height: 34px; border-radius: 10px; background: var(--card-light); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; box-shadow: inset 0 0 0 1px var(--line); }
+  .howto-item .ht-ic svg { width: 22px; height: 22px; }
+  .howto-item { cursor: pointer; user-select: none; transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s; }
+  .howto-item:hover { border-color: rgba(255,122,69,0.3); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(90,70,40,0.12); }
+  .howto-item:active { transform: scale(0.97); }
+  .howto-item b { color: var(--text); display: block; margin-bottom: 2px; font-size: 13px; }
+  .btn-big { padding: 16px 58px; font-size: 18px; border-radius: 16px; }
+  .overlay .foot-hint { margin-top: 14px; font-size: 11px; color: var(--text-dim); opacity: 0.8; letter-spacing: 0.4px; }
+  #toast {
+    position: absolute; top: 18px; left: 50%;
+    transform: translateX(-50%) translateY(-24px);
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    color: #fff; padding: 11px 26px; border-radius: 30px; font-size: 13px; font-weight: 700;
+    z-index: 20; opacity: 0; transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none; box-shadow: 0 8px 24px rgba(255,122,69,0.35); letter-spacing: 0.2px;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #event-banner {
+    position: absolute; top: 18px; left: 50%;
+    transform: translateX(-50%) translateY(-120px);
+    background: linear-gradient(135deg, var(--accent2), #f29b2e);
+    color: #fff; padding: 13px 30px; border-radius: 30px; font-size: 14px; font-weight: 700;
+    z-index: 18; transition: transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 8px 24px rgba(255,152,0,0.32); letter-spacing: 0.4px;
+  }
+  #event-banner.show { transform: translateX(-50%) translateY(0); }
+  .modal { position: absolute; inset: 0; background: rgba(60,50,35,0.35); display: flex; align-items: center; justify-content: center; z-index: 15; border-radius: var(--radius); padding: 16px; }
+  .modal-content {
+    background: var(--card); border-radius: 22px; padding: 26px;
+    max-width: 360px; width: 100%;
+    box-shadow: 0 22px 60px rgba(60,45,25,0.22); border: 1px solid var(--line);
+    animation: modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    max-height: 86%; overflow-y: auto;
+  }
+  @keyframes modalIn { from { opacity: 0; transform: scale(0.9) translateY(18px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .modal-content h3 { margin-bottom: 18px; font-size: 20px; color: var(--text); letter-spacing: 0.3px; display: flex; align-items: center; gap: 12px; }
+  .modal-content h3 .m-icon {
+    width: 48px; height: 48px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--card-light); box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .modal-content h3 .m-icon svg { width: 38px; height: 38px; }
+  .modal-content h3 .m-icon img { max-width: 88%; max-height: 88%; object-fit: contain; border-radius: 10px; }
+  .modal-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; gap: 12px; }
+  .modal-row .label { color: var(--text-dim); flex-shrink: 0; }
+  .modal-row .value { font-weight: 600; text-align: right; color: var(--text); }
+  .modal-actions { display: flex; gap: 8px; margin-top: 18px; justify-content: flex-end; flex-wrap: wrap; }
+  .price-edit { width: 72px; background: var(--card-light); border: 1px solid var(--line); color: var(--text); padding: 8px; border-radius: 10px; font-size: 14px; text-align: center; font-weight: 600; font-family: inherit; }
+  .upgrade-card {
+    background: var(--card); border-radius: 14px; padding: 15px; margin-bottom: 11px;
+    border: 1px solid var(--line); box-shadow: var(--shadow-sm); transition: all 0.2s ease;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .upgrade-card .up-ic { width: 42px; height: 42px; border-radius: 12px; background: var(--card-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 0 0 1px var(--line); }
+  .upgrade-card .up-ic svg { width: 26px; height: 26px; }
+  .upgrade-card:hover { border-color: rgba(201,138,27,0.35); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(90,70,40,0.12); }
+  .upgrade-card.purchased { border-color: rgba(31,158,110,0.4); background: rgba(31,158,110,0.05); }
+  .upgrade-card .up-body { flex: 1; min-width: 0; }
+  .upgrade-card .title { font-weight: 700; margin-bottom: 5px; font-size: 14.5px; display: flex; align-items: center; gap: 8px; }
+  .upgrade-card .desc { font-size: 12px; color: var(--text-dim); margin-bottom: 11px; line-height: 1.6; }
+  .achievement {
+    display: flex; align-items: center; gap: 12px; padding: 12px;
+    background: var(--card); border-radius: 12px; margin-bottom: 9px;
+    transition: all 0.25s ease; border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+  }
+  .achievement:hover { transform: translateY(-1px); }
+  .achievement .icon { font-size: 26px; width: 34px; text-align: center; }
+  .achievement .info { flex: 1; min-width: 0; }
+  .achievement .info .name { font-weight: 600; font-size: 13.5px; color: var(--text); }
+  .achievement .info .desc { font-size: 11.5px; color: var(--text-dim); }
+  .achievement.locked { opacity: 0.45; }
+  .achievement.unlocked { border: 1px solid rgba(201,138,27,0.4); background: linear-gradient(135deg, #fff9ec, var(--card)); }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 14px; }
+  .stat-box { background: var(--card); padding: 13px; border-radius: 12px; text-align: center; border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+  .stat-box .num { font-size: 21px; font-weight: 800; color: var(--accent-deep); }
+  .stat-box .label { font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+  #summary-overlay .summary-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; width: 100%; max-width: 420px; }
+  #summary-overlay .summary-stats .s-item { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 8px; box-shadow: var(--shadow-sm); }
+  #summary-overlay .summary-stats .s-item .num { font-size: 24px; font-weight: 800; }
+  #summary-overlay .summary-stats .s-item .lbl { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+  .star-row { display: flex; gap: 4px; justify-content: center; font-size: 28px; margin-bottom: 6px; }
+  .sum-line { font-size: 12px; color: var(--text-dim); margin-bottom: 22px; }
+  /* ===== v5.0 设置/事件/目标 UI ===== */
+  .gear-btn { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; font-size: 14px; cursor: pointer; transition: 0.2s; color: var(--text-dim); }
+  .gear-btn:hover { background: var(--card-light); transform: rotate(20deg); }
+  .settings-card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 26px 30px; width: min(380px, 90vw); box-shadow: var(--shadow-lg); animation: titleIn 0.3s ease; }
+  .settings-card h2 { font-size: 20px; margin-bottom: 18px; color: var(--text); }
+  .set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 14px; color: var(--text); }
+  .set-about { font-size: 11px; color: var(--text-dim); margin-top: 14px; text-align: center; }
+  .toggle-btn { width: 52px; height: 28px; border-radius: 999px; border: none; background: #d8d3c8; position: relative; cursor: pointer; transition: 0.25s; }
+  .toggle-btn::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: 0.25s; }
+  .toggle-btn.on { background: var(--accent); }
+  .toggle-btn.on::after { left: 27px; }
+  .btn-sm { padding: 7px 16px; font-size: 12.5px; border-radius: 10px; }
+  .btn.danger { background: var(--red); color: #fff; }
+  .help-text { font-size: 13px; line-height: 2; color: var(--text); text-align: left; }
+  .event-card { background: var(--card); border: 2px solid var(--accent); border-radius: 22px; padding: 28px 30px; width: min(420px, 90vw); box-shadow: var(--shadow-lg); text-align: center; animation: titleIn 0.3s ease; }
+  .event-card h2 { font-size: 22px; color: var(--accent-deep); margin: 10px 0 8px; }
+  .event-card p { font-size: 14px; color: var(--text-dim); line-height: 1.8; margin-bottom: 18px; }
+  .ev-ic { font-size: 42px; }
+  .ev-actions { display: flex; gap: 10px; }
+  .ev-actions .btn { flex: 1; padding: 12px 8px; font-size: 14px; }
+  .goal-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
+  .goal-card .g-title { font-size: 14px; color: var(--text); font-weight: 600; display: flex; justify-content: space-between; gap: 8px; }
+  .goal-card .g-reward { font-size: 12px; color: var(--accent-deep); white-space: nowrap; }
+  .goal-card .g-bar { height: 8px; background: #eee8db; border-radius: 99px; margin-top: 8px; overflow: hidden; }
+  .goal-card .g-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), #ffb347); border-radius: 99px; transition: width 0.4s; }
+  .goal-card.done { border-color: var(--green); background: linear-gradient(135deg, rgba(31,158,110,0.06), transparent); }
+  .goal-card.done .g-title { color: var(--green); }
+  .lvl-row { display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
+  .lvl-badge { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #ff9a3d, #e8622a); color: #fff; font-weight: 800; font-size: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(232,98,42,0.35); }
+  .lvl-info { flex: 1; }
+  .lvl-info .lvl-name { font-size: 13px; color: var(--text); font-weight: 600; }
+  .lvl-info .lvl-xp { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .lvl-bar { height: 7px; background: #eee8db; border-radius: 99px; margin-top: 5px; overflow: hidden; }
+  .lvl-bar i { display: block; height: 100%; background: linear-gradient(90deg, #e8622a, #ffb347); border-radius: 99px; }
+  .store-card { background: linear-gradient(135deg, #fff8ec, #fffdf6); border: 1.5px solid var(--line); border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; }
+  .store-card .s-name { font-size: 15px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .store-card .s-desc { font-size: 12px; color: var(--text-dim); margin: 6px 0 10px; }
+  .store-card .s-info { display: flex; gap: 14px; font-size: 11.5px; color: var(--text-dim); margin-bottom: 10px; flex-wrap: wrap; }
+  .store-card .s-info b { color: var(--text); }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  /* ===== 响应式修复：全屏浮层 + 手机布局 ===== */
+  #start-overlay, #gameover-overlay, #summary-overlay, .modal { position: fixed; }
+  #toast, #event-banner { position: fixed; top: calc(14px + env(safe-area-inset-top)); }
+  #event-banner { top: calc(14px + env(safe-area-inset-top)); transform: translateX(-50%) translateY(-140px); }
+  #event-banner.show { transform: translateX(-50%) translateY(0); }
+  #toast { top: calc(14px + env(safe-area-inset-top)); }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+  @media (max-width: 820px) {
+    #app { gap: 7px; padding: 7px; }
+    #topbar {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 4px 6px; padding: 8px 10px; justify-items: stretch;
+    }
+    #topbar .stat { justify-content: flex-start; padding: 3px 4px; gap: 5px; }
+    #topbar .stat .label { font-size: 9px; letter-spacing: 0.2px; }
+    #topbar .stat .value { font-size: 13.5px; }
+    #topbar .stat-icon { width: 15px; height: 15px; }
+    #topbar .stat-icon svg { width: 15px; height: 15px; }
+    #rep-title { justify-self: center; padding: 3px 10px; font-size: 10.5px; }
+    #main { gap: 7px; overflow: hidden; }
+    #canvas-wrap { height: auto; aspect-ratio: 800 / 500; width: 100%; min-height: 210px; max-height: 50vh; }
+    canvas { max-width: 100%; max-height: 100%; }
+    #side { flex: 1; min-height: 0; }
+    #tab-content { padding: 10px; }
+    #bottombar { padding: 7px 10px; gap: 8px; }
+    .speed-btn { min-width: 40px; padding: 8px 11px; font-size: 12px; }
+    .hint-text { font-size: 10px; line-height: 1.5; }
+    .overlay { padding: 14px; }
+    .overlay h1 { font-size: 30px; letter-spacing: 2px; }
+    .logo-wrap svg { width: 84px; height: 84px; }
+    .overlay .subtitle { font-size: 11px; letter-spacing: 2px; margin-bottom: 12px; }
+    .overlay p { font-size: 12.5px; margin-bottom: 14px; line-height: 1.7; }
+    .howto { grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; max-width: 520px; }
+    .howto-item { padding: 10px; font-size: 11px; }
+    .howto-item .ht-ic { width: 30px; height: 30px; margin-bottom: 6px; }
+    .howto-item .ht-ic svg { width: 19px; height: 19px; }
+    .btn-big { width: 100%; max-width: 320px; padding: 14px 20px; font-size: 16px; }
+    .modal { padding: 10px; }
+    .modal-content { padding: 18px; max-width: 92vw; max-height: 88%; }
+    .modal-content h3 { font-size: 18px; }
+    .summary-stats-wrap { gap: 8px; }
+    .star-row { font-size: 24px; }
+    #summary-overlay .summary-stats { gap: 8px; }
+    .stat-box { padding: 10px; }
+    .stat-box .num { font-size: 18px; }
+    .item-row { padding: 10px 12px; }
+    .item-icon { width: 40px; height: 40px; }
+    .item-icon svg { width: 32px; height: 32px; }
+    .upgrade-card { padding: 12px; }
+    #gameover-overlay > div[style] { flex-direction: column; gap: 14px; padding: 16px 24px; }
+  }
+  @media (max-width: 420px) {
+    #topbar .stat .label { display: none; }
+    #topbar .stat { justify-content: center; }
+    .howto-item b { font-size: 12px; }
+    .overlay .foot-hint { font-size: 10px; }
+  }
+  /* 矮屏（小屏手机/浏览器栏挤压）保证单屏可见 */
+  @media (max-height: 760px) and (max-width: 900px) {
+    #app { gap: 5px; padding: 5px; }
+    #canvas-wrap { max-height: 38vh; min-height: 180px; }
+    #topbar { padding: 5px 8px; gap: 3px 6px; }
+    #topbar .stat { padding: 2px 4px; }
+    #topbar .stat .value { font-size: 12.5px; }
+    #topbar .stat-icon { width: 13px; height: 13px; }
+    #topbar .stat-icon svg { width: 13px; height: 13px; }
+    #bottombar { padding: 5px 8px; }
+    .speed-btn { padding: 6px 9px; font-size: 11px; min-width: 34px; }
+    .tab { padding: 7px 2px; font-size: 11px; }
+    .overlay { padding: 8px; }
+    .logo-wrap svg { width: 60px; height: 60px; }
+    .overlay h1 { font-size: 24px; letter-spacing: 2px; margin-bottom: 2px; }
+    .overlay .subtitle { font-size: 10px; margin-bottom: 6px; }
+    .overlay p { font-size: 11px; margin-bottom: 8px; line-height: 1.6; }
+    .howto { gap: 6px; margin-bottom: 8px; }
+    .howto-item { padding: 7px; font-size: 10px; }
+    .howto-item .ht-ic { width: 24px; height: 24px; margin-bottom: 4px; }
+    .howto-item .ht-ic svg { width: 15px; height: 15px; }
+    .btn-big { padding: 10px 14px; font-size: 14px; }
+    .modal-content { padding: 14px; }
+    .modal-content h3 { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div class="stat">
+      <span class="stat-icon" data-ic="cal" data-color="#3b8fd9"></span>
+      <div class="stat-info">
+        <span class="label">营业日</span>
+        <span class="value blue-text" id="day-num">第 1 天</span>
+      </div>
+    </div>
+    <div class="stat">
+      <span class="stat-icon" data-ic="clock" data-color="#e8622a"></span>
+      <div class="stat-info">
+        <span class="label">时间</span>
+        <span class="value" id="time-display">06:00</span>
+      </div>
+    </div>
+    <div class="stat">
+      <span class="stat-icon" data-ic="cash" data-color="#c98a1b"></span>
+      <div class="stat-info">
+        <span class="label">现金</span>
+        <span class="value gold-text" id="cash-display">¥2,000</span>
+      </div>
+    </div>
+    <div class="stat">
+      <span class="stat-icon" data-ic="income" data-color="#1f9e6e"></span>
+      <div class="stat-info">
+        <span class="label">今日收入</span>
+        <span class="value green-text" id="today-income">¥0</span>
+      </div>
+    </div>
+    <div class="stat">
+      <span class="stat-icon" data-ic="rep" data-color="#ff7a45"></span>
+      <div class="stat-info">
+        <span class="label">声望</span>
+        <span class="value accent-text" id="reputation">★ 3.0</span>
+      </div>
+    </div>
+    <span id="rep-title">社区小店</span>
+  </div>
+  <div id="main">
+    <div id="canvas-wrap">
+      <canvas id="game-canvas" width="800" height="500"></canvas>
+      <div id="toast"></div>
+      <div id="event-banner"></div>
+      <div class="overlay" id="start-overlay">
+        <div class="logo-wrap" id="start-logo"></div>
+        <h1>小小便利店<span class="dot">.</span></h1>
+        <div class="subtitle">MINI MART · 模拟经营<span class="ver">v5.0</span></div>
+        <p>经营你的 24 小时便利店。进货、定价、雇人、扩建——把小店做成连锁帝国！</p>
+        <div class="howto">
+          <div class="howto-item" onclick="startGame()"><div class="ht-ic" data-ic="tabStock" data-color="#e8622a"></div><b>货架管理</b>点击货架或商品查看详情、补货、改价</div>
+          <div class="howto-item" onclick="startGame()"><div class="ht-ic" data-ic="tabStaff" data-color="#1f9e6e"></div><b>顾客经营</b>学生/上班族各有偏好，满意度影响口碑</div>
+          <div class="howto-item" onclick="startGame()"><div class="ht-ic" data-ic="tabUpgrade" data-color="#3b8fd9"></div><b>员工升级</b>雇佣员工提效，扩建店铺解锁更多货架</div>
+          <div class="howto-item" onclick="startGame()"><div class="ht-ic" data-ic="goal" data-color="#c98a1b"></div><b>目标挑战</b>每日 3 个目标 + 随机事件，决策改变命运</div>
+        </div>
+        <button class="btn btn-big" onclick="startGame()">开始营业</button>
+        <div class="foot-hint">⌨️ 空格暂停 · 1/2/4 切换速度 · 自动存档</div>
+      </div>
+      <div class="overlay hidden" id="gameover-overlay">
+        <h1 style="color:var(--red)">店铺倒闭了</h1>
+        <div class="subtitle">经营失败</div>
+        <p id="gameover-reason">现金耗尽，经营失败。</p>
+        <div style="background:var(--card);padding:22px 44px;border-radius:20px;margin-bottom:26px;display:flex;gap:44px;border:1px solid var(--line);box-shadow:var(--shadow-sm)">
+          <div><div style="font-size:30px;font-weight:800" class="gold-text" id="final-days">0</div><div style="font-size:12px;color:var(--text-dim)">营业天数</div></div>
+          <div><div style="font-size:30px;font-weight:800" class="green-text" id="final-income">¥0</div><div style="font-size:12px;color:var(--text-dim)">总营收</div></div>
+          <div><div style="font-size:30px;font-weight:800" class="blue-text" id="final-customers">0</div><div style="font-size:12px;color:var(--text-dim)">服务顾客</div></div>
+        </div>
+        <button class="btn" style="padding:16px 56px;font-size:18px" onclick="restartGame()">重新开始</button>
+      </div>
+      <div class="overlay hidden" id="summary-overlay">
+        <h1 style="color:var(--gold)">打烊总结</h1>
+        <div class="subtitle" id="summary-day">第 1 天结束</div>
+        <div class="star-row" id="summary-stars"></div>
+        <div class="summary-stats">
+          <div class="s-item"><div class="num gold-text" id="sum-income">¥0</div><div class="lbl">今日收入</div></div>
+          <div class="s-item"><div class="num green-text" id="sum-customers">0</div><div class="lbl">服务顾客</div></div>
+          <div class="s-item"><div class="num blue-text" id="sum-rep">★0</div><div class="lbl">声望变化</div></div>
+        </div>
+        <div class="sum-line" id="sum-wages"></div>
+        <div class="sum-line" id="sum-costs"></div>
+        <div class="sum-line" id="sum-xp"></div>
+        <button class="btn" style="padding:14px 48px;font-size:16px" onclick="continueNextDay()">开始新的一天</button>
+      </div>
+      <div class="modal hidden" id="modal">
+        <div class="modal-content" id="modal-content"></div>
+      </div>
+      <div class="overlay hidden" id="event-modal">
+        <div class="event-card">
+          <div class="ev-ic" id="ev-icon">⚡</div>
+          <h2 id="ev-title">突发事件</h2>
+          <p id="ev-desc"></p>
+          <div class="ev-actions">
+            <button class="btn" id="ev-a" onclick="chooseEvent('a')"></button>
+            <button class="btn" id="ev-b" onclick="chooseEvent('b')"></button>
+          </div>
+        </div>
+      </div>
+      <div class="overlay hidden" id="settings-modal">
+        <div class="settings-card">
+          <h2>⚙️ 设置</h2>
+          <div class="set-row"><span>音效</span><button class="toggle-btn" id="set-sfx" onclick="toggleSetting('sfx')"></button></div>
+          <div class="set-row"><span>背景音乐</span><button class="toggle-btn" id="set-music" onclick="toggleSetting('music')"></button></div>
+          <div class="set-row"><span>操作说明</span><button class="btn btn-sm" onclick="showHelp()">查看</button></div>
+          <div class="set-row"><span>重置存档</span><button class="btn btn-sm danger" onclick="resetSaveConfirm()">重置</button></div>
+          <div class="set-about">小小便利店 v5.0 · 原创矢量美术 · 可离线游玩</div>
+          <button class="btn" style="margin-top:12px" onclick="$('settings-modal').classList.add('hidden');G.paused=false;">关闭</button>
+        </div>
+      </div>
+      <div class="overlay hidden" id="help-modal">
+        <div class="settings-card">
+          <h2>📖 操作说明</h2>
+          <div class="help-text">
+            <b>核心循环：</b>补货 → 定价 → 接待顾客 → 打烊结算<br>
+            <b>定价技巧：</b>进价 ×2.2 附近需求最好；太贵顾客不买<br>
+            <b>顾客偏好：</b>学生爱零食、上班族爱咖啡、老主顾爱日用品<br>
+            <b>扩建店铺：</b>升级页购买扩建，货架更多、客流更大，租金也涨<br>
+            <b>贷款周转：</b>目标页可借款应急，每天自动还 22%<br>
+            <b>快捷键：</b>空格暂停 · 1/2/4 切换速度
+          </div>
+          <button class="btn" style="margin-top:12px" onclick="$('help-modal').classList.add('hidden')">关闭</button>
+        </div>
+      </div>
+    </div>
+    <div id="side">
+      <div id="tabs">
+        <div class="tab active" data-tab="stock"><i class="tab-ic" data-ic="tabStock"></i>库存</div>
+        <div class="tab" data-tab="staff"><i class="tab-ic" data-ic="tabStaff"></i>员工</div>
+        <div class="tab" data-tab="upgrade"><i class="tab-ic" data-ic="tabUpgrade"></i>升级</div>
+        <div class="tab" data-tab="goal"><i class="tab-ic" data-ic="goal"></i>目标</div>
+        <div class="tab" data-tab="stats"><i class="tab-ic" data-ic="tabStats"></i>成就</div>
+      </div>
+      <div id="tab-content"></div>
+    </div>
+  </div>
+  <div id="bottombar">
+    <div class="speed-controls">
+      <button class="speed-btn" onclick="setSpeed(0)" title="暂停">⏸</button>
+      <button class="speed-btn active" onclick="setSpeed(1)">1x</button>
+      <button class="speed-btn" onclick="setSpeed(2)">2x</button>
+      <button class="speed-btn" onclick="setSpeed(4)">4x</button>
+    </div>
+    <div class="hint-text">空格暂停 · 点击货架/顾客查看详情</div>
+    <button class="gear-btn" onclick="openSettings()" title="设置">⚙️</button>
+  </div>
+</div>
+<script>/* ================= 原创插画资产（矢量绘制，全内置） ================= */
+const ART_PRODUCTS = {
+  water: { vb:'0 0 64 64', body:"<path d='M25 5h14v11h-14z' fill='#2f6db3'/><rect x='24' y='14' width='16' height='8' fill='#dfeffa'/><path d='M21 20h22l-2.2 37a5 5 0 0 1-5 4.5H28.2a5 5 0 0 1-5-4.5z' fill='#3b8fd9'/><rect x='22' y='37' width='20' height='9' rx='1.5' fill='#ffffff' opacity='0.92'/><path d='M25 41.5l3.5-6 3 4.5 4-7 3.5 8.5z' fill='#3b8fd9'/><rect x='24' y='22' width='16' height='4' rx='2' fill='#ffffff' opacity='0.4'/>" },
+  noodle: { vb:'0 0 64 64', body:"<ellipse cx='32' cy='17' rx='20' ry='6.5' fill='#ffffff' stroke='#e8e2d8' stroke-width='1.5'/><path d='M12 17h40l-4.5 33a7 7 0 0 1-6.8 5.5H23.3a7 7 0 0 1-6.8-5.5z' fill='#e8604f'/><path d='M15 17c5 7 29 7 34 0' stroke='#f9c74f' stroke-width='6' fill='none' stroke-linecap='round'/><path d='M44 7l7 9-4 5' stroke='#a1887f' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/><path d='M18 21l2 26' stroke='#ffffff' stroke-width='2' opacity='0.35'/><path d='M46 21l-2 26' stroke='#ffffff' stroke-width='2' opacity='0.35'/>" },
+  chips: { vb:'0 0 64 64', body:"<path d='M16 7h32l-4 47a6 6 0 0 1-6 5H26a6 6 0 0 1-6-5z' fill='#ffc93c'/><path d='M14 7h36v7H14z' fill='#e8622a'/><rect x='21' y='25' width='22' height='13' rx='3' fill='#e8622a'/><path d='M25 29l14 5M25 34l14-5' stroke='#ffffff' stroke-width='2.2' stroke-linecap='round'/><path d='M19 14l3 6' stroke='#ffffff' stroke-width='2' opacity='0.55' stroke-linecap='round'/><path d='M26 8l2 4' stroke='#ffffff' stroke-width='2' opacity='0.55' stroke-linecap='round'/>" },
+  cola: { vb:'0 0 64 64', body:"<rect x='21' y='5' width='22' height='9' rx='2.5' fill='#d5dbe4'/><path d='M20 14h24l-3 42a6 6 0 0 1-6 5H29a6 6 0 0 1-6-5z' fill='#e8604f'/><rect x='22' y='27' width='20' height='13' rx='2' fill='#ffffff' opacity='0.92'/><path d='M26 33.5h12' stroke='#e8604f' stroke-width='3.5' stroke-linecap='round'/><rect x='23' y='18' width='18' height='5' rx='2' fill='#ffffff' opacity='0.35'/><path d='M31 9h2' stroke='#ffffff' stroke-width='2'/>" },
+  riceball: { vb:'0 0 64 64', body:"<path d='M32 7l22 35a8 8 0 0 1-6.8 12H16.8A8 8 0 0 1 10 42z' fill='#fdf8ee'/><path d='M14 37l18-28 18 28-9-5-9 5-9-5z' fill='#2f3d46' opacity='0.88'/><circle cx='32' cy='50' r='2.2' fill='#f9a825'/><circle cx='24' cy='43' r='1.6' fill='#f9a825'/><circle cx='40' cy='43' r='1.6' fill='#f9a825'/><path d='M23 16l6 4' stroke='#f9a825' stroke-width='2.5' stroke-linecap='round'/>" },
+  magazine: { vb:'0 0 64 64', body:"<path d='M32 13c-5.5-4-14.5-3.5-19-1.5v42c4.5-2 13.5-2.5 19 1.5 5.5-4 14.5-3.5 19-1.5v-42c-4.5-2-13.5-2.5-19 1.5z' fill='#ffffff' stroke='#e0d8cc' stroke-width='2'/><path d='M15 15h15v36H15z' fill='#7c6fd0'/><path d='M34 15h15v36H34z' fill='#3b8fd9'/><rect x='18' y='18' width='9' height='4.5' rx='1' fill='#ffffff' opacity='0.85'/><rect x='37' y='18' width='9' height='4.5' rx='1' fill='#ffffff' opacity='0.85'/><path d='M18 27l9-2M18 32l9-2M18 37l9-2' stroke='#ffffff' stroke-width='2' opacity='0.5' stroke-linecap='round'/><path d='M37 27l9-2M37 32l9-2M37 37l9-2' stroke='#ffffff' stroke-width='2' opacity='0.5' stroke-linecap='round'/>" },
+  coffee: { vb:'0 0 64 64', body:"<rect x='17' y='7' width='30' height='9' rx='2.5' fill='#ffffff' stroke='#e6e0d5' stroke-width='1.5'/><rect x='30' y='11' width='4' height='4' rx='1' fill='#6d4c41'/><path d='M13 18h38l-3 30a6.5 6.5 0 0 1-6.4 5.5H22.4a6.5 6.5 0 0 1-6.4-5.5z' fill='#8d6e63'/><rect x='14' y='21' width='36' height='6' rx='2' fill='#a1887f'/><path d='M17 28l2 16' stroke='#ffffff' stroke-width='2.5' opacity='0.35' stroke-linecap='round'/><path d='M17 8l2 3M25 8l2 3' stroke='#ffffff' stroke-width='2' opacity='0.7' stroke-linecap='round'/>" },
+  cigarette: { vb:'0 0 64 64', body:"<rect x='11' y='14' width='42' height='32' rx='4' fill='#f2f5f7' stroke='#d7dee4' stroke-width='1.5'/><rect x='11' y='21' width='42' height='8' rx='2' fill='#e8604f'/><rect x='18' y='33' width='28' height='5' rx='1' fill='#e6cfa8'/><circle cx='26' cy='40.5' r='1.6' fill='#e6cfa8'/><circle cx='34' cy='40.5' r='1.6' fill='#e6cfa8'/><path d='M28 33l-2 10M36 33l-2 10' stroke='#cfb27e' stroke-width='1.5'/><rect x='26' y='43' width='5' height='4' rx='1' fill='#a1887f'/><rect x='33' y='43' width='5' height='4' rx='1' fill='#a1887f'/>" },
+  bread: { vb:'0 0 64 64', body:"<path d='M12 24h40l-5 17a11 11 0 0 1-9.5 6.5H26.5A11 11 0 0 1 17 41z' fill='#d99b52'/><path d='M12 24h40' stroke='#f7d9a8' stroke-width='4' stroke-linecap='round'/><path d='M19 30h26' stroke='#f7d9a8' stroke-width='3' opacity='0.7' stroke-linecap='round'/><path d='M24 44l3-4M32 44l3-4M40 44l3-4' stroke='#c97e33' stroke-width='2' stroke-linecap='round'/>" },
+  icecream: { vb:'0 0 64 64', body:"<path d='M25 57l7-19 7 19z' fill='#e8a33d' stroke='#c9822a' stroke-width='1.5' stroke-linejoin='round'/><circle cx='27' cy='19' r='8.5' fill='#ff9eb5'/><circle cx='40' cy='21' r='8.5' fill='#bfe3a8'/><circle cx='41' cy='10' r='2.6' fill='#e05b4f'/><path d='M22 16l4-3M36 16l4-3' stroke='#ffffff' stroke-width='1.6' opacity='0.8' stroke-linecap='round'/>" },
+  tissue: { vb:'0 0 64 64', body:"<rect x='13' y='21' width='38' height='34' rx='5' fill='#ffffff' stroke='#d7dee4' stroke-width='1.5'/><path d='M17 21h30l4-9H13z' fill='#7fd1c8'/><path d='M19 35c5-4 21-4 26 0l-4 13H23z' fill='#eaf7f5'/><path d='M26 35l3-6M38 35l3-6' stroke='#7fd1c8' stroke-width='1.6' stroke-linecap='round'/>" },
+  oden: { vb:'0 0 64 64', body:"<path d='M12 34h40l-4 16a8 8 0 0 1-7.5 6H23.5A8 8 0 0 1 16 50z' fill='#e8604f'/><ellipse cx='32' cy='34' rx='20' ry='5.5' fill='#f9c74f'/><path d='M24 33v-13M40 33V9' stroke='#8d6e63' stroke-width='2' stroke-linecap='round'/><circle cx='24' cy='17' r='4' fill='#f5a623'/><circle cx='40' cy='13' r='4' fill='#4caf7d'/><circle cx='40' cy='22' r='4' fill='#d98f3e'/><path d='M16 42l2 6M48 42l-2 6' stroke='#c2541f' stroke-width='2' opacity='0.6' stroke-linecap='round'/>" },
+};
+const ART_UI = {
+  cal: { vb:'0 0 24 24', body:"<rect x='3' y='5' width='18' height='16' rx='3'/><path d='M3 10h18M8 3v4M16 3v4'/>" },
+  clock: { vb:'0 0 24 24', body:"<circle cx='12' cy='12' r='9'/><path d='M12 7v5l3.5 2'/>" },
+  cash: { vb:'0 0 24 24', body:"<circle cx='12' cy='12' r='9'/><path d='M9 9.5h6M9 12.5h6M12 8v8'/>" },
+  income: { vb:'0 0 24 24', body:"<path d='M4 20h16'/><rect x='6' y='12' width='3' height='8' fill='currentColor' stroke='none'/><rect x='11' y='8' width='3' height='12' fill='currentColor' stroke='none'/><rect x='16' y='4' width='3' height='16' fill='currentColor' stroke='none'/>" },
+  rep: { vb:'0 0 24 24', body:"<path d='M12 3l2.7 5.6 6.3.8-4.6 4.3 1.2 6.1L12 16.8 6.4 19.8l1.2-6.1L3 9.4l6.3-.8z'/>" },
+  tabStock: { vb:'0 0 24 24', body:"<path d='M4 5h16M4 12h16M4 19h16'/><path d='M7 3v4M17 3v4M7 10v4M17 10v4M7 17v4M17 17v4' stroke-width='1.6'/>" },
+  tabStaff: { vb:'0 0 24 24', body:"<circle cx='12' cy='8' r='4'/><path d='M5 21c1.5-4.5 6-6 7-6s5.5 1.5 7 6'/>" },
+  tabUpgrade: { vb:'0 0 24 24', body:"<path d='M12 3c3 2 5 5 5 9l-5 8-5-8c0-4 2-7 5-9z'/><circle cx='12' cy='11' r='2' fill='currentColor' stroke='none'/><path d='M9.5 14.5L6 20M14.5 14.5L18 20M12 15v5'/>" },
+  tabStats: { vb:'0 0 24 24', body:"<path d='M7 4h10v6a5 5 0 0 1-10 0z'/><path d='M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 15v4M8 21h8M10 21c0-1.5.9-2 2-2s2 .5 2 2'/>" },
+  cashier: { vb:'0 0 24 24', body:"<rect x='4' y='7' width='16' height='12' rx='2'/><rect x='4' y='4' width='16' height='3' fill='currentColor' stroke='none'/><path d='M8 11h8M8 14h5' stroke-width='1.6'/>" },
+  stocker: { vb:'0 0 24 24', body:"<path d='M4 9l8-5 8 5v10l-8 5-8-5z'/><path d='M4 9l8 5 8-5M12 14v10'/>" },
+  janitor: { vb:'0 0 24 24', body:"<path d='M6 20l9-9'/><path d='M14 4l6 6-3 3-6-6z' fill='currentColor' stroke='none'/><path d='M12 6l2 2'/>" },
+  shelf: { vb:'0 0 24 24', body:"<path d='M4 6h16M4 12h16M4 18h16'/><path d='M7 4v4M17 4v4M7 10v4M17 10v4M7 16v4M17 16v4' stroke-width='1.6'/>" },
+  auto: { vb:'0 0 24 24', body:"<rect x='5' y='9' width='14' height='10' rx='3'/><circle cx='9.5' cy='13' r='1.2' fill='currentColor' stroke='none'/><circle cx='14.5' cy='13' r='1.2' fill='currentColor' stroke='none'/><path d='M12 9V6M9 4h6'/>" },
+  decor: { vb:'0 0 24 24', body:"<circle cx='12' cy='12' r='9'/><circle cx='9' cy='9' r='1.4' fill='currentColor' stroke='none'/><circle cx='15' cy='9' r='1.4' fill='currentColor' stroke='none'/><circle cx='8' cy='14' r='1.4' fill='currentColor' stroke='none'/><path d='M17 13a2 2 0 0 1 2 2 3 3 0 0 1-3 3h-1'/>" },
+  ad: { vb:'0 0 24 24', body:"<path d='M4 10v4h3l5 4V6L7 10z' fill='currentColor' stroke='none'/><path d='M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11'/>" },
+  cig2: { vb:'0 0 24 24', body:"<rect x='3' y='9' width='13' height='7' rx='1.5'/><path d='M16 12h4v5a2 2 0 0 1-2 2h0a2 2 0 0 1-2-2z' fill='currentColor' stroke='none'/>" },
+  fridge: { vb:'0 0 24 24', body:"<rect x='5' y='3' width='14' height='18' rx='2'/><path d='M12 3v18M5 9h14'/><path d='M12 12l-1.8-1.3M12 12l1.8-1.3M12 12V9.5' stroke-width='1.5'/>" },
+  microwave: { vb:'0 0 24 24', body:"<rect x='4' y='7' width='16' height='11' rx='2'/><rect x='6' y='9' width='9' height='7' fill='currentColor' opacity='0.25' stroke='none'/><path d='M17.5 10v5'/>" },
+  goal: { vb:'0 0 24 24', body:"<circle cx='12' cy='12' r='9'/><circle cx='12' cy='12' r='4.5'/><circle cx='12' cy='12' r='1.4' fill='currentColor' stroke='none'/><path d='M12 6V3M12 21v-3M6 12H3M21 12h-3'/>" },
+  settings: { vb:'0 0 24 24', body:"<path d='M4 7h9M19 7h1M4 17h1M10 17h10'/><circle cx='16' cy='7' r='2.5'/><circle cx='7' cy='17' r='2.5'/>" },
+  shop: { vb:'0 0 24 24', body:"<path d='M4 10l8-5 8 5v11H4z'/><path d='M4 10h16'/><path d='M8 10v11M12 10v11M16 10v11'/><path d='M9 21h6'/>" },
+  coin: { vb:'0 0 24 24', body:"<circle cx='12' cy='12' r='9'/><path d='M12 7.5v9M8.5 9.5h7'/>" },
+};
+const ART_LOGO = "<svg viewBox='0 0 120 120'><rect x='14' y='36' width='92' height='72' rx='9' fill='#fdf6ea' stroke='#ead9bd' stroke-width='2.5'/><path d='M10 42h100l-7 14H17z' fill='#ff7a45'/><path d='M10 42h100' stroke='#e8622a' stroke-width='2'/><rect x='30' y='18' width='60' height='20' rx='5' fill='#e8622a'/><rect x='30' y='18' width='60' height='20' rx='5' fill='none' stroke='#c2541f' stroke-width='1.5'/><text x='60' y='32' text-anchor='middle' font-size='12' font-weight='700' fill='#ffffff' font-family='sans-serif'>便利店</text><circle cx='36' cy='42' r='1.8' fill='#ffd9b3'/><circle cx='60' cy='42' r='1.8' fill='#ffd9b3'/><circle cx='84' cy='42' r='1.8' fill='#ffd9b3'/><rect x='22' y='56' width='32' height='42' rx='5' fill='#cfe8f7' stroke='#bcd7e8' stroke-width='2'/><path d='M38 68v18M30 77h16' stroke='#ffffff' stroke-width='2'/><rect x='66' y='56' width='32' height='42' rx='5' fill='#cfe8f7' stroke='#bcd7e8' stroke-width='2'/><path d='M82 68v18M74 77h16' stroke='#ffffff' stroke-width='2'/><rect x='46' y='98' width='28' height='13' rx='4' fill='#3b8fd9'/><rect x='56' y='101' width='10' height='4' rx='2' fill='#2f6db3'/><rect x='17' y='104' width='15' height='7' rx='3' fill='#2e7d32'/><circle cx='25' cy='107' r='3.5' fill='#43a047'/><rect x='88' y='104' width='15' height='7' rx='3' fill='#2e7d32'/><circle cx='96' cy='107' r='3.5' fill='#43a047'/></svg>";
+function svgInline(art,w,color){
+  return '<svg viewBox="'+art.vb+'" style="width:'+(w||28)+'px;height:'+(w||28)+'px'+(color?';color:'+color:'')+'">'+art.body+'</svg>';
+}
+function svgData(art){
+  const full='<svg xmlns="http://www.w3.org/2000/svg" viewBox="'+art.vb+'">'+art.body+'</svg>';
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(full);
+}
+const _imgCache={};
+function productImg(pid){
+  const art=ART_PRODUCTS[pid];
+  if(!art) return null;
+  if(!_imgCache[pid]){ const im=new Image(); im.src=svgData(art); _imgCache[pid]=im; }
+  return _imgCache[pid];
+}
+/* ===== AI 插画素材（assets/ 相对路径，本地自包含） ===== */
+const IMG={};
+const IMG_LIST={
+  bg:'assets/bg.jpg',
+  water:'assets/water.png', riceball:'assets/riceball.png', noodle:'assets/noodle.png',
+  chips:'assets/chips.png', cola:'assets/cola.png', coffee:'assets/coffee.png', magazine:'assets/magazine.png',
+  customer1:'assets/customer1.png', customer2:'assets/customer2.png', customer3:'assets/customer3.png',
+  customer4:'assets/customer4.png', customer5:'assets/customer5.png',
+  cashier:'assets/cashier.png', stocker:'assets/stocker.png', cleaner:'assets/cleaner.png'
+};
+function loadImages(cb){
+  const keys=Object.keys(IMG_LIST); let left=keys.length;
+  keys.forEach(k=>{
+    const im=new Image();
+    im.onload=()=>{ IMG[k]=im; if(--left===0) cb&&cb(); };
+    im.onerror=()=>{ if(--left===0) cb&&cb(); };
+    im.src=IMG_LIST[k];
+  });
+}
+function imgReady(k){ return !!(IMG[k]&&IMG[k].complete&&IMG[k].naturalWidth>0); }
+function imgTag(k,w,h){
+  if(IMG_LIST[k]){
+    return '<img src="assets/'+k+'.png" alt="" style="width:'+(w||36)+'px;height:'+(h||w||36)+'px;object-fit:contain;display:block">';
+  }
+  const art=ART_PRODUCTS[k];
+  return art?svgInline(art,w):'';
+}
+function drawProductImg(ctx,pid,x,y,w,h,fallbackIcon){
+  if(imgReady(pid)){ ctx.drawImage(IMG[pid],x,y,w,h); return; }
+  const img=productImg(pid);
+  if(img && img.complete && img.naturalWidth>0){ ctx.drawImage(img,x,y,w,h); return; }
+  if(fallbackIcon){ ctx.font=Math.min(w,h)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(fallbackIcon,x+w/2,y+h/2); }
+}
+function initIcons(){
+  document.querySelectorAll('[data-ic]').forEach(function(el){
+    const key=el.getAttribute('data-ic');
+    const color=el.getAttribute('data-color')||'';
+    const art=ART_UI[key];
+    if(art) el.innerHTML=svgInline(art,color?22:16,color);
+    if(color) el.style.background=color+'1f';
+  });
+  const logoEl=$('start-logo');
+  if(logoEl) logoEl.innerHTML=ART_LOGO;
+}
+/* ================= 数据定义 ================= */
+const PRODUCTS = [
+  { id:'water',    name:'矿泉水', icon:'💧', cost:0.5, price:1.5, stock:20, demand:1.0, color:'#3b8fd9', bg:'rgba(59,143,217,0.10)', desc:'解渴必备，畅销单品', maxStock:60 },
+  { id:'noodle',   name:'泡面',   icon:'🍜', cost:1.5, price:4.0, stock:15, demand:0.9, color:'#f29b2e', bg:'rgba(242,155,46,0.10)', desc:'夜宵之王，年轻人最爱', maxStock:45 },
+  { id:'chips',    name:'薯片',   icon:'🍟', cost:1.0, price:3.0, stock:15, demand:0.7, color:'#e8b320', bg:'rgba(232,179,32,0.10)', desc:'休闲零食，利润可观', maxStock:45 },
+  { id:'cola',     name:'可乐',   icon:'🥤', cost:1.0, price:3.0, stock:20, demand:0.8, color:'#e05b4f', bg:'rgba(224,91,79,0.10)', desc:'碳酸饮料，销量稳定', maxStock:60 },
+  { id:'riceball', name:'饭团',   icon:'🍙', cost:1.5, price:4.5, stock:10, demand:0.95,color:'#6b7280', bg:'rgba(107,114,128,0.10)', desc:'新鲜便当，早餐热门', maxStock:35 },
+  { id:'magazine', name:'杂志',   icon:'📖', cost:2.0, price:6.0, stock:5,  demand:0.3, color:'#7c6fd0', bg:'rgba(124,111,208,0.10)', desc:'潮流杂志，长尾消费', maxStock:25 },
+  { id:'coffee',   name:'咖啡',   icon:'☕', cost:2.0, price:6.0, stock:8,  demand:0.6, color:'#8d6e63', bg:'rgba(141,110,99,0.12)', desc:'提神醒脑，上班族刚需', maxStock:30 },
+  { id:'cigarette',name:'香烟',   icon:'🚬', cost:8.0, price:15.0,stock:0,  demand:0.4, color:'#78909c', bg:'rgba(120,144,156,0.10)', locked:true, desc:'高利润，需许可证', maxStock:25 },
+  { id:'bread',     name:'面包',   icon:'🍞', cost:1.2, price:3.5, stock:12, demand:0.85,color:'#d99b52', bg:'rgba(217,155,82,0.12)', desc:'现烤出炉，早餐热销', maxStock:40 },
+  { id:'icecream',  name:'冰淇淋', icon:'🍦', cost:1.5, price:5.0, stock:0,  demand:0.65,color:'#ff9eb5', bg:'rgba(255,158,181,0.12)', locked:true, unlockBy:'fridge', desc:'夏日顶流，需冷藏柜', maxStock:30 },
+  { id:'oden',      name:'关东煮', icon:'🍢', cost:1.8, price:5.5, stock:0,  demand:0.7, color:'#e8604f', bg:'rgba(232,96,79,0.12)', locked:true, unlockBy:'microwave', desc:'暖胃神器，需微波炉', maxStock:30 },
+  { id:'tissue',    name:'纸巾',   icon:'🧻', cost:1.0, price:3.0, stock:12, demand:0.5, color:'#7fd1c8', bg:'rgba(127,209,200,0.12)', desc:'生活必需，细水长流', maxStock:50 },
+];
+const STAFF_TYPES = [
+  { id:'cashier', name:'收银员', icon:'💳', wage:50, desc:'结账速度 +150%', count:0 },
+  { id:'stocker', name:'理货员', icon:'📦', wage:40, desc:'每天自动补货', count:0 },
+  { id:'janitor', name:'清洁工', icon:'🧹', wage:35, desc:'声望 +0.2/人', count:0 },
+];
+const UPGRADES = [
+  { id:'shelf1', name:'货架扩容 I',  icon:'📚', desc:'商品库存上限 +15', cost:500,  bought:false },
+  { id:'shelf2', name:'货架扩容 II', icon:'📚', desc:'商品库存上限 +25', cost:1500, bought:false, req:'shelf1' },
+  { id:'auto',   name:'自动补货机',  icon:'🤖', desc:'每天自动补一次货', cost:800,  bought:false },
+  { id:'decor',  name:'精美装修',    icon:'🎨', desc:'声望 +0.5，客流提升', cost:1000, bought:false },
+  { id:'ad',     name:'广告投放',    icon:'📢', desc:'客流 +50%（持续1天）', cost:300, bought:false },
+  { id:'cig',    name:'香烟经营权',  icon:'🚬', desc:'解锁高利润香烟', cost:1200, bought:false },
+  { id:'fridge', name:'冷藏柜',      icon:'🧊', desc:'饮料需求 +30%', cost:700, bought:false },
+  { id:'microwave', name:'微波炉',   icon:'🔥', desc:'热食需求 +30%', cost:600, bought:false },
+];
+const UPGRADE_ICON = { shelf1:'shelf', shelf2:'shelf', auto:'auto', decor:'decor', ad:'ad', cig:'cig2', fridge:'fridge', microwave:'microwave' };
+const STAFF_ICON = { cashier:'cashier', stocker:'stocker', janitor:'janitor' };
+const STAFF_IMG = { cashier:'cashier', stocker:'stocker', janitor:'cleaner' };
+const ACHIEVEMENTS = [
+  { id:'first_customer', name:'第一位顾客', desc:'接待第一个顾客', icon:'👋', unlocked:false },
+  { id:'rich',   name:'小有所成',   desc:'现金达到 ¥5,000', icon:'💰', unlocked:false },
+  { id:'busy',   name:'繁忙小店',   desc:'单日服务 50 位顾客', icon:'🏃', unlocked:false },
+  { id:'boss',   name:'雇佣达人',   desc:'同时雇佣 3 名员工', icon:'👔', unlocked:false },
+  { id:'tycoon', name:'便利店大亨', desc:'总营收达到 ¥10,000', icon:'👑', unlocked:false },
+  { id:'legend', name:'传奇店主',   desc:'连续经营 30 天', icon:'🌟', unlocked:false },
+  { id:'perfect',name:'五星好评',   desc:'单日获得 5 星评分', icon:'💎', unlocked:false },
+  { id:'collector',name:'收藏家',   desc:'购买全部升级', icon:'🎯', unlocked:false },
+  { id:'weather',name:'风雨无阻',   desc:'经历过 3 种天气', icon:'🌧️', unlocked:false },
+  { id:'vip',    name:'贵客临门',   desc:'接待一位 VIP 大客户', icon:'💎', unlocked:false },
+  { id:'chain',  name:'旗舰店长',   desc:'店铺扩建至旗舰超市', icon:'🏙️', unlocked:false },
+  { id:'chain2', name:'空间大师',   desc:'完成首次店铺扩建', icon:'🏗️', unlocked:false },
+  { id:'lvl10',  name:'经营达人',   desc:'玩家等级达到 10 级', icon:'📈', unlocked:false },
+];
+const REP_TITLES = [
+  { min:0,   title:'路边小摊', icon:'🛖' },
+  { min:2.0, title:'社区小店', icon:'🏪' },
+  { min:3.0, title:'人气便利店', icon:'🏬' },
+  { min:4.0, title:'明星店铺', icon:'✨' },
+  { min:4.6, title:'连锁品牌', icon:'🏙️' },
+];
+/* ================= v5.0 扩展配置 ================= */
+const SHOP_LEVELS = [
+  { level:1, name:'路边小店',  cost:0,    shelves:3, rent:20,  capBonus:0,  desc:'起步的温馨小店' },
+  { level:2, name:'社区便利店',cost:800,  shelves:5, rent:45,  capBonus:6,  desc:'更多货架，更大客流' },
+  { level:3, name:'人气商店',  cost:2500, shelves:7, rent:90,  capBonus:14, desc:'整排货架，应有尽有' },
+  { level:4, name:'旗舰超市',  cost:6000, shelves:9, rent:160, capBonus:24, desc:'商圈地标级旗舰店' },
+];
+const SHELF_PLAN = [
+  ['water','cola','coffee'], ['noodle','riceball','bread'], ['chips','magazine','cigarette'],
+  ['tissue','water','cola'], ['coffee','bread','oden'], ['riceball','tissue','magazine'],
+  ['water','noodle','chips'], ['cola','bread','icecream'], ['coffee','riceball','tissue'],
+];
+const SHELF_SLOTS = [
+  [50,50],[50,110],[50,170],[50,230],[530,50],[530,110],[530,170],[530,230],[290,280],
+];
+function buildShelves(level){
+  const cnt=SHOP_LEVELS[Math.min(Math.max(level,1),4)-1].shelves;
+  const out=[];
+  for(let i=0;i<cnt;i++){
+    out.push({x:SHELF_SLOTS[i][0], y:SHELF_SLOTS[i][1], w:220, h:36, products:SHELF_PLAN[i].slice()});
+  }
+  return out;
+}
+const CUSTOMER_TYPES = [
+  { id:'student', name:'学生',    icon:'🎒', budget:2.6, speed:1.15, pref:['chips','cola','noodle','icecream','water'],   hours:[[11,14],[16,20]] },
+  { id:'worker',  name:'上班族',  icon:'💼', budget:3.2, speed:1.05, pref:['coffee','riceball','bread','water','noodle'], hours:[[7,9],[11,14],[17,19]] },
+  { id:'elder',   name:'老主顾',  icon:'🧓', budget:2.2, speed:0.8,  pref:['tissue','riceball','bread','magazine','water'],hours:[[8,12],[14,17]] },
+  { id:'family',  name:'家庭客',  icon:'👨‍👩‍👧', budget:3.0, speed:0.95, pref:['water','cola','chips','bread','icecream','tissue'], hours:[[10,12],[18,20]] },
+];
+const TARGET_POOL = [
+  { id:'inc1', text:'今日收入达到 ¥200', type:'income', goal:200, reward:80 },
+  { id:'inc2', text:'今日收入达到 ¥500', type:'income', goal:500, reward:150 },
+  { id:'srv1', text:'接待 15 位顾客',    type:'served', goal:15,  reward:60 },
+  { id:'srv2', text:'接待 30 位顾客',    type:'served', goal:30,  reward:120 },
+  { id:'rst1', text:'补货 3 次',         type:'restock',goal:3,   reward:50 },
+  { id:'rst2', text:'补货 8 次',         type:'restock',goal:8,   reward:120 },
+  { id:'hap1', text:'顾客平均满意度 ≥ 80%', type:'happy', goal:0.8, reward:100 },
+  { id:'rep1', text:'当日声望提升 ≥ 0.2',   type:'rep',    goal:0.2, reward:130 },
+];
+const EVENTS = [
+  { id:'supplier', title:'供应商涨价', icon:'📈', desc:'供应商通知：原材料成本上涨。你怎么应对？',
+    a:{ label:'接受涨价', effect:function(){ G.costBoost=1.12; G.costBoostDays=3; return '进价 +12%，持续 3 天'; } },
+    b:{ label:'谈判压价', effect:function(){ if(chance(0.5)){ G.costBoost=0.94; G.costBoostDays=3; return '谈判成功，进价 -6%！'; } G.costBoost=1.16; G.costBoostDays=3; return '谈判破裂，进价 +16%…'; } } },
+  { id:'thief', title:'发现小偷！', icon:'🕵️', desc:'一个小偷正在偷薯片。',
+    a:{ label:'上前制止', effect:function(){ if(chance(0.6)){ addParticles(CANVAS_W/2,CANVAS_H/2,'#ffd700',18); return '抓个正着，声望 +0.2！'; } G.reputation=clamp(G.reputation-0.15,1,5); return '小偷跑了，还打翻货架…声望 -0.15'; } },
+    b:{ label:'装没看见', effect:function(){ return '损失了几包薯片，就当破财消灾'; } } },
+  { id:'hygiene', title:'卫生检查', icon:'🧼', desc:'市监局突击检查卫生。',
+    a:{ label:'立即大扫除', effect:function(){ if(G.cash>=500){ G.cash-=500; G.reputation=clamp(G.reputation+0.3,1,5); return '花了 ¥500，卫生满分，声望 +0.3'; } return '现金不够，只能硬着头皮应付'; } },
+    b:{ label:'碰碰运气', effect:function(){ if(chance(0.55)){ return '检查通过，虚惊一场'; } G.cash=Math.max(0,G.cash-800); G.reputation=clamp(G.reputation-0.2,1,5); return '被罚款 ¥800，声望 -0.2'; } } },
+  { id:'blogger', title:'美食博主探店', icon:'📸', desc:'一位博主来探店，可能带来大量客流。',
+    a:{ label:'免费招待', effect:function(){ G.cash=Math.max(0,G.cash-60); G.adBoost=true; G.adTimer=0; G.reputation=clamp(G.reputation+0.3,1,5); return '豪爽！客流 +50%，声望 +0.3'; } },
+    b:{ label:'正常接待', effect:function(){ G.reputation=clamp(G.reputation+0.1,1,5); return '中规中矩，声望 +0.1'; } } },
+  { id:'blackout', title:'片区停电', icon:'⚡', desc:'今晚 18:00-20:00 计划停电。',
+    a:{ label:'租发电机', effect:function(){ if(G.cash>=600){ G.cash-=600; return '花 ¥600 租了发电机，照常营业'; } return '现金不足，只能停业 2 小时'; } },
+    b:{ label:'贴公告歇业', effect:function(){ G.cash=Math.max(0,G.cash-0); return '诚实公告，顾客表示理解'; } } },
+];
+const XP_PER_LEVEL = 100;
+const LOAN_OPTIONS = [ {amount:500, total:600}, {amount:1000, total:1250}, {amount:2000, total:2600} ];
+/* ================= 游戏状态 ================= */
+const SAVE_KEY = 'mini-mart-save-v1';
+const G = {
+  running:false, gameOver:false, speed:1, paused:false,
+  day:1, hour:6, minute:0,
+  cash:2000, totalIncome:0, todayIncome:0, reputation:3.0,
+  products:JSON.parse(JSON.stringify(PRODUCTS)),
+  staff:JSON.parse(JSON.stringify(STAFF_TYPES)),
+  upgrades:JSON.parse(JSON.stringify(UPGRADES)),
+  achievements:JSON.parse(JSON.stringify(ACHIEVEMENTS)),
+  customers:[], particles:[], floatTexts:[],
+  totalCustomers:0, servedCustomers:0, todayServed:0,
+  lastTime:0, maxStockBonus:0,
+  adBoost:false, adTimer:0, autoRestock:false, decorLevel:0,
+  fridgeBonus:false, microwaveBonus:false,
+  gameTime:0, selectedShelf:null,
+  perfectDays:0, weather:'sunny', seenWeather:{},
+  eventQueue:[], eventsActive:{}, vipChance:0,
+  lastDaySummary:null, summaryMode:false, newDayReady:false,
+  audioOn:true, lastCashShown:null, lastIncomeShown:null,
+  /* v5.0 */
+  storeLevel:1, costBoost:1, costBoostDays:0,
+  loan:0, loanTotal:0,
+  xp:0, level:1,
+  dailyTargets:[], dayHappySum:0, dayHappyCount:0,
+  stat:{ restockSpend:0, staffSpend:0, maxDayIncome:0, totalRestock:0, loansTaken:0 },
+  settings:{ sfx:true, music:true },
+  tutorialDone:false,
+};
+const CANVAS_W=800, CANVAS_H=500, WALL=24;
+const DOOR_X=CANVAS_W/2-50, DOOR_W=100;
+let SHELVES = buildShelves(1);
+const CHECKOUT = { x:620, y:368, w:140, h:92 };
+const CUSTOMER_COLORS = ['#ff7a45','#1f9e6e','#c98a1b','#7c6fd0','#3b8fd9','#f29b2e','#e05b4f','#8d6e63','#78909c','#c26bb8','#43a047','#e8708a'];
+const HAIR_COLORS = ['#3e2723','#212121','#5d4037','#4e342e','#263238','#6d4c41'];
+const MIN_DIST = 28;
+/* ================= 音效 ================= */
+let AudioCtx = null;
+function initAudio() {
+  if (!AudioCtx) {
+    try { AudioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { AudioCtx = null; }
+  }
+  if (AudioCtx && AudioCtx.state === 'suspended') AudioCtx.resume();
+}
+function playTone(freq, dur, type, vol) {
+  if (!AudioCtx || !G.audioOn) return;
+  try {
+    const o = AudioCtx.createOscillator();
+    const g = AudioCtx.createGain();
+    o.type = type || 'sine';
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(vol || 0.08, AudioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, AudioCtx.currentTime + dur);
+    o.connect(g); g.connect(AudioCtx.destination);
+    o.start();
+    o.stop(AudioCtx.currentTime + dur + 0.02);
+  } catch(e) {}
+}
+function sfxClick()  { playTone(600, 0.08, 'triangle', 0.05); }
+function sfxBuy()    { playTone(880, 0.12, 'sine', 0.07); playTone(1320, 0.15, 'sine', 0.05); }
+function sfxCash()   { playTone(1046, 0.1, 'square', 0.05); playTone(1568, 0.14, 'square', 0.04); }
+function sfxAchieve(){ playTone(660, 0.12, 'sine', 0.08); playTone(880, 0.12, 'sine', 0.08); playTone(1320, 0.2, 'sine', 0.08); }
+function sfxError()  { playTone(220, 0.15, 'sawtooth', 0.05); }
+function sfxHire()   { playTone(523, 0.1, 'triangle', 0.07); playTone(784, 0.14, 'triangle', 0.07); }
+/* ================= 工具函数 ================= */
+function $(id){ return document.getElementById(id); }
+function rand(min,max){ return Math.random()*(max-min)+min; }
+function randInt(min,max){ return Math.floor(rand(min,max+1)); }
+function chance(p){ return Math.random() < p; }
+function getProduct(id){ return G.products.find(p=>p.id===id); }
+function getUpgrade(id){ return G.upgrades.find(u=>u.id===id); }
+function getAchievement(id){ return G.achievements.find(a=>a.id===id); }
+function fmtMoney(n){
+  if(!isFinite(n)) return '¥0';
+  const abs=Math.abs(n);
+  if(abs>0 && abs<10 && n%1!==0) return '¥' + (Math.round(n*10)/10).toLocaleString('zh-CN');
+  return '¥' + Math.floor(n).toLocaleString('zh-CN');
+}
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+function getRepTitle(){
+  let t=REP_TITLES[0];
+  for(const r of REP_TITLES){ if(G.reputation>=r.min) t=r; }
+  return t;
+}
+function showToast(msg){
+  const t=$('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._timer); t._timer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+function showEventBanner(msg){
+  const b=$('event-banner'); b.textContent=msg; b.classList.add('show');
+  setTimeout(()=>b.classList.remove('show'),3600);
+}
+function unlockAchievement(id){
+  const a=getAchievement(id);
+  if(a && !a.unlocked){
+    a.unlocked=true; sfxAchieve();
+    showToast('🏆 成就解锁：'+a.name);
+    addParticles(CANVAS_W/2, CANVAS_H/2, '#ffd700', 30);
+    addParticles(CANVAS_W/2, CANVAS_H/2, '#ff7a45', 20);
+    const t=document.querySelector('.tab.active');
+    if(t && t.dataset.tab==='stats') renderTab('stats');
+  }
+}
+function addFloatText(x,y,text,color){
+  G.floatTexts.push({x,y,text,color:color||'#e8622a',life:1400,vy:-1.8});
+}
+function addParticles(x,y,color,count){
+  for(let i=0;i<(count||10);i++){
+    G.particles.push({x,y,vx:rand(-2.5,2.5),vy:rand(-3.5,-0.5),life:rand(500,900),color,size:rand(2,5)});
+  }
+}
+/* ================= v5.0 经济与系统 ================= */
+function priceFairness(p){
+  return clamp(1.15 - (p.price/p.cost - 2.2)*0.22, 0.25, 1.15);
+}
+function rollDailyTargets(){
+  const pool=TARGET_POOL.slice();
+  const pick=[];
+  while(pick.length<3 && pool.length){ pick.push(pool.splice(randInt(0,pool.length-1),1)[0]); }
+  G.dailyTargets=pick.map(t=>({ id:t.id, text:t.text, type:t.type, goal:t.goal, reward:t.reward, cur:0, done:false }));
+}
+function updateTarget(type,val){
+  G.dailyTargets.forEach(t=>{
+    if(t.type===type && !t.done){
+      t.cur=Math.min(t.goal, t.cur+val);
+      if(t.cur>=t.goal){ t.done=true; G.cash+=t.reward; sfxBuy(); addFloatText(CANVAS_W/2,CANVAS_H/2-20,'🎯 目标达成 +¥'+t.reward,'#e8622a'); }
+    }
+  });
+}
+function giveXp(amount){
+  G.xp+=amount;
+  while(G.xp>=XP_PER_LEVEL*G.level){ G.xp-=XP_PER_LEVEL*G.level; G.level++; sfxAchieve(); G.maxStockBonus+=4; showToast('📈 玩家升级！Lv.'+G.level+' 库存上限 +4'); unlockAchievement('lvl10'); }
+}
+function takeLoan(idx){
+  const o=LOAN_OPTIONS[idx]; if(!o){ return; }
+  if(G.loan>0){ showToast('已有未还贷款'); sfxError(); return; }
+  G.cash+=o.amount; G.loan=o.amount; G.loanTotal=o.total; G.stat.loansTaken++;
+  sfxCash(); showToast('借款 '+fmtMoney(o.amount)+'（需还 '+fmtMoney(o.total)+'）');
+  renderTab('goal');
+}
+function repayLoan(){
+  if(G.loan<=0) return;
+  const pay=Math.min(G.cash, Math.ceil(G.loan));
+  G.cash-=pay; G.loan=Math.max(0,G.loan-pay);
+  sfxCash();
+  if(G.loan<=0){ G.loanTotal=0; showToast('✅ 贷款已结清！'); }
+  else showToast('还款 '+fmtMoney(pay)+'，剩余 '+fmtMoney(G.loan));
+  renderTab('goal');
+}
+function expandStore(){
+  const next=SHOP_LEVELS[G.storeLevel]; if(!next) return;
+  if(G.cash<next.cost){ showToast('现金不足，需要 '+fmtMoney(next.cost)); sfxError(); return; }
+  G.cash-=next.cost; G.storeLevel++;
+  SHELVES=buildShelves(G.storeLevel);
+  sfxAchieve();
+  showToast('🏬 扩建成功！'+SHOP_LEVELS[G.storeLevel-1].name+'（货架 ×'+SHELVES.length+'）');
+  addParticles(CANVAS_W/2,CANVAS_H/2,'#ffd700',30);
+  unlockAchievement('chain2');
+  renderTab('upgrade');
+}
+/* 决策事件 */
+function rollEvent(){
+  if(G.gameOver || !G.running) return;
+  const list=EVENTS.slice();
+  while(list.length){
+    const ev=list.splice(randInt(0,list.length-1),1)[0];
+    if(G.eventsActive[ev.id]) continue;
+    showEventCard(ev); return;
+  }
+}
+function showEventCard(ev){
+  G.paused=true; G.eventsActive[ev.id]=true;
+  $('ev-icon').textContent=ev.icon;
+  $('ev-title').textContent=ev.title;
+  $('ev-desc').textContent=ev.desc;
+  $('ev-a').textContent=ev.a.label;
+  $('ev-b').textContent=ev.b.label;
+  $('event-modal').classList.remove('hidden');
+  window._curEvent=ev;
+}
+function chooseEvent(opt){
+  const ev=window._curEvent; if(!ev) return;
+  const res=(opt==='a'?ev.a:ev.b).effect();
+  $('event-modal').classList.add('hidden');
+  G.paused=false; window._curEvent=null;
+  sfxClick();
+  setTimeout(()=>showToast((opt==='a'?ev.a.label:ev.b.label)+'：'+res),80);
+  saveGame();
+}
+/* BGM：轻量 WebAudio 循环 */
+let bgmTimer=null, bgmStep=0;
+function startBGM(){
+  if(!AudioCtx || bgmTimer) return;
+  const notes=[523.25,587.33,659.25,783.99];
+  const play=()=>{
+    if(!G.settings.music || !G.running){ stopBGM(); return; }
+    try{
+      if(AudioCtx.state==='suspended') AudioCtx.resume();
+      const o=AudioCtx.createOscillator(), g=AudioCtx.createGain();
+      o.type='sine'; o.frequency.value=notes[bgmStep%notes.length]*0.5;
+      g.gain.setValueAtTime(0.012,AudioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001,AudioCtx.currentTime+1.2);
+      o.connect(g); g.connect(AudioCtx.destination); o.start(); o.stop(AudioCtx.currentTime+1.3);
+      bgmStep++;
+    }catch(e){}
+  };
+  bgmTimer=setInterval(play,1300); play();
+}
+function stopBGM(){ if(bgmTimer){ clearInterval(bgmTimer); bgmTimer=null; } }
+/* 新手引导 */
+const TUTORIAL_TIPS = [
+  '👋 欢迎经营小小便利店！点击货架可以补货和定价',
+  '💰 定价影响销量：太贵顾客不买，太便宜利润低',
+  '🧑‍🤝‍🧑 顾客有不同喜好：学生爱零食，上班族爱咖啡',
+  '🏪 赚到钱后在「升级」页扩建店铺，解锁更多货架',
+  '🎯 完成每日目标可获额外奖金',
+  '⚡ 突发事件需要你做出选择，大胆决策吧！',
+];
+function startTutorial(){
+  if(G.tutorialDone) return;
+  let i=0;
+  const next=()=>{
+    if(i<TUTORIAL_TIPS.length && G.running && !G.gameOver){
+      showToast(TUTORIAL_TIPS[i]); i++;
+      setTimeout(next, 4200);
+    } else if(i>=TUTORIAL_TIPS.length){ G.tutorialDone=true; saveGame(); }
+  };
+  setTimeout(next, 1200);
+}
+/* ================= 存档 ================= */
+function saveGame(){
+  try {
+    const data = {
+      day:G.day, hour:G.hour, minute:G.minute,
+      cash:G.cash, totalIncome:G.totalIncome, reputation:G.reputation,
+      products:G.products, staff:G.staff, upgrades:G.upgrades, achievements:G.achievements,
+      totalCustomers:G.totalCustomers, servedCustomers:G.servedCustomers,
+      maxStockBonus:G.maxStockBonus, autoRestock:G.autoRestock, decorLevel:G.decorLevel,
+      fridgeBonus:G.fridgeBonus, microwaveBonus:G.microwaveBonus,
+      perfectDays:G.perfectDays, seenWeather:G.seenWeather, weather:G.weather,
+      ver:5,
+      storeLevel:G.storeLevel, costBoost:G.costBoost, costBoostDays:G.costBoostDays,
+      loan:G.loan, loanTotal:G.loanTotal,
+      xp:G.xp, level:G.level,
+      stat:G.stat, settings:G.settings, tutorialDone:G.tutorialDone,
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+  } catch(e){}
+}
+function loadSave(){
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    G.day=d.day||1; G.hour=d.hour||6; G.minute=d.minute||0;
+    G.cash=d.cash??2000; G.totalIncome=d.totalIncome||0; G.reputation=d.reputation||3;
+    if(d.products) G.products = d.products;
+    if(d.staff) G.staff = d.staff;
+    if(d.upgrades) G.upgrades = d.upgrades;
+    if(d.achievements) G.achievements = d.achievements;
+    G.totalCustomers=d.totalCustomers||0; G.servedCustomers=d.servedCustomers||0;
+    G.maxStockBonus=d.maxStockBonus||0; G.autoRestock=!!d.autoRestock; G.decorLevel=d.decorLevel||0;
+    G.fridgeBonus=!!d.fridgeBonus; G.microwaveBonus=!!d.microwaveBonus;
+    G.perfectDays=d.perfectDays||0; G.seenWeather=d.seenWeather||{}; G.weather=d.weather||'sunny';
+    /* v5.0 兼容旧存档 */
+    G.storeLevel=Math.min(Math.max(d.storeLevel||1,1),4);
+    G.costBoost=d.costBoost||1; G.costBoostDays=d.costBoostDays||0;
+    G.loan=d.loan||0; G.loanTotal=d.loanTotal||0;
+    G.xp=d.xp||0; G.level=d.level||1;
+    G.stat=d.stat||{restockSpend:0, staffSpend:0, maxDayIncome:0, totalRestock:0, loansTaken:0};
+    G.settings=Object.assign({sfx:true, music:true}, d.settings||{});
+    G.tutorialDone=!!d.tutorialDone;
+    SHELVES=buildShelves(G.storeLevel);
+    /* 旧档补充新商品，避免 getProduct 返回 undefined */
+    PRODUCTS.forEach(p=>{ if(!G.products.some(x=>x.id===p.id)) G.products.push(JSON.parse(JSON.stringify(p))); });
+    G.products.forEach(p=>{ if(p.locked && p.unlockBy==='fridge' && G.fridgeBonus){ p.locked=false; } if(p.locked && p.unlockBy==='microwave' && G.microwaveBonus){ p.locked=false; } });
+    return true;
+  } catch(e){ return false; }
+}
+function hasSave(){ try { return !!localStorage.getItem(SAVE_KEY); } catch(e){ return false; } }
+/* ================= 顾客类 ================= */
+class Customer {
+  constructor(){
+    this.x=CANVAS_W/2+rand(-15,15);
+    this.y=CANVAS_H-WALL-5;
+    this.state='enter';
+    this.targetShelf=null; this.targetProduct=null;
+    this.color=CUSTOMER_COLORS[randInt(0,CUSTOMER_COLORS.length-1)];
+    this.hairColor=HAIR_COLORS[randInt(0,HAIR_COLORS.length-1)];
+    this.spriteKey='customer'+randInt(1,5);
+    this.faceDir=1;
+    this.hatType=randInt(0,5);
+    this.hatColor=['#e8708a','#3b8fd9','#c98a1b','#1f9e6e','#7c6fd0','#f29b2e'][randInt(0,5)];
+    const ct=CUSTOMER_TYPES[randInt(0,CUSTOMER_TYPES.length-1)];
+    this.ct=ct;
+    this.budget=ct.budget;
+    this.speed=rand(2.2,3.2)*ct.speed;
+    this.shoppingTimer=0; this.happiness=1.0; this.bought=null;
+    this.walkPhase=rand(0,Math.PI*2); this.isMoving=false;
+    this.mood='happy'; this.slotOffset=rand(-20,20);
+    this.isCarrying=false; this.isVip=false;
+    this.stuckT=0; this.stuckCheck=0; this.lastX=this.x; this.lastY=this.y;
+    if(chance(0.04)) { this.isVip=true; this.color='#c98a1b'; this.hatType=6; this.hatColor='#e8622a'; }
+  }
+  update(dt){
+    const sm=G.speed||1;
+    this.walkPhase += dt*0.002*sm;
+    this.isMoving=false;
+    /* 卡住检测：每 0.6 秒看位移，连续约 2.4 秒几乎不动 → 强行推进状态 */
+    this.stuckCheck+=dt*sm;
+    if(this.stuckCheck>600){
+      this.stuckCheck=0;
+      const moved=Math.abs(this.x-this.lastX)+Math.abs(this.y-this.lastY);
+      if(moved<2.5) this.stuckT++; else this.stuckT=0;
+      this.lastX=this.x; this.lastY=this.y;
+    }
+    if(this.stuckT>=4){ this.stuckT=0; this.resolveStuck(); }
+    switch(this.state){
+      case 'enter':
+        if(!this.targetShelf) this.chooseProduct();
+        if(this.targetShelf){
+          const tx=this.targetShelf.x+this.targetShelf.w/2+this.slotOffset;
+          const ty=this.targetShelf.y+this.targetShelf.h+28;
+          this.isMoving=true; this.moveTo(tx,ty,dt,sm);
+          if(this.distanceTo(tx,ty)<8){
+            this.state='browse'; this.shoppingTimer=rand(700,1900);
+          }
+        }
+        break;
+      case 'browse':
+        this.shoppingTimer-=dt*sm;
+        if(this.shoppingTimer<=0){
+          const p=getProduct(this.targetProduct);
+          if(p && p.stock>0){
+            const fair=priceFairness(p);
+            if(p.price > this.budget*p.cost || fair<0.3){
+              this.happiness=0.25; this.mood='sad';
+            } else {
+              p.stock--; this.bought=this.targetProduct; this.happiness=fair; this.mood='happy';
+              this.isCarrying=true;
+              addParticles(this.x,this.y-15,p.color,5);
+            }
+          } else { this.happiness=0.3; this.mood='sad'; }
+          this.state='queue';
+        }
+        break;
+      case 'queue':{
+        const queued=G.customers.filter(c=>c.state==='queue'||c.state==='pay');
+        const idx=queued.indexOf(this);
+        const qy=CHECKOUT.y+CHECKOUT.h/2+15;
+        const qx=CHECKOUT.x-10-idx*42;
+        const qyy=qy+(idx%2===0?-6:6);
+        const dist=this.distanceTo(qx,qyy);
+        if(dist>4){ this.isMoving=true; this.moveTo(qx,qyy,dt,sm); }
+        else this.isMoving=false;
+        if(idx===0 && dist<6){ this.state='pay'; this.payTimer=0; }
+        break;
+      }
+      case 'pay':
+        this.isMoving=false;
+        this.payTimer+=dt*sm;
+        const cs=1+G.staff.find(s=>s.id==='cashier').count*1.5;
+        if(this.payTimer > 900/cs){
+          if(this.bought){
+            const p=getProduct(this.bought);
+            let rev=p.price*this.happiness;
+            if(this.isVip) rev*=2;
+            G.cash+=rev; G.todayIncome+=rev; G.totalIncome+=rev; G.todayServed++;
+            G.dayHappySum+=this.happiness; G.dayHappyCount++;
+            G.stat.maxDayIncome=Math.max(G.stat.maxDayIncome,G.todayIncome);
+            updateTarget('income',rev); updateTarget('served',1);
+            addFloatText(CHECKOUT.x+CHECKOUT.w/2, CHECKOUT.y-12, '+'+(this.isVip?'✨':'' )+rev.toFixed(1));
+            addParticles(CHECKOUT.x+CHECKOUT.w/2, CHECKOUT.y, '#ffd700', this.isVip?18:8);
+            if(this.isVip) { sfxAchieve(); unlockAchievement('vip'); }
+            else sfxCash();
+          }
+          G.servedCustomers++;
+          this.isCarrying=false; this.state='leave';
+        }
+        break;
+      case 'leave':{
+        this.isMoving=true;
+        const doorY=CANVAS_H-WALL-5, doorX=CANVAS_W/2;
+        /* 先垂直沉到底部门口线，再横向走向门口，避免横穿收银台排队区 */
+        if(Math.abs(this.y-doorY)>10) this.moveTo(this.x,doorY,dt,sm);
+        else this.moveTo(doorX,doorY,dt,sm);
+        if(this.distanceTo(doorX,doorY)<12){ this.state='exit'; this.exitTimer=200; }
+        break;
+      }
+      case 'exit':
+        this.exitTimer-=dt*sm;
+        if(this.exitTimer<=0) this.y=CANVAS_H+30;
+        break;
+    }
+    this.avoidOthers();
+  }
+  resolveStuck(){
+    switch(this.state){
+      case 'enter':
+        if(this.targetShelf){
+          this.x=this.targetShelf.x+this.targetShelf.w/2+this.slotOffset;
+          this.y=this.targetShelf.y+this.targetShelf.h+28;
+        }
+        this.state='browse'; this.shoppingTimer=rand(700,1900);
+        break;
+      case 'queue': {
+        const queued=G.customers.filter(c=>c.state==='queue'||c.state==='pay');
+        const idx=queued.indexOf(this);
+        this.x=CHECKOUT.x-10-idx*42;
+        this.y=CHECKOUT.y+CHECKOUT.h/2+15+(idx%2===0?-6:6);
+        if(idx===0){ this.state='pay'; this.payTimer=0; }
+        break;
+      }
+      case 'leave':
+        this.x=CANVAS_W/2; this.y=CANVAS_H-WALL-5;
+        this.state='exit'; this.exitTimer=150;
+        break;
+    }
+  }
+  chooseProduct(){
+    const h=G.hour;
+    let pref=this.ct.pref.slice();
+    if(G.fridgeBonus) pref=pref.concat(['water','cola','coffee']);
+    if(G.microwaveBonus) pref=pref.concat(['noodle','riceball']);
+    const hourOk=this.ct.hours.some(r=>h>=r[0]&&h<r[1]);
+    if(hourOk && pref.length>1) pref.push(pref[randInt(0,pref.length-1)]);
+    const avail=pref.filter(id=>{ const p=getProduct(id); return p && !p.locked; });
+    this.targetProduct = avail.length ? avail[randInt(0,avail.length-1)] : 'water';
+    this.targetShelf=SHELVES.find(s=>s.products.includes(this.targetProduct))||SHELVES[0];
+  }
+  moveTo(tx,ty,dt,sm){
+    const dx=tx-this.x, dy=ty-this.y;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    if(d>1){
+      if(dx>0.5) this.faceDir=1; else if(dx<-0.5) this.faceDir=-1;
+      const step=Math.min(this.speed*dt*0.016*(sm||1), d*0.2);
+      this.x+=(dx/d)*step; this.y+=(dy/d)*step;
+    }
+  }
+  avoidOthers(){
+    for(let i=0;i<G.customers.length;i++){
+      const o=G.customers[i];
+      if(o===this) continue;
+      const dx=this.x-o.x, dy=this.y-o.y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<MIN_DIST && d>0){
+        const push=(MIN_DIST-d)*0.1;
+        this.x+=Math.max(-1.5,Math.min(1.5,(dx/d)*push));
+        this.y+=Math.max(-1.5,Math.min(1.5,(dy/d)*push));
+      }
+    }
+  }
+  distanceTo(x,y){ return Math.sqrt((this.x-x)**2+(this.y-y)**2); }
+  drawThoughtBubble(ctx){
+    if(this.state==='browse' && this.targetProduct){
+      const bx=this.x, by=this.y-42;
+      ctx.fillStyle='rgba(255,255,255,0.96)';
+      ctx.beginPath(); ctx.arc(bx,by,14,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle='#e4ded2'; ctx.lineWidth=1.2; ctx.stroke();
+      ctx.beginPath(); ctx.arc(bx-4,by+15,3.2,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(bx-8,by+19,2.2,0,Math.PI*2); ctx.fill();
+      drawProductImg(ctx,this.targetProduct,bx-10,by-10,20,20,getProduct(this.targetProduct).icon);
+    }
+  }
+  draw(ctx){
+    const bob=this.isMoving?Math.sin(this.walkPhase)*0.6:0;
+    const bodyY=this.y+bob;
+    /* AI 插画小人优先，加载失败回退矢量 */
+    if(imgReady(this.spriteKey)){
+      softEllipse(this.x,bodyY+8,11,3.4,0.16);
+      const h=this.isVip?42:36;
+      const w=Math.round(h*IMG[this.spriteKey].width/IMG[this.spriteKey].height);
+      ctx.save();
+      ctx.translate(this.x,bodyY+8);
+      if(this.faceDir<0) ctx.scale(-1,1);
+      ctx.drawImage(IMG[this.spriteKey],-w/2,-h,w,h);
+      ctx.restore();
+      if(this.isVip){
+        ctx.fillStyle='rgba(232,98,42,0.95)';
+        ctx.beginPath(); ctx.roundRect(this.x-9,bodyY-44,18,6,3); ctx.fill();
+        ctx.fillStyle='#ffd54f';
+        for(let i=0;i<3;i++){
+          ctx.beginPath();
+          ctx.moveTo(this.x-8+i*6.2,bodyY-38);
+          ctx.lineTo(this.x-5+i*6.2,bodyY-47);
+          ctx.lineTo(this.x-2+i*6.2,bodyY-38);
+          ctx.closePath(); ctx.fill();
+        }
+      }
+      if(this.isCarrying && imgReady(this.bought)){
+        const pw=14, ph=14;
+        ctx.drawImage(IMG[this.bought],this.x+w*0.28,bodyY-18,pw,ph);
+      }
+      return;
+    }
+    softEllipse(this.x,bodyY+14,10,3.6,0.16);
+    const grad=ctx.createRadialGradient(this.x-3,bodyY-4,2,this.x,bodyY,14);
+    grad.addColorStop(0,this.lighten(this.color,40));
+    grad.addColorStop(1,this.color);
+    ctx.fillStyle=grad;
+    ctx.beginPath(); ctx.ellipse(this.x,bodyY,10.5,13,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.28)';
+    ctx.beginPath(); ctx.ellipse(this.x-4,bodyY-3,2.8,7.5,0.15,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=this.color;
+    ctx.beginPath(); ctx.ellipse(this.x-11,bodyY,2.8,4.5,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(this.x+11,bodyY,2.8,4.5,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#37474f';
+    const ls=this.isMoving?Math.sin(this.walkPhase)*1:0;
+    ctx.fillRect(this.x-5.5,bodyY+10,4.5,5.5+Math.max(0,ls));
+    ctx.fillRect(this.x+1,bodyY+10,4.5,5.5+Math.max(0,-ls));
+    ctx.fillStyle='#ffd54f';
+    ctx.beginPath(); ctx.arc(this.x,bodyY-15,9,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=this.hairColor;
+    ctx.beginPath(); ctx.arc(this.x,bodyY-18,9,Math.PI,Math.PI*2); ctx.fill();
+    ctx.fillRect(this.x-9,bodyY-18,3,5); ctx.fillRect(this.x+6,bodyY-18,3,5);
+    ctx.fillStyle='rgba(0,0,0,0.12)';
+    ctx.beginPath(); ctx.arc(this.x,bodyY-18,9,0.15*Math.PI,0.45*Math.PI); ctx.fill();
+    if(this.hatType===1){
+      ctx.fillStyle=this.hatColor;
+      ctx.beginPath(); ctx.arc(this.x,bodyY-18,9,Math.PI,Math.PI*2); ctx.fill();
+      ctx.fillRect(this.x,bodyY-24,17,3.5);
+      ctx.fillRect(this.x+8.5,bodyY-22,7.5,2);
+    } else if(this.hatType===2){
+      ctx.fillStyle=this.hatColor;
+      ctx.beginPath(); ctx.arc(this.x,bodyY-18,9,Math.PI,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(this.x+6,bodyY-16,4.5,0,Math.PI); ctx.fill();
+    } else if(this.hatType===3){
+      ctx.fillStyle=this.hatColor;
+      ctx.beginPath(); ctx.arc(this.x,bodyY-19,8.5,Math.PI*1.15,Math.PI*1.85); ctx.fill();
+      ctx.fillRect(this.x-8.5,bodyY-20,17,2.5);
+    } else if(this.hatType===4){
+      ctx.fillStyle=this.hatColor;
+      ctx.beginPath(); ctx.arc(this.x,bodyY-21,7,0,Math.PI*2); ctx.fill();
+      ctx.fillRect(this.x-2,bodyY-29,4.5,9);
+    } else if(this.hatType===5){
+      ctx.fillStyle=this.hatColor;
+      ctx.beginPath(); ctx.arc(this.x,bodyY-19,9,Math.PI*1.05,Math.PI*1.95); ctx.fill();
+      ctx.fillRect(this.x-2,bodyY-27,4,8);
+    } else if(this.hatType===6){
+      ctx.fillStyle='#e8622a';
+      ctx.beginPath();
+      ctx.moveTo(this.x-8,bodyY-16);
+      ctx.lineTo(this.x-8,bodyY-25); ctx.lineTo(this.x-4,bodyY-20);
+      ctx.lineTo(this.x,bodyY-27); ctx.lineTo(this.x+4,bodyY-20);
+      ctx.lineTo(this.x+8,bodyY-25); ctx.lineTo(this.x+8,bodyY-16);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle='#c98a1b';
+      ctx.fillRect(this.x-1,bodyY-28,2,2); ctx.fillRect(this.x-5,bodyY-22,2,2); ctx.fillRect(this.x+3,bodyY-22,2,2);
+    }
+    ctx.fillStyle='#263238';
+    ctx.beginPath(); ctx.arc(this.x-3,bodyY-14,1.4,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(this.x+3,bodyY-14,1.4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(255,130,130,0.35)';
+    ctx.beginPath(); ctx.arc(this.x-9.5,bodyY-9.5,2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(this.x+9.5,bodyY-9.5,2,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#263238'; ctx.lineWidth=1.2;
+    ctx.beginPath();
+    if(this.mood==='happy') ctx.arc(this.x,bodyY-11,2.6,0.2*Math.PI,0.8*Math.PI);
+    else if(this.mood==='neutral'){ ctx.moveTo(this.x-2,bodyY-10); ctx.lineTo(this.x+2,bodyY-10); }
+    else ctx.arc(this.x,bodyY-8.5,2.6,1.2*Math.PI,1.8*Math.PI);
+    ctx.stroke();
+    if(this.isCarrying && this.bought){
+      const p=getProduct(this.bought);
+      ctx.fillStyle='#8b5a2b';
+      ctx.beginPath(); ctx.roundRect(this.x+7.5,bodyY-7,13,10,2.5); ctx.fill();
+      ctx.strokeStyle='#5a3a1a'; ctx.lineWidth=1; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(this.x+9,bodyY-7); ctx.quadraticCurveTo(this.x+14,bodyY-13,this.x+19,bodyY-7); ctx.stroke();
+      drawProductImg(ctx,this.bought,this.x+10,bodyY-5,8,7,p.icon);
+    }
+    if(this.isVip){
+      ctx.fillStyle='#c98a1b';
+      ctx.font='bold 9px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('VIP',this.x,bodyY-30);
+    }
+  }
+  lighten(hex,amt){
+    const n=parseInt(hex.slice(1),16);
+    const r=clamp((n>>16)+amt,0,255), g=clamp(((n>>8)&255)+amt,0,255), b=clamp((n&255)+amt,0,255);
+    return 'rgb('+r+','+g+','+b+')';
+  }
+  isGone(){ return this.state==='exit' && this.y>CANVAS_H+20; }
+}
+/* ================= 时间与天气 ================= */
+const WEATHERS = {
+  sunny:{ name:'晴天', icon:'☀️', tint:null, rateMul:1.0 },
+  rain: { name:'雨天', icon:'🌧️', tint:'rgba(90,120,170,0.14)', rateMul:0.75, drops:true },
+  snow: { name:'雪天', icon:'❄️', tint:'rgba(210,225,245,0.12)', rateMul:0.6, drops:true, snow:true },
+  windy:{ name:'大风', icon:'💨', tint:'rgba(140,150,160,0.06)', rateMul:0.85 },
+};
+function rollWeather(){
+  const r=Math.random();
+  if(r<0.55) G.weather='sunny';
+  else if(r<0.78) G.weather='rain';
+  else if(r<0.92) G.weather='windy';
+  else G.weather='snow';
+  const w=WEATHERS[G.weather];
+  if(!G.seenWeather[G.weather]) G.seenWeather[G.weather]=true;
+  if(Object.keys(G.seenWeather).length>=3) unlockAchievement('weather');
+  return w;
+}
+function updateTime(dt){
+  G.minute += (dt/1000)*6*G.speed;
+  while(G.minute>=60){ G.minute-=60; G.hour++; if(G.hour>=24){ G.hour=0; endDay(); } }
+}
+function endDay(){
+  G.day++;
+  let wages=0, rent=0, spoilage=0, loanPay=0;
+  G.staff.forEach(s=>{ wages+=s.wage*s.count; });
+  G.cash-=wages;
+  const lvl=SHOP_LEVELS[G.storeLevel-1];
+  rent=lvl.rent; G.cash-=rent;
+  /* 滞销损耗：积压库存每日折旧 */
+  G.products.forEach(p=>{
+    if(!p.locked && p.stock>15){
+      const loss=(p.stock-15)*0.05*p.cost; spoilage+=loss; G.cash-=loss;
+    }
+  });
+  /* 贷款日供 */
+  if(G.loan>0){
+    loanPay=Math.min(G.loan, Math.ceil(G.loan*0.22));
+    G.cash-=loanPay; G.loan-=loanPay;
+    if(G.loan<=0) G.loanTotal=0;
+  }
+  /* 成本加成到期 */
+  if(G.costBoostDays>0){ G.costBoostDays--; if(G.costBoostDays===0) G.costBoost=1; }
+  if(G.staff.find(s=>s.id==='stocker').count>0){
+    G.products.forEach(p=>{
+      if(!p.locked && p.stock<10){
+        const need=10-p.stock, cost=need*p.cost*0.8*G.costBoost;
+        if(G.cash>=cost){ p.stock+=need; G.cash-=cost; G.stat.restockSpend+=cost; }
+      }
+    });
+  }
+  if(G.autoRestock){
+    G.products.forEach(p=>{ if(!p.locked && p.stock<5) p.stock=Math.min(p.stock+10,getMaxStock(p)); });
+  }
+  const janitor=G.staff.find(s=>s.id==='janitor').count;
+  let repChange=0;
+  if(janitor>0) repChange+=janitor*0.2;
+  if(G.decorLevel>0) repChange+=0.3;
+  if(G.todayServed>=40) repChange+=0.2;
+  else if(G.todayServed>=20) repChange+=0.1;
+  if(G.todayServed===0) repChange-=0.1;
+  if(G.weather==='snow') repChange-=0.05;
+  if(G.dayHappyCount>0){
+    const avg=G.dayHappySum/G.dayHappyCount;
+    if(avg<0.5) repChange-=0.15;
+    else if(avg>=0.9) repChange+=0.1;
+    updateTarget('happy', avg>=0.8?1:0);
+  }
+  G.reputation=clamp(G.reputation+repChange, 1.0, 5.0);
+  updateTarget('rep', repChange>=0.2?1:0);
+  if(G.day>=30) unlockAchievement('legend');
+  if(G.cash>=5000) unlockAchievement('rich');
+  if(G.todayServed>=50) unlockAchievement('busy');
+  const ts=G.staff.reduce((s,x)=>s+x.count,0);
+  if(ts>=3) unlockAchievement('boss');
+  if(G.totalIncome>=10000) unlockAchievement('tycoon');
+  if(G.reputation>=4.9){ G.perfectDays++; unlockAchievement('perfect'); }
+  else G.perfectDays=0;
+  if(G.upgrades.every(u=>u.bought)) unlockAchievement('collector');
+  if(G.storeLevel>=4) unlockAchievement('chain');
+  if(G.adBoost){ G.adBoost=false; G.adTimer=0; }
+  const xpGain=10+Math.floor(G.todayIncome/40)+G.todayServed;
+  giveXp(xpGain);
+  G.stat.staffSpend+=wages;
+  const w=rollWeather();
+  G.lastDaySummary={ day:G.day-1, income:G.todayIncome, served:G.todayServed, rep:G.reputation, repChange, wages, rent, loan:loanPay, spoilage, xpGain, weather:G.weather };
+  G.summaryMode=true; G.running=false;
+  showSummary();
+  saveGame();
+  if(G.cash<0){ setTimeout(()=>gameOver('现金耗尽，店铺倒闭了。'), 600); return; }
+}
+function showSummary(){
+  const s=G.lastDaySummary;
+  $('summary-day').textContent='第 '+s.day+' 天结束 · '+WEATHERS[s.weather].icon+' '+WEATHERS[s.weather].name;
+  $('sum-income').textContent=fmtMoney(s.income);
+  $('sum-customers').textContent=s.served+' 位';
+  $('sum-rep').textContent='★ '+s.rep.toFixed(1);
+  $('sum-wages').textContent='员工工资 -'+fmtMoney(s.wages)+' · 店铺租金 -'+fmtMoney(s.rent||0);
+  $('sum-costs').textContent=(s.loan>0?'贷款还款 -'+fmtMoney(s.loan)+' · ':'')+(s.spoilage>0.5?'滞销损耗 -'+fmtMoney(s.spoilage):'无滞销损耗');
+  $('sum-xp').textContent='+'+s.xpGain+' 经验 · Lv.'+G.level+(s.repChange>=0?' · 声望 +'+s.repChange.toFixed(1):' · 声望 '+s.repChange.toFixed(1));
+  let stars='';
+  const starCount = s.rep>=4.8?5 : s.rep>=4.0?4 : s.rep>=3.0?3 : s.rep>=2.0?2 : 1;
+  for(let i=0;i<5;i++) stars += i<starCount?'⭐':'☆';
+  $('summary-stars').textContent=stars;
+  $('summary-overlay').classList.remove('hidden');
+}
+function continueNextDay(){
+  $('summary-overlay').classList.add('hidden');
+  G.todayIncome=0; G.todayServed=0; G.dayHappySum=0; G.dayHappyCount=0;
+  rollDailyTargets();
+  G.summaryMode=false; G.newDayReady=true;
+  G.running=true;
+  G.lastTime=performance.now();
+  showEventBanner(WEATHERS[G.weather].icon+' 第 '+G.day+' 天 · '+WEATHERS[G.weather].name+' 开始营业');
+  sfxHire();
+  if(chance(0.35)) setTimeout(rollEvent, 1600);
+}
+/* ================= 生成顾客 ================= */
+function getMaxStock(p){ return (p.maxStock||30)+G.maxStockBonus+SHOP_LEVELS[G.storeLevel-1].capBonus; }
+function spawnCustomer(dt){
+  const h=G.hour; let rate=0.3;
+  if(h>=7&&h<9) rate=1.25;
+  else if(h>=11&&h<13) rate=1.05;
+  else if(h>=17&&h<20) rate=1.15;
+  else if(h>=21||h<6) rate=0.12;
+  else rate=0.4;
+  rate *= (G.reputation/3.0);
+  if(G.decorLevel>0) rate*=1.3;
+  if(G.adBoost) rate*=1.5;
+  rate*=WEATHERS[G.weather].rateMul;
+  if(G.staff.find(s=>s.id==='janitor').count>0) rate*=1.15;
+  rate*=(1+G.storeLevel*0.15);
+  if(chance(rate*dt*0.001*G.speed)){
+    if(G.customers.length<14+G.storeLevel*2){
+      G.customers.push(new Customer());
+      G.totalCustomers++;
+      if(G.totalCustomers===1) unlockAchievement('first_customer');
+    }
+  }
+}/* ================= 渲染 ================= */
+const canvas=$('game-canvas');
+const ctx=canvas.getContext('2d');
+let rainDrops=[], snowFlakes=[];
+for(let i=0;i<40;i++) rainDrops.push({x:rand(0,CANVAS_W),y:rand(0,CANVAS_H),v:rand(5,9)});
+for(let i=0;i<35;i++) snowFlakes.push({x:rand(0,CANVAS_W),y:rand(0,CANVAS_H),v:rand(0.4,1.2),s:rand(1.5,3.5)});
+function drawBg(){
+  if(imgReady('bg')){
+    ctx.drawImage(IMG.bg,0,0,CANVAS_W,CANVAS_H);
+    return;
+  }
+  drawFloor();
+}
+function hexLighten(hex,amt){
+  const n=parseInt(hex.slice(1),16);
+  const r=clamp((n>>16)+amt,0,255), g=clamp(((n>>8)&255)+amt,0,255), b=clamp((n&255)+amt,0,255);
+  return 'rgb('+r+','+g+','+b+')';
+}
+function softEllipse(x,y,rx,ry,alpha){
+  const g=ctx.createRadialGradient(x,y,1,x,y,Math.max(rx,ry));
+  g.addColorStop(0,'rgba(50,35,20,'+alpha+')');
+  g.addColorStop(1,'rgba(50,35,20,0)');
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2); ctx.fill();
+}
+function drawFloor(){
+  const g=ctx.createLinearGradient(0,0,0,CANVAS_H);
+  g.addColorStop(0,'#f8eeda'); g.addColorStop(1,'#eddcbe');
+  ctx.fillStyle=g; ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
+  ctx.strokeStyle='rgba(165,130,85,0.14)'; ctx.lineWidth=1;
+  for(let y=WALL;y<CANVAS_H;y+=28){
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(CANVAS_W,y); ctx.stroke();
+  }
+  for(let x=0;x<CANVAS_W;x+=56){
+    ctx.beginPath(); ctx.moveTo(x,WALL); ctx.lineTo(x,CANVAS_H); ctx.stroke();
+  }
+  ctx.fillStyle='rgba(190,60,70,0.32)';
+  ctx.fillRect(DOOR_X-10,CANVAS_H-WALL-2,DOOR_W+20,8);
+  const r=ctx.createRadialGradient(CANVAS_W/2,CANVAS_H/2,40,CANVAS_W/2,CANVAS_H/2,420);
+  r.addColorStop(0,'rgba(255,255,255,0.16)'); r.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=r; ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
+}
+function drawWalls(){
+  /* 店招横幅 */
+  const sx=312, sw=196, sy=23, sh=30;
+  ctx.save();
+  ctx.shadowColor='rgba(90,55,20,0.30)'; ctx.shadowBlur=12; ctx.shadowOffsetY=3;
+  const g=ctx.createLinearGradient(0,sy,0,sy+sh);
+  g.addColorStop(0,'#ff9a62'); g.addColorStop(0.55,'#ff7a45'); g.addColorStop(1,'#e8622a');
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.roundRect(sx,sy,sw,sh,9); ctx.fill();
+  ctx.shadowColor='transparent';
+  /* 底部波浪边 */
+  ctx.fillStyle='#e8622a';
+  for(let i=0;i<11;i++){
+    ctx.beginPath();
+    ctx.arc(sx+8+i*18.7, sy+sh-2.5, 6.5, 0, Math.PI);
+    ctx.fill();
+  }
+  /* 两端装饰圆钮 */
+  ctx.fillStyle='rgba(255,255,255,0.85)';
+  ctx.beginPath(); ctx.arc(sx+8, sy+sh/2, 2.6, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(sx+sw-8, sy+sh/2, 2.6, 0, Math.PI*2); ctx.fill();
+  /* 白色描边 + 文字 */
+  ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.roundRect(sx+1.5,sy+1.5,sw-3,sh-3,8); ctx.stroke();
+  ctx.fillStyle='#fff';
+  ctx.font='bold 14px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowColor='rgba(160,60,10,0.55)'; ctx.shadowBlur=4; ctx.shadowOffsetY=1;
+  ctx.fillText('★ 小 小 便 利 店 ★',CANVAS_W/2,sy+sh/2+1);
+  ctx.shadowBlur=0;
+  ctx.restore();
+  /* 促销小签（票券风） */
+  const posters=[
+    {x:88,text:'新品上市',color:'#e8708a',rot:-0.05},
+    {x:250,text:'限时折扣',color:'#1f9e6e',rot:0.04},
+    {x:545,text:'周末促销',color:'#f29b2e',rot:-0.03},
+  ];
+  posters.forEach(p=>{
+    ctx.save();
+    ctx.translate(p.x+31,p.y+16);
+    ctx.rotate(p.rot);
+    ctx.shadowColor='rgba(90,60,25,0.22)'; ctx.shadowBlur=6; ctx.shadowOffsetY=2;
+    const pg=ctx.createLinearGradient(0,-14,0,14);
+    pg.addColorStop(0,hexLighten(p.color,38)); pg.addColorStop(1,p.color);
+    ctx.fillStyle=pg;
+    ctx.beginPath(); ctx.roundRect(-27,-13,54,26,7); ctx.fill();
+    ctx.shadowColor='transparent';
+    /* 左侧小圆孔 */
+    ctx.fillStyle='#f9f4ea';
+    ctx.beginPath(); ctx.arc(-19,-5,2.2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(-19,5,2.2,0,Math.PI*2); ctx.fill();
+    /* 右侧燕尾缺口 */
+    ctx.fillStyle='#f9f4ea';
+    ctx.beginPath();
+    ctx.moveTo(23,-8); ctx.lineTo(30,0); ctx.lineTo(23,8);
+    ctx.closePath(); ctx.fill();
+    /* 白描 + 文字 */
+    ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.roundRect(-27,-13,54,26,7); ctx.stroke();
+    ctx.fillStyle='#fff';
+    ctx.font='bold 10px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(p.text,0,1.5);
+    ctx.restore();
+  });
+  /* 挂钟 */
+  ctx.save();
+  ctx.shadowColor='rgba(60,45,25,0.18)'; ctx.shadowBlur=8; ctx.shadowOffsetY=2;
+  ctx.fillStyle='#fffdf8';
+  ctx.beginPath(); ctx.arc(CANVAS_W-44,WALL+30,14,0,Math.PI*2); ctx.fill();
+  ctx.shadowColor='transparent';
+  ctx.strokeStyle='#d8cfc0'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(CANVAS_W-44,WALL+30,14,0,Math.PI*2); ctx.stroke();
+  ctx.strokeStyle='#c9bfae'; ctx.lineWidth=1.4;
+  for(let i=0;i<12;i++){
+    const a=i*Math.PI/6;
+    ctx.beginPath();
+    ctx.moveTo(CANVAS_W-44+Math.cos(a)*10.5, WALL+30+Math.sin(a)*10.5);
+    ctx.lineTo(CANVAS_W-44+Math.cos(a)*12.5, WALL+30+Math.sin(a)*12.5);
+    ctx.stroke();
+  }
+  ctx.strokeStyle='#e8622a'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(CANVAS_W-44,WALL+30); ctx.lineTo(CANVAS_W-44,WALL+21); ctx.stroke();
+  ctx.strokeStyle='#5a5548'; ctx.lineWidth=1.6;
+  ctx.beginPath(); ctx.moveTo(CANVAS_W-44,WALL+30); ctx.lineTo(CANVAS_W-37,WALL+31.5); ctx.stroke();
+  ctx.fillStyle='#c98a1b';
+  ctx.beginPath(); ctx.arc(CANVAS_W-44,WALL+30,1.8,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+function drawDoor(){
+  /* 门框 */
+  const g=ctx.createLinearGradient(DOOR_X,0,DOOR_X+DOOR_W,0);
+  g.addColorStop(0,'#7a5230'); g.addColorStop(0.5,'#96683e'); g.addColorStop(1,'#7a5230');
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.roundRect(DOOR_X-3,CANVAS_H-WALL-3,DOOR_W+6,WALL+6,4); ctx.fill();
+  /* 玻璃门扇 */
+  const dg=ctx.createLinearGradient(DOOR_X,0,DOOR_X+DOOR_W,0);
+  dg.addColorStop(0,'#cfe4f5'); dg.addColorStop(0.5,'#eaf4fb'); dg.addColorStop(1,'#cfe4f5');
+  ctx.fillStyle=dg;
+  ctx.fillRect(DOOR_X+1,CANVAS_H-WALL-1,DOOR_W-2,WALL-4);
+  /* 玻璃高光 */
+  ctx.fillStyle='rgba(255,255,255,0.6)';
+  ctx.beginPath();
+  ctx.moveTo(DOOR_X+10,CANVAS_H-WALL+4); ctx.lineTo(DOOR_X+22,CANVAS_H-WALL-2);
+  ctx.lineTo(DOOR_X+15,CANVAS_H-WALL-2); ctx.lineTo(DOOR_X+4,CANVAS_H-WALL+4);
+  ctx.closePath(); ctx.fill();
+  /* 门把 */
+  ctx.fillStyle='#f2c14e';
+  ctx.beginPath(); ctx.arc(DOOR_X+DOOR_W-12,CANVAS_H-WALL-10,3,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#c98a1b'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(DOOR_X+DOOR_W-12,CANVAS_H-WALL-10,3,0,Math.PI*2); ctx.stroke();
+  /* 门眉小招牌 */
+  ctx.save();
+  ctx.shadowColor='rgba(60,45,25,0.25)'; ctx.shadowBlur=5; ctx.shadowOffsetY=1.5;
+  ctx.fillStyle='#fff8ec';
+  ctx.beginPath(); ctx.roundRect(DOOR_X+DOOR_W/2-22,CANVAS_H-WALL-24,44,15,5); ctx.fill();
+  ctx.shadowColor='transparent';
+  ctx.strokeStyle='rgba(232,98,42,0.45)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(DOOR_X+DOOR_W/2-22,CANVAS_H-WALL-24,44,15,5); ctx.stroke();
+  ctx.fillStyle='#e8622a';
+  ctx.font='bold 9px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('出 入',DOOR_X+DOOR_W/2,CANVAS_H-WALL-16);
+  ctx.restore();
+  /* 门口地垫 */
+  const mg=ctx.createLinearGradient(0,CANVAS_H-WALL,0,CANVAS_H-WALL+6);
+  mg.addColorStop(0,'#c98a1b'); mg.addColorStop(1,'#a96f13');
+  ctx.fillStyle=mg;
+  ctx.beginPath(); ctx.roundRect(DOOR_X-14,CANVAS_H-WALL,DOOR_W+28,6,3); ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(DOOR_X-14,CANVAS_H-WALL,DOOR_W+28,6,3); ctx.stroke();
+}
+function drawShelfShadow(s){
+  const g=ctx.createRadialGradient(s.x+s.w/2,s.y+s.h+10,4,s.x+s.w/2,s.y+s.h+10,s.w*0.55);
+  g.addColorStop(0,'rgba(80,55,25,0.28)');
+  g.addColorStop(1,'rgba(80,55,25,0)');
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.ellipse(s.x+s.w/2,s.y+s.h+10,s.w*0.52,s.h*0.62,0,0,Math.PI*2); ctx.fill();
+}
+function drawShelves(){
+  SHELVES.forEach((shelf,idx)=>{
+    const sel=G.selectedShelf===idx;
+    drawShelfShadow(shelf);
+    /* 侧立柱 */
+    ctx.fillStyle='#8a5f35';
+    ctx.beginPath(); ctx.roundRect(shelf.x-4,shelf.y-8,9,shelf.h+38,3); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(shelf.x+shelf.w-5,shelf.y-8,9,shelf.h+38,3); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.18)';
+    ctx.beginPath(); ctx.roundRect(shelf.x-4,shelf.y-8,3,shelf.h+38,2); ctx.fill();
+    /* 顶板（浅色） */
+    const tg=ctx.createLinearGradient(0,shelf.y-8,0,shelf.y);
+    tg.addColorStop(0,'#f3dfb6'); tg.addColorStop(1,'#ddb97e');
+    ctx.fillStyle=tg;
+    ctx.beginPath(); ctx.roundRect(shelf.x-2,shelf.y-8,shelf.w+4,9,4); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.5)';
+    ctx.beginPath(); ctx.roundRect(shelf.x-2,shelf.y-8,shelf.w+4,2.5,2); ctx.fill();
+    /* 前板（深木纹） */
+    const fg=ctx.createLinearGradient(0,shelf.y,0,shelf.y+shelf.h);
+    fg.addColorStop(0,'#d8a668'); fg.addColorStop(1,'#b8864a');
+    ctx.fillStyle=fg;
+    ctx.beginPath(); ctx.roundRect(shelf.x,shelf.y,shelf.w,shelf.h,5); ctx.fill();
+    ctx.fillStyle='rgba(120,70,25,0.25)';
+    ctx.beginPath(); ctx.roundRect(shelf.x+3,shelf.y+2,shelf.w-6,2,1); ctx.fill();
+    /* 分隔线 */
+    const iw=shelf.w/shelf.products.length;
+    ctx.strokeStyle='rgba(120,70,25,0.22)'; ctx.lineWidth=1;
+    for(let i=1;i<shelf.products.length;i++){
+      ctx.beginPath(); ctx.moveTo(shelf.x+iw*i,shelf.y+4); ctx.lineTo(shelf.x+iw*i,shelf.y+shelf.h-4); ctx.stroke();
+    }
+    /* 商品与价签 */
+    shelf.products.forEach((pid,i)=>{
+      const p=getProduct(pid);
+      const cx=shelf.x+iw*i+iw/2;
+      if(p.locked||p.stock<=0){
+        if(p.locked){
+          ctx.save();
+          ctx.textAlign='center'; ctx.textBaseline='middle';
+          ctx.font='11px sans-serif';
+          ctx.fillText('🔒',cx,shelf.y-11);
+          ctx.restore();
+        } else {
+          ctx.save();
+          ctx.setLineDash([3,3]);
+          ctx.strokeStyle='rgba(120,80,40,0.35)'; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.roundRect(cx-12,shelf.y-18,24,15,4); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle='rgba(120,80,40,0.5)';
+          ctx.font='8px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+          ctx.fillText('补货中',cx,shelf.y-10);
+          ctx.restore();
+        }
+        return;
+      }
+      /* 商品投影 */
+      softEllipse(cx,shelf.y-1,9,3,0.20);
+      drawProductImg(ctx,pid,cx-16,shelf.y-27,32,26,p.icon);
+      /* 价签 */
+      ctx.save();
+      ctx.translate(cx,shelf.y+shelf.h-9);
+      ctx.rotate(i%2===0?-0.03:0.03);
+      ctx.shadowColor='rgba(80,50,20,0.25)'; ctx.shadowBlur=4; ctx.shadowOffsetY=1;
+      ctx.fillStyle='#fffdf6';
+      ctx.beginPath(); ctx.roundRect(-16,-6.5,32,13,6); ctx.fill();
+      ctx.shadowColor='transparent';
+      ctx.strokeStyle='rgba(180,140,90,0.4)'; ctx.lineWidth=0.8;
+      ctx.beginPath(); ctx.roundRect(-16,-6.5,32,13,6); ctx.stroke();
+      ctx.fillStyle=p.color;
+      ctx.beginPath(); ctx.arc(-11,0,1.8,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#b0443e';
+      ctx.font='bold 8px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('¥'+p.price.toFixed(1),1,0.5);
+      ctx.restore();
+    });
+    /* 选中高亮 */
+    if(sel){
+      ctx.save();
+      ctx.strokeStyle='rgba(255,122,69,'+(0.55+0.3*Math.sin(G.gameTime*0.006))+')';
+      ctx.lineWidth=2.5;
+      ctx.shadowColor='rgba(255,122,69,0.5)'; ctx.shadowBlur=12;
+      ctx.beginPath(); ctx.roundRect(shelf.x-7,shelf.y-12,shelf.w+14,shelf.h+44,8); ctx.stroke();
+      ctx.restore();
+    }
+  });
+}
+function drawCheckout(){
+  /* 前台地垫 */
+  softEllipse(CHECKOUT.x+CHECKOUT.w/2,CHECKOUT.y+CHECKOUT.h+6,95,12,0.14);
+  const rug=ctx.createLinearGradient(0,CHECKOUT.y+CHECKOUT.h-4,0,CHECKOUT.y+CHECKOUT.h+12);
+  rug.addColorStop(0,'rgba(255,255,255,0.85)'); rug.addColorStop(1,'rgba(240,228,206,0.85)');
+  ctx.fillStyle=rug;
+  ctx.beginPath(); ctx.roundRect(CHECKOUT.x-28,CHECKOUT.y+CHECKOUT.h-2,CHECKOUT.w+56,14,7); ctx.fill();
+  ctx.strokeStyle='rgba(150,110,60,0.25)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(CHECKOUT.x-28,CHECKOUT.y+CHECKOUT.h-2,CHECKOUT.w+56,14,7); ctx.stroke();
+  /* 柜台主体 */
+  const g=ctx.createLinearGradient(0,CHECKOUT.y,0,CHECKOUT.y+CHECKOUT.h);
+  g.addColorStop(0,'#8fc3ea'); g.addColorStop(0.35,'#63a9e0'); g.addColorStop(1,'#3f7fba');
+  ctx.save();
+  ctx.shadowColor='rgba(40,70,110,0.35)'; ctx.shadowBlur=14; ctx.shadowOffsetY=5;
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.roundRect(CHECKOUT.x,CHECKOUT.y,CHECKOUT.w,CHECKOUT.h,12); ctx.fill();
+  ctx.shadowColor='transparent';
+  /* 台面高光 */
+  ctx.fillStyle='rgba(255,255,255,0.35)';
+  ctx.beginPath(); ctx.roundRect(CHECKOUT.x+4,CHECKOUT.y+3,CHECKOUT.w-8,7,4); ctx.fill();
+  /* 左侧小标签 */
+  ctx.fillStyle='rgba(20,45,80,0.25)';
+  ctx.font='bold 9px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText('收银台',CHECKOUT.x+13,CHECKOUT.y+16);
+  /* 收银屏 */
+  const sc=ctx.createLinearGradient(0,CHECKOUT.y+26,0,CHECKOUT.y+52);
+  sc.addColorStop(0,'#223c52'); sc.addColorStop(1,'#16283a');
+  ctx.fillStyle=sc;
+  ctx.beginPath(); ctx.roundRect(CHECKOUT.x+CHECKOUT.w-58,CHECKOUT.y+24,48,26,6); ctx.fill();
+  ctx.strokeStyle='rgba(90,160,220,0.5)'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.roundRect(CHECKOUT.x+CHECKOUT.w-58,CHECKOUT.y+24,48,26,6); ctx.stroke();
+  ctx.fillStyle='#4dd0e1';
+  ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('¥'+Math.floor(G.todayIncome),CHECKOUT.x+CHECKOUT.w-34,CHECKOUT.y+37);
+  ctx.fillStyle='rgba(77,208,225,0.25)';
+  ctx.beginPath(); ctx.roundRect(CHECKOUT.x+CHECKOUT.w-58,CHECKOUT.y+24,48,26,6); ctx.fill();
+  ctx.restore();
+  /* 员工 */
+  const cc=G.staff.find(s=>s.id==='cashier').count;
+  for(let i=0;i<cc;i++) drawStaff(CHECKOUT.x+30+i*22,CHECKOUT.y+40,'cashier');
+  const sc2=G.staff.find(s=>s.id==='stocker').count;
+  for(let i=0;i<sc2;i++) drawStaff(150+i*36,252,'stocker');
+  const jc=G.staff.find(s=>s.id==='janitor').count;
+  for(let i=0;i<jc;i++) drawStaff(500+i*36,252,'cleaner');
+}
+function drawStaff(x,y,imgKey,color){
+  const bob=G.speed>0?Math.sin(G.gameTime*0.001)*0.5:0;
+  if(imgKey && imgReady(imgKey)){
+    softEllipse(x,y+4,10,3.2,0.18);
+    const h=30,w=Math.round(h*IMG[imgKey].width/IMG[imgKey].height);
+    ctx.drawImage(IMG[imgKey],x-w/2,y-h+4,w,h);
+    return;
+  }
+  softEllipse(x,y+15,9,3,0.18);
+  ctx.fillStyle=color;
+  ctx.beginPath(); ctx.ellipse(x,y+bob,10,12.5,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.25)';
+  ctx.beginPath(); ctx.ellipse(x-3.5,y+bob-2,2.6,7,0.15,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#ffd54f';
+  ctx.beginPath(); ctx.arc(x,y-14+bob,8,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#263238';
+  ctx.beginPath(); ctx.arc(x-2.5,y-13+bob,1.2,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+2.5,y-13+bob,1.2,0,Math.PI*2); ctx.fill();
+}
+function drawPlants(){
+  const spots=[[40,CANVAS_H-42],[CANVAS_W-58,CANVAS_H-42]];
+  spots.forEach(([x,y],si)=>{
+    softEllipse(x,y+4,16,5,0.18);
+    ctx.fillStyle=si===0?'#2e7d32':'#1b5e20';
+    ctx.beginPath(); ctx.ellipse(x,y-8,12,15,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#43a047';
+    ctx.beginPath(); ctx.ellipse(x-5,y-13,8,10,-0.3,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x+5,y-13,8,10,0.3,0,Math.PI*2); ctx.fill();
+    const pg=ctx.createLinearGradient(0,y-4,0,y+8);
+    pg.addColorStop(0,'#a06b46'); pg.addColorStop(1,'#7a4e2e');
+    ctx.fillStyle=pg;
+    ctx.beginPath(); ctx.roundRect(x-9,y-2,18,9,3); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.25)';
+    ctx.beginPath(); ctx.roundRect(x-9,y-2,5,9,2); ctx.fill();
+  });
+  /* 收银台旁糖果架 */
+  const cx=CHECKOUT.x+CHECKOUT.w-74;
+  softEllipse(cx+10,CHECKOUT.y+CHECKOUT.h-2,14,4,0.15);
+  ctx.fillStyle='#8d6e63';
+  ctx.beginPath(); ctx.roundRect(cx,CHECKOUT.y+CHECKOUT.h-30,20,26,3); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.22)';
+  ctx.beginPath(); ctx.roundRect(cx,CHECKOUT.y+CHECKOUT.h-30,20,4,2); ctx.fill();
+  [[ '#e8708a',cx+6,CHECKOUT.y+CHECKOUT.h-22],['#ffc93c',cx+14,CHECKOUT.y+CHECKOUT.h-18],['#1f9e6e',cx+10,CHECKOUT.y+CHECKOUT.h-10]].forEach(([c,px,py])=>{
+    ctx.fillStyle=c;
+    ctx.beginPath(); ctx.arc(px,py,3.2,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.4)';
+    ctx.beginPath(); ctx.arc(px-1,py-1,1,0,Math.PI*2); ctx.fill();
+  });
+}
+function drawWeatherFX(){
+  if(WEATHERS[G.weather].drops){
+    const w=WEATHERS[G.weather];
+    if(w.snow){
+      snowFlakes.forEach(f=>{
+        f.y+=f.v*G.speed; f.x+=Math.sin(f.y*0.02)*0.3*G.speed;
+        if(f.y>CANVAS_H){ f.y=-5; f.x=rand(0,CANVAS_W); }
+        ctx.fillStyle='rgba(255,255,255,0.85)';
+        ctx.beginPath(); ctx.arc(f.x,f.y,f.s,0,Math.PI*2); ctx.fill();
+      });
+    } else {
+      rainDrops.forEach(r=>{
+        r.y+=r.v*G.speed; r.x-=0.3*G.speed;
+        if(r.y>CANVAS_H){ r.y=-10; r.x=rand(0,CANVAS_W); }
+        ctx.strokeStyle='rgba(120,160,220,0.45)';
+        ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(r.x,r.y); ctx.lineTo(r.x+2,r.y-7); ctx.stroke();
+      });
+    }
+    const tint=WEATHERS[G.weather].tint;
+    if(tint){ ctx.fillStyle=tint; ctx.fillRect(0,0,CANVAS_W,CANVAS_H); }
+  } else if(WEATHERS[G.weather].tint){
+    ctx.fillStyle=WEATHERS[G.weather].tint; ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
+  }
+}
+function drawLighting(){
+  /* 顶部暖光 */
+  const lg=ctx.createRadialGradient(CANVAS_W/2,0,20,CANVAS_W/2,0,280);
+  lg.addColorStop(0,'rgba(255,210,130,0.20)');
+  lg.addColorStop(1,'rgba(255,210,130,0)');
+  ctx.fillStyle=lg; ctx.fillRect(0,0,CANVAS_W,CANVAS_H*0.7);
+  if(G.hour<6||G.hour>=20){
+    ctx.fillStyle='rgba(20,25,55,0.24)';
+    ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
+    const g=ctx.createRadialGradient(CANVAS_W/2,CANVAS_H/2,60,CANVAS_W/2,CANVAS_H/2,320);
+    g.addColorStop(0,'rgba(255,235,170,0.20)');
+    g.addColorStop(1,'rgba(255,235,170,0)');
+    ctx.fillStyle=g; ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
+  } else if(G.hour<8||G.hour>=17){
+    ctx.fillStyle='rgba(255,185,85,0.06)';
+    ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
+  }
+}
+function draw(){
+  drawBg();
+  drawWalls();
+  drawDoor();
+  drawShelves();
+  drawCheckout();
+  G.customers.forEach(c=>{ c.drawThoughtBubble(ctx); c.draw(ctx); });
+  G.particles.forEach(p=>{
+    ctx.globalAlpha=Math.max(0,p.life/900);
+    ctx.shadowColor=p.color; ctx.shadowBlur=6;
+    ctx.fillStyle=p.color;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+  });
+  ctx.globalAlpha=1;
+  G.floatTexts.forEach(t=>{
+    const a=Math.min(1,Math.max(0,t.life/700));
+    ctx.globalAlpha=a;
+    ctx.font='bold 13px sans-serif';
+    const tw=ctx.measureText('+'+t.text).width;
+    ctx.save();
+    ctx.translate(t.x,t.y);
+    ctx.shadowColor='rgba(80,50,20,0.25)'; ctx.shadowBlur=6; ctx.shadowOffsetY=2;
+    ctx.fillStyle='rgba(255,255,255,0.95)';
+    ctx.beginPath(); ctx.roundRect(-tw/2-9,-13,tw+18,24,12); ctx.fill();
+    ctx.shadowColor='transparent';
+    ctx.strokeStyle=t.color; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.roundRect(-tw/2-9,-13,tw+18,24,12); ctx.stroke();
+    ctx.fillStyle=t.color;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('+'+t.text,0,0.5);
+    ctx.beginPath(); ctx.moveTo(-4,11); ctx.lineTo(0,15); ctx.lineTo(4,11); ctx.fill();
+    ctx.restore();
+  });
+  ctx.globalAlpha=1;
+  drawLighting();
+  drawWeatherFX();
+  const w=WEATHERS[G.weather];
+  const wc={sunny:'#f5a623',rain:'#3b8fd9',snow:'#8fc1e8',windy:'#78909c'}[G.weather]||'#f5a623';
+  ctx.save();
+  ctx.shadowColor='rgba(60,45,25,0.20)'; ctx.shadowBlur=8; ctx.shadowOffsetY=2;
+  const bg=ctx.createLinearGradient(0,CANVAS_H-52,0,CANVAS_H-26);
+  bg.addColorStop(0,'rgba(255,255,255,0.97)'); bg.addColorStop(1,'rgba(255,248,236,0.97)');
+  ctx.fillStyle=bg;
+  ctx.beginPath(); ctx.roundRect(24,CANVAS_H-52,96,26,13); ctx.fill();
+  ctx.shadowColor='transparent';
+  ctx.strokeStyle='rgba(180,140,90,0.3)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(24,CANVAS_H-52,96,26,13); ctx.stroke();
+  ctx.fillStyle=wc;
+  ctx.beginPath(); ctx.arc(39,CANVAS_H-39,8,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fff';
+  ctx.font='10px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(w.icon,39,CANVAS_H-38.5);
+  ctx.fillStyle='#5a5548';
+  ctx.font='bold 11px sans-serif'; ctx.textAlign='left';
+  ctx.fillText(w.name,53,CANVAS_H-38);
+  ctx.restore();
+}
+/* ================= 主循环 ================= */
+let animFrame=null;
+function loop(timestamp){
+  if(!G.running||G.gameOver) return;
+  const dt=G.lastTime?timestamp-G.lastTime:16;
+  G.lastTime=timestamp;
+  if(G.paused){ draw(); updateUI(); return; }
+  G.gameTime+=dt;
+  updateTime(dt);
+  spawnCustomer(dt);
+  G.customers.forEach(c=>c.update(dt));
+  G.customers=G.customers.filter(c=>!c.isGone());
+  const fm=G.speed||0;
+  G.particles=G.particles.filter(p=>p.life>0);
+  G.particles.forEach(p=>{ p.x+=p.vx*fm; p.y+=p.vy*fm; p.life-=16*fm; });
+  G.floatTexts=G.floatTexts.filter(t=>t.life>0);
+  G.floatTexts.forEach(t=>{ t.y+=t.vy*fm; t.life-=16*fm; });
+  if(G.adBoost){ G.adTimer+=dt; if(G.adTimer>60000){ G.adBoost=false; G.adTimer=0; showToast('📢 广告效果结束'); } }
+  draw();
+  updateUI();
+  if(Math.floor(G.gameTime/1000) !== Math.floor((G.gameTime-dt)/1000)) saveGame();
+}
+function updateUI(){
+  $('day-num').textContent='第 '+G.day+' 天';
+  const h=String(Math.floor(G.hour)).padStart(2,'0');
+  const m=String(Math.floor(G.minute)).padStart(2,'0');
+  $('time-display').textContent=h+':'+m;
+  const cashTxt=fmtMoney(G.cash);
+  const incomeTxt=fmtMoney(G.todayIncome);
+  if(G.lastCashShown!==null && G.lastCashShown!==G.cash){
+    const el=$('cash-display');
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  }
+  if(G.lastIncomeShown!==null && G.lastIncomeShown!==G.todayIncome){
+    const el=$('today-income');
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  }
+  G.lastCashShown=G.cash; G.lastIncomeShown=G.todayIncome;
+  $('cash-display').textContent=cashTxt;
+  $('today-income').textContent=incomeTxt;
+  $('cash-display').className='value '+(G.cash<200?'red-text':'gold-text');
+  const rt=getRepTitle();
+  const repEl=$('rep-title');
+  repEl.textContent=rt.icon+' '+rt.title;
+  $('reputation').textContent='★ '+G.reputation.toFixed(1);
+}
+/* ================= UI 渲染 ================= */
+function renderTab(tab){
+  const content=$('tab-content');
+  let html='';
+  if(tab==='stock'){
+    html='<div class="section-title">商品库存</div>';
+    G.products.forEach(p=>{
+      const art=ART_PRODUCTS[p.id];
+      if(p.locked){
+        const hint=p.unlockBy==='fridge'?'🔒 需购买冷藏柜解锁':(p.unlockBy==='microwave'?'🔒 需购买微波炉解锁':'🔒 需解锁经营权');
+        html+='<div class="item-row" style="opacity:0.45">'
+          +'<div class="item-info"><div class="item-icon" style="filter:grayscale(1)">'+imgTag(p.id,36)+'</div>'
+          +'<div class="item-details"><div class="name">'+p.name+'</div><div class="meta">'+hint+'</div></div></div>'
+          +'<div class="item-actions"><span style="color:var(--text-dim)">---</span></div></div>';
+        return;
+      }
+      const low=p.stock<=5;
+      const maxS=getMaxStock(p);
+      const ratio=clamp(p.stock/maxS,0,1);
+      const barClass=ratio<=0.15?'danger':(ratio<=0.35?'warn':'');
+      html+='<div class="item-row" style="--item-c:'+p.color+'" onclick="showProductModal(\''+p.id+'\')">'
+        +'<div class="item-info"><div class="item-icon">'+imgTag(p.id,36)+'</div>'
+        +'<div class="item-details"><div class="name">'+p.name+'</div>'
+        +'<div class="meta">'+p.stock+' / '+maxS+(low?' · <span style="color:var(--red)">库存不足</span>':'')+'</div>'
+        +'<div class="stock-bar"><i class="'+barClass+'" style="width:'+(ratio*100).toFixed(1)+'%"></i></div></div></div>'
+        +'<div class="item-actions"><span style="color:var(--gold);font-weight:700">'+fmtMoney(p.price)+'</span></div></div>';
+    });
+  } else if(tab==='staff'){
+    html='<div class="section-title">员工管理</div>';
+    G.staff.forEach(s=>{
+      const art=ART_UI[STAFF_ICON[s.id]];
+      const simg=STAFF_IMG[s.id];
+      html+='<div class="item-row">'
+        +'<div class="item-info"><div class="item-icon">'+(simg?imgTag(simg,17,26):(art?svgInline(art,26,s.color||'#e8622a'):s.icon))+'</div>'
+        +'<div class="item-details"><div class="name">'+s.name+'</div>'
+        +'<div class="meta">'+s.desc+' · 已雇 '+s.count+' 人 · 日薪 '+fmtMoney(s.wage)+'</div></div></div>'
+        +'<div class="item-actions">'
+        +'<button class="btn small" onclick="hire(\''+s.id+'\')" '+(G.cash<s.wage?'disabled':'')+'>雇佣</button>'
+        +(s.count>0?'<button class="btn small secondary" onclick="fire(\''+s.id+'\')">解雇</button>':'')
+        +'</div></div>';
+    });
+    const tw=G.staff.reduce((s,x)=>s+x.wage*x.count,0);
+    html+='<div style="margin-top:12px;font-size:12px;color:var(--text-dim);padding:12px;background:var(--card-light);border:1px solid var(--line);border-radius:12px">📋 每日工资支出：'+fmtMoney(tw)+'</div>';
+  } else if(tab==='upgrade'){
+    html='<div class="section-title">店铺扩建</div>';
+    const cur=SHOP_LEVELS[G.storeLevel-1];
+    const next=SHOP_LEVELS[G.storeLevel];
+    html+='<div class="store-card">'
+      +'<div class="s-name">'+cur.icon+' '+cur.name+' <span style="font-size:11px;font-weight:500;color:var(--text-dim)">(当前)</span></div>'
+      +'<div class="s-desc">'+cur.desc+'</div>'
+      +'<div class="s-info"><span>货架 <b>'+cur.shelves+'</b></span><span>日租金 <b>'+fmtMoney(cur.rent)+'</b></span><span>库存加成 <b>+'+cur.capBonus+'</b></span></div>'
+      +(next
+        ? '<div style="display:flex;gap:8px;align-items:center;justify-content:space-between">'
+          +'<div style="font-size:12px;color:var(--text-dim)">下一级：<b style="color:var(--text)">'+next.name+'</b> · 货架 ×'+next.shelves+' · 日租金 '+fmtMoney(next.rent)
+          +'<div class="s-desc" style="margin:4px 0 0">'+next.desc+'</div></div>'
+          +'<button class="btn small orange" onclick="expandStore()" '+(G.cash<next.cost?'disabled':'')+'>扩建 '+fmtMoney(next.cost)+'</button>'
+          +'</div>'
+        :'<div style="font-size:13px;font-weight:700;color:var(--gold)">🏆 已达成最高等级！</div>')
+      +'</div>';
+    html+='<div class="section-title">科技升级</div>';
+    G.upgrades.forEach(u=>{
+      const reqMet=!u.req||getUpgrade(u.req).bought;
+      const art=ART_UI[UPGRADE_ICON[u.id]];
+      html+='<div class="upgrade-card '+(u.bought?'purchased':'')+'">'
+        +'<div class="up-ic">'+(art?svgInline(art,26):u.icon)+'</div>'
+        +'<div class="up-body"><div class="title">'+u.name+(u.bought?' <span style="color:var(--green)">✓</span>':'')+'</div>'
+        +'<div class="desc">'+u.desc+'</div>'
+        +(u.bought?'<span style="color:var(--green);font-size:12.5px;font-weight:600">已购买</span>'
+          :!reqMet?'<span style="color:var(--text-dim);font-size:12.5px">🔒 需要先购买前置升级</span>'
+          :'<button class="btn small" onclick="buyUpgrade(\''+u.id+'\')" '+(G.cash<u.cost?'disabled':'')+'>购买 '+fmtMoney(u.cost)+'</button>')
+        +'</div></div>';
+    });
+  } else if(tab==='goal'){
+    html='<div class="section-title">玩家等级</div>'
+      +'<div class="lvl-row">'
+      +'<div class="lvl-badge">Lv.'+G.level+'</div>'
+      +'<div class="lvl-info"><div class="lvl-name">经营者 Lv.'+G.level+'</div>'
+      +'<div class="lvl-xp">经验 '+G.xp+' / '+(XP_PER_LEVEL*G.level)+' · 每级库存上限 +4</div>'
+      +'<div class="lvl-bar"><i style="width:'+Math.min(100,(G.xp/(XP_PER_LEVEL*G.level))*100).toFixed(1)+'%"></i></div></div>'
+      +'</div>';
+    html+='<div class="section-title">今日目标 <span style="font-size:11px;font-weight:400;color:var(--text-dim)">达成可获现金奖励</span></div>';
+    if(G.dailyTargets.length===0){
+      html+='<div class="goal-card" style="text-align:center;color:var(--text-dim)">目标将于每日开始时刷新</div>';
+    }
+    G.dailyTargets.forEach(t=>{
+      const pct=Math.min(100,(t.cur/t.goal)*100);
+      html+='<div class="goal-card '+(t.done?'done':'')+'">'
+        +'<div class="g-title"><span>'+(t.done?'✅ ':'🎯 ')+t.text+'</span><span class="g-reward">+'+fmtMoney(t.reward)+'</span></div>'
+        +'<div class="g-bar"><i style="width:'+pct.toFixed(1)+'%"></i></div>'
+        +'<div style="font-size:11px;color:var(--text-dim);margin-top:5px">'+(t.done?'已完成':'进度 '+Math.min(t.cur,t.goal).toFixed(1)+' / '+t.goal)+'</div>'
+        +'</div>';
+    });
+    html+='<div class="section-title">资金周转</div>'
+      +'<div class="store-card">'
+      +'<div class="s-name">🏦 贷款服务 <span style="font-size:11px;font-weight:500;color:var(--text-dim)">应急救急，日供 22%</span></div>'
+      +'<div class="s-desc">'+ (G.loan>0 ? '当前欠款 <b style="color:var(--red)">'+fmtMoney(G.loan)+'</b>（共需 '+fmtMoney(G.loanTotal)+'）' : '资金紧张时借一笔，每天打烊自动扣还' ) +'</div>'
+      +'<div class="s-info">'
+      + LOAN_OPTIONS.map((o,i)=>'<button class="btn small" onclick="takeLoan('+i+')" '+(G.loan>0?'disabled':'')+'>借 '+fmtMoney(o.amount)+'</button>').join('')
+      +'<button class="btn small green" onclick="repayLoan()" '+(G.loan<=0?'disabled':'')+'>还款</button>'
+      +'</div></div>';
+  } else if(tab==='stats'){
+    const days=Math.max(1,G.day);
+    const avgInc=G.totalIncome/days;
+    html+='<div class="lvl-row">'
+      +'<div class="lvl-badge">Lv.'+G.level+'</div>'
+      +'<div class="lvl-info"><div class="lvl-name">经营者 Lv.'+G.level+'</div>'
+      +'<div class="lvl-xp">经验 '+G.xp+' / '+(XP_PER_LEVEL*G.level)+'</div>'
+      +'<div class="lvl-bar"><i style="width:'+Math.min(100,(G.xp/(XP_PER_LEVEL*G.level))*100).toFixed(1)+'%"></i></div></div>'
+      +'</div>';
+    html+='<div class="stats-grid">'
+      +'<div class="stat-box"><div class="num">'+G.totalCustomers+'</div><div class="label">总顾客</div></div>'
+      +'<div class="stat-box"><div class="num">'+G.servedCustomers+'</div><div class="label">已服务</div></div>'
+      +'<div class="stat-box"><div class="num">'+fmtMoney(G.totalIncome)+'</div><div class="label">总营收</div></div>'
+      +'<div class="stat-box"><div class="num">'+G.day+'</div><div class="label">营业天数</div></div>'
+      +'<div class="stat-box"><div class="num">'+fmtMoney(avgInc)+'</div><div class="label">日均收入</div></div>'
+      +'<div class="stat-box"><div class="num">'+fmtMoney(G.stat.maxDayIncome)+'</div><div class="label">单日最高</div></div>'
+      +'<div class="stat-box"><div class="num">'+fmtMoney(G.stat.restockSpend)+'</div><div class="label">补货支出</div></div>'
+      +'<div class="stat-box"><div class="num">'+fmtMoney(G.stat.staffSpend)+'</div><div class="label">工资支出</div></div>'
+      +'<div class="stat-box"><div class="num">'+SHOP_LEVELS[G.storeLevel-1].name+'</div><div class="label">店铺等级</div></div>'
+      +'<div class="stat-box"><div class="num">'+G.stat.loansTaken+'</div><div class="label">贷款次数</div></div>'
+      +'<div class="stat-box"><div class="num">'+(G.todayServed)+'</div><div class="label">今日顾客</div></div>'
+      +'<div class="stat-box"><div class="num">'+G.perfectDays+'</div><div class="label">5星天数</div></div>'
+      +'</div>';
+    html+='<div class="section-title">成就 '+G.achievements.filter(a=>a.unlocked).length+' / '+G.achievements.length+'</div>';
+    G.achievements.forEach(a=>{
+      html+='<div class="achievement '+(a.unlocked?'unlocked':'locked')+'">'
+        +'<div class="icon">'+a.icon+'</div>'
+        +'<div class="info"><div class="name">'+a.name+'</div>'
+        +'<div class="desc">'+a.desc+'</div></div>'
+        +(a.unlocked?'<span style="color:var(--gold);font-weight:800">✓</span>':'')
+        +'</div>';
+    });
+  }
+  content.innerHTML=html;
+}
+/* ================= 弹窗 ================= */
+function showProductModal(pid){
+  const p=getProduct(pid);
+  if(!p) return;
+  const modal=$('modal'), content=$('modal-content');
+  if(p.locked){
+    const hint=p.unlockBy==='fridge'?'在「升级」页购买冷藏柜后解锁':(p.unlockBy==='microwave'?'在「升级」页购买微波炉后解锁':'需要购买经营权升级');
+    content.innerHTML='<h3><span class="m-icon" style="filter:grayscale(1)">'+imgTag(p.id,38)+'</span>'+p.name+'</h3>'
+      +'<div class="modal-row"><span class="label">状态</span><span class="value" style="color:var(--red)">🔒 尚未解锁</span></div>'
+      +'<div class="modal-row"><span class="label">解锁方式</span><span class="value">'+hint+'</span></div>'
+      +'<div class="modal-actions"><button class="btn small secondary" onclick="closeModal()">关闭</button></div>';
+    modal.classList.remove('hidden');
+    return;
+  }
+  const profit=(p.price-p.cost).toFixed(1);
+  content.innerHTML='<h3><span class="m-icon">'+imgTag(p.id,38)+'</span>'+p.name+'</h3>'
+    +'<div class="modal-row"><span class="label">描述</span><span class="value">'+p.desc+'</span></div>'
+    +'<div class="modal-row"><span class="label">进价</span><span class="value">'+fmtMoney(p.cost)+'</span></div>'
+    +'<div class="modal-row"><span class="label">售价</span><span class="value gold-text">'+fmtMoney(p.price)+'</span></div>'
+    +'<div class="modal-row"><span class="label">单件利润</span><span class="value green-text">+'+fmtMoney(profit)+'</span></div>'
+    +'<div class="modal-row"><span class="label">库存</span><span class="value">'+p.stock+' / '+getMaxStock(p)+'</span></div>'
+    +'<div class="modal-row"><span class="label">需求度</span><span class="value">'+(p.demand*100).toFixed(0)+'%</span></div>'
+    +'<div class="modal-actions">'
+    +'<button class="btn small secondary" onclick="closeModal()">关闭</button>'
+    +'<button class="btn small green" onclick="restock(\''+p.id+'\',10);closeModal()">补货10</button>'
+    +'<button class="btn small orange" onclick="restock(\''+p.id+'\',20);closeModal()">补货20</button>'
+    +'<button class="btn small blue" onclick="showPriceEdit(\''+p.id+'\')">改价</button>'
+    +'</div><div id="price-edit-area" style="margin-top:14px"></div>';
+  modal.classList.remove('hidden');
+}
+function showPriceEdit(pid){
+  const p=getProduct(pid);
+  const maxP=Math.max(Math.ceil(p.cost*4),20);
+  $('price-edit-area').innerHTML='<div style="font-size:12px;color:var(--text-dim);margin-bottom:8px">可调范围：'+fmtMoney(p.cost)+' ~ '+fmtMoney(maxP)+'</div>'
+    +'<div style="display:flex;gap:8px;align-items:center;justify-content:center">'
+    +'<input type="number" class="price-edit" id="new-price" value="'+p.price+'" step="0.5" min="'+p.cost+'" max="'+maxP+'">'
+    +'<button class="btn small green" onclick="setPriceFromModal(\''+pid+'\')">确定</button></div>';
+}
+function setPriceFromModal(pid){ setPrice(pid,parseFloat($('new-price').value)); closeModal(); }
+function showCustomerModal(c){
+  const modal=$('modal'), content=$('modal-content');
+  const states={enter:'进店中',browse:'挑选商品',queue:'排队结账',pay:'结账中',leave:'离店中',exit:'离开中'};
+  content.innerHTML='<h3><span class="m-icon">'+imgTag(c.spriteKey||'customer1',17,26)+'</span>'+(c.isVip?'VIP 顾客':'顾客详情')+'</h3>'
+    +'<div class="modal-row"><span class="label">状态</span><span class="value">'+(states[c.state]||c.state)+'</span></div>'
+    +'<div class="modal-row"><span class="label">满意度</span><span class="value">'+(c.happiness*100).toFixed(0)+'%</span></div>'
+    +'<div class="modal-row"><span class="label">想买</span><span class="value">'+(c.targetProduct?getProduct(c.targetProduct).name:'未知')+'</span></div>'
+    +'<div class="modal-row"><span class="label">已买</span><span class="value">'+(c.bought?getProduct(c.bought).name:'无')+'</span></div>'
+    +(c.isVip?'<div class="modal-row"><span class="label">身份</span><span class="value gold-text">VIP 大客户 · 双倍消费</span></div>':'')
+    +'<div class="modal-row"><span class="label">类型</span><span class="value">'+(c.isVip?'👑 VIP':c.ct.icon+' '+c.ct.name)+'</span></div>'
+    +'<div class="modal-row"><span class="label">预算上限</span><span class="value">'+fmtMoney(c.budget)+'× 进价</span></div>'
+    +'<div class="modal-actions"><button class="btn small secondary" onclick="closeModal()">关闭</button></div>';
+  modal.classList.remove('hidden');
+}
+function closeModal(){
+  $('modal').classList.add('hidden');
+  G.selectedShelf=null;
+}
+/* ================= 设置 ================= */
+function openSettings(){
+  G.paused=true;
+  updateSettingUI();
+  $('settings-modal').classList.remove('hidden');
+}
+function toggleSetting(key){
+  G.settings[key]=!G.settings[key];
+  if(key==='sfx') G.audioOn=G.settings.sfx;
+  if(key==='music'){ if(G.settings.music) startBGM(); else stopBGM(); }
+  updateSettingUI();
+  saveGame();
+}
+function updateSettingUI(){
+  $('set-sfx').classList.toggle('on',!!G.settings.sfx);
+  $('set-sfx').textContent=G.settings.sfx?'开':'关';
+  $('set-music').classList.toggle('on',!!G.settings.music);
+  $('set-music').textContent=G.settings.music?'开':'关';
+}
+function showHelp(){ $('help-modal').classList.remove('hidden'); }
+function resetSaveConfirm(){
+  if(confirm('确定要重置存档吗？所有进度将丢失，且不可恢复！')){
+    try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+    $('settings-modal').classList.add('hidden');
+    G.paused=false;
+    location.reload();
+  }
+}
+/* ================= 操作 ================= */
+function setPrice(pid,val){
+  const p=getProduct(pid);
+  const np=parseFloat(val);
+  const maxP=Math.max(Math.ceil(p.cost*4),20);
+  if(isNaN(np)){ sfxError(); return; }
+  if(np>=p.cost&&np<=maxP){
+    p.price=np; showToast(p.name+' 售价 '+fmtMoney(np)); sfxClick();
+    const t=document.querySelector('.tab.active');
+    if(t) renderTab(t.dataset.tab);
+  } else { showToast('价格需在 '+fmtMoney(p.cost)+' ~ '+fmtMoney(maxP)+' 之间'); sfxError(); }
+}
+function restock(pid,qty){
+  const p=getProduct(pid);
+  const cost=p.cost*qty*G.costBoost;
+  if(G.cash>=cost){
+    G.cash-=cost; p.stock=Math.min(p.stock+qty,getMaxStock(p));
+    G.stat.restockSpend+=cost; G.stat.totalRestock++;
+    updateTarget('restock',1);
+    showToast('📦 补货 '+qty+' 个 '+p.name); sfxBuy();
+    const t=document.querySelector('.tab.active');
+    if(t) renderTab(t.dataset.tab);
+  } else { showToast('现金不足！'); sfxError(); }
+}
+function hire(sid){
+  const s=G.staff.find(x=>x.id===sid);
+  if(G.cash>=s.wage){
+    s.count++; G.cash-=s.wage;
+    showToast('🤝 雇佣了 '+s.name); sfxHire();
+    const t=document.querySelector('.tab.active');
+    if(t) renderTab(t.dataset.tab);
+  } else { showToast('现金不足！'); sfxError(); }
+}
+function fire(sid){
+  const s=G.staff.find(x=>x.id===sid);
+  if(s.count>0){
+    s.count--; showToast('👋 解雇了 '+s.name); sfxClick();
+    const t=document.querySelector('.tab.active');
+    if(t) renderTab(t.dataset.tab);
+  }
+}
+function buyUpgrade(uid){
+  const u=getUpgrade(uid);
+  if(u.bought||G.cash<u.cost) return;
+  G.cash-=u.cost; u.bought=true; sfxBuy();
+  if(uid==='shelf1') G.maxStockBonus+=15;
+  if(uid==='shelf2') G.maxStockBonus+=25;
+  if(uid==='auto') G.autoRestock=true;
+  if(uid==='decor') G.decorLevel++;
+  if(uid==='ad'){ G.adBoost=true; G.adTimer=0; }
+  if(uid==='cig'){ const p=getProduct('cigarette'); p.locked=false; p.stock=10; }
+  if(uid==='fridge'){ G.fridgeBonus=true; const p=getProduct('icecream'); if(p){ p.locked=false; p.stock=8; } }
+  if(uid==='microwave'){ G.microwaveBonus=true; const p=getProduct('oden'); if(p){ p.locked=false; p.stock=8; } }
+  showToast('🚀 购买了 '+u.name);
+  addParticles(CANVAS_W/2,CANVAS_H/2,'#ffd700',20);
+  const t=document.querySelector('.tab.active');
+  if(t) renderTab(t.dataset.tab);
+}
+function setSpeed(s){
+  G.speed=s;
+  document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.speed-btn').forEach(b=>{
+    const txt=b.textContent.trim();
+    if((s===0&&txt==='⏸')||(parseInt(txt)===s)) b.classList.add('active');
+  });
+  if(s===0) G.paused=true; else G.paused=false;
+}
+/* ================= 流程 ================= */
+function startGame(){
+  initAudio();
+  G.running=true;
+  $('start-overlay').classList.add('hidden');
+  if(G.dailyTargets.length===0) rollDailyTargets();
+  renderTab('stock');
+  G.lastTime=performance.now();
+  if(animFrame) clearInterval(animFrame);
+  animFrame=setInterval(function(){ loop(performance.now()); },16);
+  const w=WEATHERS[G.weather];
+  showEventBanner(w.icon+' 第 '+G.day+' 天 · '+w.name+' 开始营业');
+  sfxHire();
+  startBGM();
+  if(!G.tutorialDone) setTimeout(startTutorial, 1500);
+}
+function gameOver(reason){
+  G.gameOver=true; G.running=false;
+  if(animFrame) clearInterval(animFrame);
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  $('gameover-reason').textContent=reason;
+  $('final-days').textContent=G.day;
+  $('final-income').textContent=fmtMoney(G.totalIncome);
+  $('final-customers').textContent=G.servedCustomers;
+  $('gameover-overlay').classList.remove('hidden');
+}
+function restartGame(){
+  G.running=false; G.gameOver=false; G.speed=1; G.paused=false;
+  G.day=1; G.hour=6; G.minute=0;
+  G.cash=2000; G.totalIncome=0; G.todayIncome=0; G.reputation=3.0;
+  G.products=JSON.parse(JSON.stringify(PRODUCTS));
+  G.staff=JSON.parse(JSON.stringify(STAFF_TYPES));
+  G.upgrades=JSON.parse(JSON.stringify(UPGRADES));
+  G.achievements=JSON.parse(JSON.stringify(ACHIEVEMENTS));
+  G.customers=[]; G.particles=[]; G.floatTexts=[];
+  G.totalCustomers=0; G.servedCustomers=0; G.todayServed=0;
+  G.maxStockBonus=0; G.adBoost=false; G.adTimer=0; G.autoRestock=false; G.decorLevel=0;
+  G.fridgeBonus=false; G.microwaveBonus=false; G.perfectDays=0;
+  G.seenWeather={}; G.weather='sunny';
+  G.summaryMode=false; G.newDayReady=false; G.lastDaySummary=null;
+  G.lastCashShown=null; G.lastIncomeShown=null;
+  G.storeLevel=1; G.costBoost=1; G.costBoostDays=0; G.loan=0; G.loanTotal=0;
+  G.xp=0; G.level=1; G.dailyTargets=[]; G.dayHappySum=0; G.dayHappyCount=0;
+  G.stat={restockSpend:0, staffSpend:0, maxDayIncome:0, totalRestock:0, loansTaken:0};
+  G.tutorialDone=false;
+  SHELVES=buildShelves(1);
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  $('gameover-overlay').classList.add('hidden');
+  $('summary-overlay').classList.add('hidden');
+  startGame();
+}
+/* ================= 交互 ================= */
+canvas.addEventListener('click',function(e){
+  if(!G.running||G.gameOver||G.summaryMode) return;
+  const rect=canvas.getBoundingClientRect();
+  const x=(e.clientX-rect.left)*CANVAS_W/rect.width;
+  const y=(e.clientY-rect.top)*CANVAS_H/rect.height;
+  for(let i=0;i<SHELVES.length;i++){
+    const s=SHELVES[i];
+    if(x>=s.x-6&&x<=s.x+s.w+6&&y>=s.y-30&&y<=s.y+s.h+2){
+      G.selectedShelf=i;
+      showProductModal(s.products[0]);
+      return;
+    }
+  }
+  for(let i=0;i<G.customers.length;i++){
+    const c=G.customers[i];
+    if(Math.sqrt((x-c.x)**2+(y-c.y)**2)<20){
+      showCustomerModal(c);
+      return;
+    }
+  }
+});
+document.querySelectorAll('.tab').forEach(function(tab){
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    renderTab(tab.dataset.tab);
+  });
+});
+document.addEventListener('keydown',function(e){
+  if(e.code==='Space'){ e.preventDefault(); setSpeed(G.speed===0?1:0); }
+  if(e.code==='Escape'){
+    if(!$('event-modal').classList.contains('hidden')){ $('event-modal').classList.add('hidden'); G.paused=false; }
+    else if(!$('settings-modal').classList.contains('hidden')){ $('settings-modal').classList.add('hidden'); G.paused=false; }
+    else if(!$('help-modal').classList.contains('hidden')){ $('help-modal').classList.add('hidden'); }
+    else closeModal();
+  }
+  if(e.code==='Digit1') setSpeed(1);
+  if(e.code==='Digit2') setSpeed(2);
+  if(e.code==='Digit4') setSpeed(4);
+});
+$('modal').addEventListener('click',function(e){
+  if(e.target===this) closeModal();
+});
+/* ================= 启动 ================= */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+initIcons();
+loadImages();
+updateSettingUI();
+if(hasSave()){
+  loadSave();
+  G.audioOn=G.settings.sfx;
+  updateSettingUI();
+  const w=WEATHERS[G.weather];
+  $('start-overlay').querySelector('h1').innerHTML='小小便利店<span class="dot">.</span>';
+  const p=$('start-overlay').querySelector('p');
+  p.innerHTML='欢迎回来，店长！你已经营到 <b style="color:var(--accent-deep)">第 '+G.day+' 天</b>，现金 '+fmtMoney(G.cash)+'。<br>继续你的便利店帝国吧！';
+  const btn=$('start-overlay').querySelector('.btn');
+  btn.textContent='继续营业';
+  btn.onclick=function(){ startGame(); };
+  const tip=$('start-overlay').querySelector('.foot-hint');
+  if(tip){ tip.textContent='⌨️ 空格暂停 · 1/2/4 切换速度 · 存档已自动读取'; }
+  showEventBanner('📂 已读取存档 · 第 '+G.day+' 天');
+}
+draw();
+updateUI();
+</script>
+</body>
+</html>

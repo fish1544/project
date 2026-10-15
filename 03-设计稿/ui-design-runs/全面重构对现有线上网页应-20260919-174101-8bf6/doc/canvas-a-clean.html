@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<!-- ══ 写完这一份之后，唯一的下一步是执行这一条命令 ═══════════════
+     python3 C:\Users\zhy\AppData\Local\Doubao\User Data\Default\.doubao\agent_mode\workspace\.skills\doubao-ui-design\scripts\ui.py review --run D:\Project\ui-design-runs\全面重构对现有线上网页应-20260919-174101-8bf6\run.json
+
+     它是**一条要执行的命令**，不是「你自己去看一眼」。
+     一条做完：起服务器 → 整页与逐状态截图 → 跑门 → 写好看图回执。
+     不要自己 open_url_in_browser、不要自己 take_screenshot、
+     不要自己 python3 -m http.server —— 那条路走完也拿不到门的结果，
+     更拿不到交付参数，最后既没有 doc 也没有卡片。
+     ══════════════════════════════════════════════════════════════ -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>个人使用说明书 · 界面全面重构 · 设计方案</title>
+<style>
+/* ══════════════════════════════════════════════════════════════════
+   飞书文档里的窄栏排版画布。这一侧拼的是**排版**，不是画面。
+   多大的地方放什么、分几栏、谁大谁小、先看到哪个 —— 那是这里的全部内容。
+
+   三条物理约束（都是真事故换来的，不要试探）：
+   1. 必须是完整 HTML 文档。片段会被飞书当片段渲染。
+   2. 注释和样式里不得出现结构标签字面量。曾经一句注释里的 body 字面量，
+      让消费方从那里截出 143KB CSS 当正文印了出来。
+   3. 单块 <= 512KB。图一律 base64 内嵌 —— 外链和本地路径在飞书里都会变裂图。
+
+   两条几何约束：
+   · **不要写断点**。飞书块宽在 560–1145px 之间浮动（侧栏展开 698，最典型 820），
+     写死断点必然在某个宽度崩掉。用 clamp 让间距跟着块宽走。
+   · **网格不要用 auto-fit**。它的列数随宽度浮动，一定会在某个宽度上排出
+     3+1 / 5+1 的孤儿行。列数由**项数**决定，写在标签的 --cols 上（见下面）。
+   ══════════════════════════════════════════════════════════════════ */
+
+*{box-sizing:border-box;margin:0;padding:0}
+.cv{
+  /* ══ 人格层：这 7 个值决定「这份文档是谁」。它们没有默认值，必须由你定。 ══
+     为什么留空：骨架一旦出厂就带着一套完整人格（白纸 + 系统无衬线 + 等宽编号 +
+     2px 墨线 + 3px 圆角），两份完全不同项目的画布填完空之后，
+     **13 个视觉角色里会有 7 个逐字节相同** —— 一眼就能看出是同一个模板。
+     骨架越好用越容易变成模板 —— 所以人格必须留空，逼你做决定。
+
+     怎么定：读 style.json 的六维签名，把它翻译成这几个值。
+       ground=paper → 微黄纸 / 米白 / 牛皮       ground=dark → 深底浅字
+       typeVoice=serif-editorial → 衬线 + 双线分隔 + 零圆角
+       typeVoice=rounded-friendly → 圆体 + 大圆角 + 柔和阴影
+     三份 gold 是三个做完的样本，可以看，**不可以抄**：
+       PULSE   白纸 / 近黑 / 信号橙红 / 无衬线压缩重体 / 单墨线 / 直角
+       QQ      微黄档案纸 / 深靛 / 宋体 / 双线 / 零圆角
+       骑不骑   沙色 / 暖褐 / 圆润体 / 无分隔线 / 大圆角
+     它们两两之间最多只有 5 个角色相同。你这一份对它们任何一份也不该超过 5。 */
+  --bg:#F3EFE4;          /* 纸 */
+  --ink:#22302B;           /* 墨 */
+  --sub:#5F6B63;         /* 灰阶 */
+  --line:1px solid rgba(34,48,43,.16);     /* 发丝线 */
+  --soft:#EAE3D2;         /* 浅底块 */
+  /* 本篇主色：跟成品的强调色一致，文档才像同一个项目。
+     --acc    做色块、色带、分隔线（可以饱和）
+     --accink 做**文字**（必须压深）—— 这两个是不同的角色。
+     已知失败条件：品牌蓝直接当小字色，在纸底上只有 1.87:1，整行读不出来，
+     而肉眼只觉得"淡了点"。凡是 color: 用强调色的地方，用 --accink。 */
+  --acc:#D96E21; --acc2:rgba(217,110,33,.14); --accink:#B25A17;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  width:100%; max-width:900px; margin:0 auto;
+  /* 阅读边距：文字不能贴着块边。飞书块宽 560–1145 浮动，所以用 clamp 跟着走。
+     顶部那条色带要满幅，所以它用负 margin 顶出去（见 .topbar）。 */
+  --gut:clamp(24px,4.6vw,56px);
+  background:var(--bg); color:var(--ink);
+  font-family:Noto Serif SC;
+  /* 刻度也是人格：两份稿「看起来一样」，多半不是颜色一样，是这几项一样。 */
+  font-size:15px; line-height:1.75; -webkit-font-smoothing:antialiased;
+  padding:0 var(--gut) 48px;
+}
+.cv img{display:block;max-width:100%;height:auto}
+
+/* ── 页眉：一条主色细条 + 大字距眉标。整篇的身份就靠这两行 ── */
+.topbar{height:5px;background:var(--acc);margin:0 calc(var(--gut) * -1) 26px}
+.runhead{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  font:600 11px/1.6 var(--mono);letter-spacing:.22em;color:var(--sub);
+  padding-bottom:12px;border-bottom:1px solid var(--line)}
+
+/* ── 章节头：2px 墨线 + 巨编号 + 标题 + 一行灰副题 ──
+   这四件套是整份文档的节奏来源。不要用卡片和阴影代替它。 */
+.sec{padding-top:56px}
+.sec-top{border-top:2px dotted rgba(34,48,43,.28);padding-top:20px;
+  display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:baseline}
+.sn{font:700 15px Noto Serif SC;color:var(--accink)}
+.sec-top h2{font-size:26px;font-weight:800;line-height:1.25;letter-spacing:-.01em}
+.sec-top p{grid-column:2;font-size:14px;color:var(--sub);margin-top:6px}
+
+.lede{font-size:17px;line-height:2;margin-top:24px;max-width:42em}
+.lede em{font-style:normal;background:linear-gradient(transparent 62%,var(--acc2) 62%);padding:0 2px;font-weight:600}
+.body{font-size:15.5px;line-height:1.95;margin-top:20px;max-width:42em;color:#2B2F38}
+
+/* ── 通栏版面证据：给成品长图用 ────────────────────────────
+   截图要落在一块**场**里：场有底色，图有大圆角和一层柔和投影。
+   直接通栏 + 1px 细边看起来像"贴了张图"，加了场和投影才像"一件作品"。
+   参考稿的共同机制：浅色场 + 圆角 + 大投影，图的四边都留出场。 */
+.plate{margin-top:26px;padding:clamp(20px,3.4%,40px);
+  background:linear-gradient(160deg,var(--soft),var(--bg));
+  border-radius:10px}
+.plate img{width:100%;border:0;border-radius:10px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.06),0 24px 48px -18px rgba(0,0,0,.28)}
+.plate .cap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  font:600 11px/1.6 var(--mono);letter-spacing:.16em;color:var(--sub);margin-top:10px}
+
+/* ── 等分网格：列数必须整除项数，否则会出现"孤儿行"（3+1 / 5+1），整版立刻显乱。
+   列数由项数决定，写在标签的 --cols 上；门会查声明与实渲染是否一致。 */
+.quad,.gain,.duo{display:grid;
+  grid-template-columns:repeat(var(--cols,2),minmax(0,1fr))}
+
+/* ── 把一台手机放进文档：.device / .device-row ────────────────────
+   要求：文档里放移动端页面时要好看，图不能糊。
+
+   参考稿的机制完全一致：
+     手机机身宽度占容器  15% – 26%（三张分别约 24% / 17% / 19%）
+     两侧各留            30%+ 的场
+     场是**有内容的**    浅灰渐变 ／ 装饰物件（行李箱·相机·云·植物）／ 满版美术
+     机身                圆角 + 内描边 + 投影
+   —— 它看起来是「一台手机」，不是「一张竖图」。
+
+   只有通栏和裸图网格时，一张 600×2464 的手机长图会被借通栏拉满 795px 版心。
+   **"模糊"和"不成比例"是同一件事的两面**：既然要铺满 795px 就得塞进 512KB，
+   就只能把像素宽砍到 400。**把手机缩到 22%，它需要的像素只有原来的 1/14。**
+   出图直接用：python3 scripts/pack_img.py <截图> --slot device
+
+   场（--stage）三选一，按 style.json 的 ground 定，别都用灰渐变：
+     linear-gradient(…)          最克制，适合工具类
+     var(--soft)                 纸感 / 亮场
+     url(data:image/jpeg;base64,…) center/cover   满版美术，适合有世界观的稿 */
+/* `.ui-stage` 是脚本生成的片段用的前缀，与 `.device` 完全同义 ——
+   片段自带一份同样的样式，所以它粘进手写画布也成立；两边同名同义，
+   同一份画布里混用不会长成两个样子。 */
+.device,.device-row,.ui-stage{
+  --stage:linear-gradient(160deg,var(--soft),var(--bg));
+  --phone:22%;                  /* 机身占容器宽 —— 参考稿实测 15–26% */
+  margin-top:26px;padding:clamp(28px,5%,56px) 0;
+  background:var(--stage);border-radius:10px;
+  display:flex;align-items:flex-start;justify-content:center;gap:4%;
+}
+.device figure,.device-row figure,.ui-stage figure{
+  margin:0;width:var(--phone);flex:none}
+.device img,.device-row img,.ui-stage img{
+  width:100%;display:block;border-radius:12px;
+  /* 机身：内描边当边框，投影给它落在场里的重量。不要用粗边框假装机身。 */
+  box-shadow:0 0 0 1.5px rgba(0,0,0,.14),0 18px 34px -14px rgba(0,0,0,.34);
+}
+/* 多机错落：中间那台抬高。一个场里 2–3 台，**再多就换一个场**，
+   不要挤成一排，也不要退回没有机身的裸图网格。 */
+.device-row>figure:nth-child(2),.ui-stage-row>figure:nth-child(2){
+  transform:translateY(-7%)}
+.device-cap{margin-top:14px;font-size:13px;line-height:1.8;color:var(--sub)}
+.device-cap b{display:block;color:var(--ink);font-size:14px;margin-bottom:3px}
+
+/* ── 左标签右正文：解释设计决定用它，比一堆卡片清楚 ── */
+.dl .r{display:grid;grid-template-columns:minmax(88px,110px) 1fr;gap:14px 20px;
+  padding:16px 0;border-top:1px solid var(--line);align-items:baseline}
+.dl .r:last-child{border-bottom:1px solid var(--line)}
+.dl dt{font:600 11px/1.7 var(--mono);letter-spacing:.14em;color:var(--accink)}
+.dl dd{font-size:14.5px;line-height:1.8}
+
+/* ── 四宫格：色板 / 字阶 / 圆角 / 栅格。设计语言一节必须出示成品数值 ──
+   **必须带 data-spec**：数值该在这里被看见，不该在正文里被读出来。
+   带了 data-spec，`check.py --doc-voice` 的口吻判据就会跳过它。 */
+.quad{--cols:2;gap:0 38px;margin-top:26px;border-top:1px solid var(--line)}
+.quad>div{padding:22px 22px 22px 0;border-bottom:1px solid var(--line)}
+.quad h4{font:600 11px/1.7 var(--mono);letter-spacing:.18em;color:var(--sub);margin-bottom:14px}
+.sw{display:flex;align-items:center;gap:12px;padding:7px 0}
+.sw i{width:26px;height:26px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.sw code{margin-left:auto;font:400 11.5px var(--mono);color:var(--sub)}
+/* 字阶示例断成"Aa 数 / 字"两行会让人以为坏了 —— 示例元素一律不折行 */
+.ts{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:5px 0}
+.ts b{white-space:nowrap;font-weight:600}
+.ts small{font-size:12px;color:var(--sub)}
+
+/* 洞察：一段被抬起来的判断 */
+.insight{margin-top:28px;padding:26px 28px;background:var(--soft);
+  border-left:3px solid var(--acc)}
+.insight .k{font:600 11px/1.7 var(--mono);letter-spacing:.2em;color:var(--accink);
+  display:block;margin-bottom:10px}
+.insight p{font-size:19px;line-height:1.72;font-weight:600;letter-spacing:-.005em}
+
+/* 设计主张：整篇最大的一句话 */
+.claim{margin-top:32px;padding:38px 0 32px;border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);text-align:center}
+.claim q{quotes:none;display:block;font-size:clamp(30px,4.4vw,44px);font-weight:800;
+  line-height:1.26;letter-spacing:-.02em}
+.claim q em{font-style:normal;color:var(--accink)}
+.claim .why{margin-top:20px;font-size:14.5px;color:var(--sub);line-height:1.9;
+  max-width:34em;margin-inline:auto}
+
+/* 效益：三栏 */
+.gain{--cols:3;gap:0 34px;margin-top:28px;border-top:1px solid var(--line)}
+.gain>div{padding:26px 20px 26px 0;border-bottom:1px solid var(--line)}
+.gain h4{font-size:17px;font-weight:700;margin-bottom:10px;letter-spacing:-.01em}
+.gain p{font-size:14.5px;line-height:1.92;color:#2B2F38}
+
+/* 下一步 */
+.next{margin-top:26px}
+.next div{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:baseline;
+  padding:17px 0;border-top:1px solid var(--line);font-size:15px;line-height:1.88}
+.next div:last-child{border-bottom:1px solid var(--line)}
+.next b{font:600 11px/1.7 var(--mono);letter-spacing:.14em;color:var(--accink)}
+/* 双图 */
+.duo{--cols:2;gap:22px 24px;margin-top:28px;align-items:start}
+.duo figure{margin:0}
+.duo img{border:1px solid var(--line);border-radius:10px}
+.duo figcaption{font-size:13px;color:var(--sub);margin-top:10px;line-height:1.8}
+.duo figcaption b{display:block;color:var(--ink);font-size:14px;margin-bottom:4px}
+
+/* ── 对照表：三列「问题 / 为什么 / 怎么解」比一段散文有力得多 ── */
+table{width:100%;border-collapse:collapse;margin-top:24px;font-size:13.5px}
+th,td{text-align:left;vertical-align:top;padding:12px 12px 12px 0;
+  border-bottom:1px solid var(--line);line-height:1.72}
+th{font:600 11px/1.7 var(--mono);letter-spacing:.14em;color:var(--sub);
+  border-bottom:1.5px solid var(--ink);white-space:nowrap}
+td:first-child{font-weight:600;white-space:nowrap;color:var(--accink)}
+
+.note{margin-top:26px;padding:20px 22px;background:var(--soft);
+  border-left:3px solid var(--acc);font-size:14px;line-height:1.85}
+.foot{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
+  font:400 11px/1.8 var(--mono);letter-spacing:.1em;color:var(--sub);
+  display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="cv">
+  <div class="topbar"></div>
+  <div class="runhead"><span>个人使用说明书 · 界面全面重构 · 设计方案</span><span>PART 01</span></div>
+
+  <!-- ══ 乙方汇报七节。读者是甲方，不是 QA。 ══
+       正文里不要出现 px / hex / 选择器 / 断言 / 门 / 验收 / 边界 / 状态枚举。
+       数值应该被**看到**（下面 04 的四宫格），不该被**读到**（句子里）。
+       上篇：01–04（理解 / 机会 / 主张 / 视觉语言）。关键界面在下篇 canvas-b。 -->
+
+  <section class="sec">
+    <div class="sec-top"><div class="sn">01</div><h2>我们怎么理解这件事</h2></div>
+    <p class="lede">这是一款「个人使用说明书」工具：用语音记下行为与情绪，用计时沉淀任务时长，
+      让 AI 在日、周、月的尺度上帮你找出自己的规律——下午几点后喝咖啡会失眠、
+      做什么之后最容易进入工作状态、连续几天不出门效率会骤降。
+      它不让你打卡，不催你自律，只让你越来越懂自己。
+      翻译成一句话：<em>把记录变成聊天，把复盘变成镜子，把建议变成你自己验证过的脚本</em>。</p>
+    <p class="body">这一稿的重心是「低门槛记录」与「可落地的规律输出」：语音与一键计时负责把记录成本降到随手，
+      说明书负责把规律变成下一步就能做的动作。它不是打卡工具，不提供通用模板，也不做社交比较——
+      这三样都是它刻意不做的事。</p>
+  </section>
+
+  <section class="sec">
+    <div class="sec-top"><div class="sn">02</div><h2>我们看到的机会</h2></div>
+    <div class="insight"><span class="k">INSIGHT</span>
+      <p>通用的自律模板在替每个人做决定；<br>真正能坚持下去的规则，只能从自己过去的数据里长出来。</p></div>
+    <p class="body">市面上的记录工具把「记录」做成任务：打字、填表、打卡；把「建议」做成口号：要早睡、要专注。
+      用户缺的从来不是意志力，而是看见自己行为的镜子。当一个人亲眼看到
+      「下午三点后喝咖啡，入睡会推迟」这样属于自己的事实，改变是自动发生的——
+      这正是「说明书」与「打卡」之间最本质的差别。</p>
+    <div class="duo">
+      <figure><img src="__IMG_RHYTHM__" alt="精力节律曲线插画"><figcaption><b>规律来自你自己的曲线</b>节律、阈值、习惯，全部由你的数据画出，不借用任何人的模板。</figcaption></figure>
+      <figure><img src="__IMG_MANUAL__" alt="展开的个人说明书插画"><figcaption><b>说明书是一份能落地的清单</b>每一条建议都对应一个可以执行的应对动作，而不是一句「要自律」。</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-top"><div class="sn">03</div><h2>设计主张</h2></div>
+    <div class="claim">
+      <q>与其研究别人的自律模板，<br>不如多研究<em>自己</em></q>
+      <p class="why">这句话是产品存在的理由，也是打开应用时看到的第一行字。它可以出现在说明书封面、
+        内测邀请话术与分享卡片里——一句话同时回答「这是什么」和「为什么它值得用」。</p></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-top"><div class="sn">04</div><h2>视觉语言</h2></div>
+    <dl class="dl">
+      <div class="r"><dt>颜色</dt><dd>纸感米白是底，深墨绿是墨，琥珀橙只给一个角色——行动与选择。整本说明书像一份被认真书写的个人档案。</dd></div>
+      <div class="r"><dt>字</dt><dd>衬线标题像档案册上的批注，正文用无衬线保持日用工具的可读性；读时长、读数据的数字用等宽数字，沉稳不慌。</dd></div>
+      <div class="r"><dt>影像</dt><dd>手册、手机、曲线、纸张。这个世界是「一本正在被书写的个人档案」——画面负责氛围，界面负责所有要读的字。</dd></div>
+      <div class="r"><dt>形状</dt><dd>圆角只出现在可点与承载的地方，图标统一同一套线性笔画。装饰不做加法，只做留白与刻度。</dd></div>
+    </dl>
+    <div class="quad" data-spec>
+      <div>
+        <h4>色板</h4>
+        <div class="sw"><i style="background:#F3EFE4"></i><span>纸底</span><code>#F3EFE4</code></div>
+        <div class="sw"><i style="background:#1E3B34"></i><span>墨绿</span><code>#1E3B34</code></div>
+        <div class="sw"><i style="background:#D96E21"></i><span>琥珀</span><code>#D96E21</code></div>
+        <div class="sw"><i style="background:#22302B"></i><span>墨字</span><code>#22302B</code></div>
+      </div>
+      <div>
+        <h4>字阶</h4>
+        <div class="ts"><b style="font-family:Noto Serif SC">说明书标题</b><small>26 · 衬线 · 重</small></div>
+        <div class="ts"><b>正文内容</b><small>15 · 无衬线</small></div>
+        <div class="ts"><b>小标签</b><small>11.5 · 大字距</small></div>
+        <div class="ts"><b>42:36</b><small>等宽数字</small></div>
+      </div>
+      <div>
+        <h4>圆角</h4>
+        <div class="ts"><b>卡片与场</b><small>14</small></div>
+        <div class="ts"><b>控件</b><small>8</small></div>
+        <div class="ts"><b>按钮与标签</b><small>胶囊</small></div>
+      </div>
+      <div>
+        <h4>栅格</h4>
+        <div class="ts"><b>版心留白</b><small>20</small></div>
+        <div class="ts"><b>正文行高</b><small>1.65</small></div>
+        <div class="ts"><b>卡片间距</b><small>14</small></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot"><span>个人使用说明书 · 界面全面重构 · 设计方案</span><span>2026-09-19</span></div>
+</div>
+</body>
+</html>

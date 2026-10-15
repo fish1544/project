@@ -1,0 +1,67 @@
+@import "tw-animate-css";
+@import "./tailwind-theme.css";
+@import "./typography.css";
+
+@config "../../tailwind.config.ts";
+
+html {
+  --background: hsl(45 33% 95%);
+  --foreground: hsl(153 38% 20%);
+  --card: hsl(45 35% 97%);
+  --card-foreground: hsl(153 38% 20%);
+  --popover: hsl(45 35% 97%);
+  --popover-foreground: hsl(153 38% 20%);
+  --primary: hsl(153 40% 32%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(152 52% 94%);
+  --secondary-foreground: hsl(153 40% 25%);
+  --muted: hsl(40 20% 94%);
+  --muted-foreground: hsl(150 15% 45%);
+  --accent: hsl(152 52% 94%);
+  --accent-foreground: hsl(153 40% 25%);
+  --destructive: hsl(0 70% 55%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(40 20% 88%);
+  --input: hsl(40 20% 88%);
+  --ring: hsl(153 40% 32%);
+  --radius: 0.75rem;
+  --success: hsl(152 50% 45%);
+  --warning: hsl(38 80% 55%);
+  --chart-1: hsl(152 50% 45%);
+  --chart-2: hsl(38 80% 55%);
+  --chart-3: hsl(9 75% 61%);
+  --chart-4: hsl(270 40% 65%);
+  --chart-5: hsl(200 60% 55%);
+  --sidebar: hsl(45 35% 96%);
+  --sidebar-foreground: hsl(153 38% 20%);
+  --sidebar-primary: hsl(153 40% 32%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(152 52% 94%);
+  --sidebar-accent-foreground: hsl(153 40% 25%);
+  --sidebar-border: hsl(40 20% 88%);
+  --sidebar-ring: hsl(153 40% 32%);
+}
+
+/* 彻底隐藏平台水印 */
+[data-watermark],
+[data-custom-element*="watermark"],
+[data-custom-element*="Watermark"],
+.app-watermark,
+.platform-watermark,
+.powered-by-watermark,
+.miaoda-watermark,
+.doubao-watermark,
+.watermark-container,
+.watermark-wrapper,
+.watermark-layer,
+.watermark-root,
+.brand-watermark,
+.suda-watermark {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}

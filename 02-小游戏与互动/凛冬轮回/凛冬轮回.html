@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>凛冬轮回 · Frozen Reincarnation</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1628'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle' fill='%235ec8f8'%3E%E2%9D%84%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+<style>
+/* ============ 设计系统 ============ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#050b14;--bg2:#0a1422;--card:rgba(17,32,54,.72);--card-solid:#112036;
+  --line:rgba(94,200,248,.14);--line-bright:rgba(94,200,248,.35);
+  --ice:#5ec8f8;--ice2:#2aa0d8;--ice-dim:#1a4a66;
+  --ember:#ff7a45;--ember-dim:#c44a20;
+  --gold:#ffd56a;--red:#ff5c5c;--green:#5ed19a;--violet:#b39cff;
+  --text:#e8f3ff;--dim:#8aa5c0;--faint:#4d6884;
+  --serif:'Noto Serif SC',serif;--sans:'Noto Sans SC',-apple-system,sans-serif;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:var(--sans);background:var(--bg);color:var(--text);
+  font-size:14px;line-height:1.6;user-select:none;-webkit-user-select:none;
+  -webkit-font-smoothing:antialiased;
+}
+/* 背景图层 */
+#bgimg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;background-size:cover;background-position:center;transition:opacity 1.2s;filter:saturate(.8)}
+#bgimg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,11,20,.7),rgba(5,11,20,.85))}
+#bgimg.start{background-image:url('assets/city.jpg')}
+#bgimg.prep{background-image:url('assets/bunker.jpg')}
+#bgimg.apoc{background-image:url('assets/blizzard.jpg')}
+#bgimg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,11,20,.7),rgba(5,11,20,.85))}
+/* 背景：冰冻极光 */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(94,200,248,.10), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(94,156,255,.06), transparent 60%),
+    radial-gradient(ellipse 50% 30% at 10% 100%, rgba(255,122,69,.04), transparent 60%),
+    var(--bg);
+}
+/* 噪点 */
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ============ 布局 ============ */
+#app{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;max-width:860px;margin:0 auto}
+
+/* 顶栏 */
+#topbar{
+  flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;background:linear-gradient(180deg,rgba(17,32,54,.9),rgba(10,20,34,.6));
+  border-bottom:1px solid var(--line);backdrop-filter:blur(12px);
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{width:26px;height:26px;filter:drop-shadow(0 0 6px rgba(94,200,248,.5))}
+.brand .name{font-family:var(--serif);font-size:17px;font-weight:900;color:var(--ice);letter-spacing:3px}
+.brand .ver{font-size:9px;color:var(--faint);letter-spacing:1px}
+.top-stats{display:flex;gap:16px}
+.tstat{text-align:center}
+.tstat .lb{font-size:9px;color:var(--faint);letter-spacing:1px}
+.tstat .vl{font-family:'SF Mono','Courier New',monospace;font-weight:700;font-size:14px;line-height:1.3}
+.tstat .vl.ice{color:var(--ice)}
+.tstat .vl.gold{color:var(--gold)}
+.tstat .vl.ember{color:var(--ember)}
+
+/* 主区 */
+#main{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 16px 90px;scroll-behavior:smooth;position:relative}
+#main::-webkit-scrollbar{width:3px}
+#main::-webkit-scrollbar-thumb{background:var(--line-bright);border-radius:2px}
+
+/* 游戏内UI默认隐藏，进入游戏后显示 */
+#topbar,#bottombar{display:none!important}
+body.in-game #topbar{display:flex!important}
+body.in-game #bottombar{display:flex!important}
+body.in-game #main{padding-bottom:90px}
+body:not(.in-game) #main{padding-bottom:20px}
+
+/* 入场动画 */
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.panel,.btn,.hero-card{animation:slideUp .35s ease both}
+.panel:nth-child(2){animation-delay:.04s}
+.panel:nth-child(3){animation-delay:.08s}
+.panel:nth-child(4){animation-delay:.12s}
+
+/* ============ 卡片 ============ */
+.panel{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:16px;margin-bottom:12px;backdrop-filter:blur(14px);
+  box-shadow:0 4px 24px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.ptitle{
+  font-size:12px;font-weight:700;color:var(--ice);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;letter-spacing:1px;
+}
+.ptitle::before{content:'';width:3px;height:14px;background:linear-gradient(180deg,var(--ice),var(--ice2));border-radius:2px;box-shadow:0 0 6px var(--ice)}
+.ptitle .right{margin-left:auto;font-weight:400;font-size:10px;color:var(--faint)}
+
+/* ============ 按钮 ============ */
+.btn{
+  display:flex;align-items:center;gap:10px;width:100%;padding:13px 14px;margin:6px 0;min-height:48px;
+  background:linear-gradient(180deg,rgba(42,80,120,.4),rgba(20,40,68,.4));
+  border:1px solid var(--line-bright);border-radius:10px;color:var(--text);
+  font-size:13px;cursor:pointer;text-align:left;transition:all .18s;font-family:var(--sans);
+  position:relative;overflow:hidden;
+}
+.btn:hover{background:rgba(94,200,248,.12);border-color:var(--ice);transform:translateX(3px)}
+.btn:active{transform:translateX(3px) scale(.99)}
+.btn .bd{display:block;font-size:11px;color:var(--dim);margin-top:2px;line-height:1.4}
+.btn .ic{width:20px;height:20px;flex-shrink:0;opacity:.85}
+.btn .cost{margin-left:auto;color:var(--gold);font-family:monospace;font-size:11px;white-space:nowrap}
+.btn.ember{background:linear-gradient(180deg,rgba(196,74,32,.5),rgba(120,40,15,.5));border-color:var(--ember);color:#fff;font-weight:700;justify-content:center;text-align:center}
+.btn.ember:hover{background:var(--ember);box-shadow:0 0 16px rgba(255,122,69,.4)}
+.btn.danger{border-color:rgba(255,92,92,.4)}
+.btn.danger:hover{background:rgba(255,92,92,.1);border-color:var(--red)}
+.btn.mini{padding:8px 10px;min-height:36px;font-size:12px;margin:3px 0}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+/* 页面过渡动画 */
+#main{animation:fadeIn .3s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* 弹窗淡入 */
+.mmask{animation:modalIn .25s ease-out}
+@keyframes modalIn{from{opacity:0}to{opacity:1}}
+.mcard{animation:cardIn .3s ease-out}
+@keyframes cardIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+/* 物资数字变化动画 */
+.icell .q{transition:color .3s}
+.icell:hover .q{color:var(--gold)}
+/* 行动卡片 */
+.act-card{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .2s}
+.act-card:hover{background:rgba(94,200,248,.08);border-color:var(--ice);transform:translateY(-2px)}
+.act-card:active{transform:scale(.98)}
+/* 日志滚动 */
+#log{scroll-behavior:smooth}
+
+/* ============ 数据行 ============ */
+.srow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed rgba(94,200,248,.08);font-size:13px}
+.srow:last-child{border-bottom:none}
+.srow .k{color:var(--dim)}
+.srow .v{font-family:monospace;font-weight:700}
+.srow .v.ice{color:var(--ice)}.srow .v.gold{color:var(--gold)}
+.srow .v.ember{color:var(--ember)}.srow .v.good{color:var(--green)}
+.srow .v.warn{color:var(--gold)}.srow .v.bad{color:var(--red)}
+
+/* ============ 进度条 ============ */
+.bar{background:rgba(0,0,0,.4);border-radius:6px;height:16px;overflow:hidden;position:relative;border:1px solid rgba(94,200,248,.1)}
+.bar>i{display:block;height:100%;transition:width .6s;border-radius:5px}
+.bar>i.hp{background:linear-gradient(90deg,#ff5c5c,#ff8a5c)}
+.bar>i.integ{background:linear-gradient(90deg,#2aa0d8,#5ec8f8)}
+.bar>i.attn{background:linear-gradient(90deg,#5ed19a,#ffd56a,#ff5c5c)}
+.bar>i.xp{background:linear-gradient(90deg,#b39cff,#5ec8f8)}
+.bar .lb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;text-shadow:0 1px 3px #000}
+
+/* ============ 行动点 ============ */
+.ap-row{display:flex;gap:6px;align-items:center;margin:10px 0}
+.ap{
+  width:30px;height:30px;border-radius:50%;border:2px solid var(--ice-dim);
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+  color:var(--faint);transition:all .3s;
+}
+.ap.on{background:var(--ice);color:var(--bg);box-shadow:0 0 10px rgba(94,200,248,.6);border-color:var(--ice)}
+
+/* ============ 日志 ============ */
+#logbox{max-height:200px;overflow-y:auto;font-size:12px;padding:10px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid var(--line)}
+#logbox .le{padding:5px 0;border-bottom:1px solid rgba(94,200,248,.06);color:var(--dim);line-height:1.5}
+#logbox .le:last-child{border-bottom:none}
+#logbox .le .d{color:var(--faint);font-size:10px;margin-right:6px}
+#logbox .le.good{color:var(--green)}#logbox .le.bad{color:var(--red)}
+#logbox .le.warn{color:var(--gold)}#logbox .le.ice{color:var(--ice)}
+
+/* ============ 模态 ============ */
+.mmask{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(6px);animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{
+  background:linear-gradient(180deg,#14253d,#0c1a2e);border:1px solid var(--line-bright);
+  border-radius:14px;max-width:500px;width:100%;max-height:86vh;overflow-y:auto;
+  padding:20px;box-shadow:0 8px 40px rgba(0,0,0,.6),0 0 30px rgba(94,200,248,.1);
+  animation:modalIn .25s cubic-bezier(.2,.9,.3,1.2);
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.92) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal h3{font-family:var(--serif);color:var(--ice);font-size:18px;margin-bottom:14px;text-align:center;letter-spacing:2px}
+.modal h3.ember{color:var(--ember)}
+.modal h3.gold{color:var(--gold)}
+
+/* ============ 启动页 ============ */
+.hero{text-align:center;padding:30px 16px}
+.hero .snow{width:64px;height:64px;margin:0 auto 16px;opacity:.9;filter:drop-shadow(0 0 12px rgba(94,200,248,.6));animation:spin 20s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero h1{font-family:var(--serif);font-size:38px;font-weight:900;letter-spacing:10px;color:var(--ice);text-shadow:0 0 30px rgba(94,200,248,.5);margin-bottom:6px}
+.hero .sub{font-size:11px;color:var(--faint);letter-spacing:4px;margin-bottom:24px}
+.hero .lore{font-size:13px;color:var(--dim);max-width:360px;margin:0 auto 20px;line-height:1.9}
+.savecard{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--dim);margin:16px auto;max-width:360px;line-height:1.9}
+
+/* ============ 结局结算 ============ */
+.ending-hero{text-align:center;padding:24px 0 12px}
+.ending-hero .tag{font-size:10px;color:var(--faint);letter-spacing:4px}
+.ending-hero h2{font-family:var(--serif);font-size:32px;font-weight:900;letter-spacing:6px;margin:8px 0;text-shadow:0 0 24px currentColor}
+.ending-hero h2.ice{color:var(--ice)}
+.ending-hero h2.ember{color:var(--ember)}
+.ending-hero h2.gold{color:var(--gold)}
+.ending-hero p{font-size:12px;color:var(--dim)}
+
+/* ============ 评分格 ============ */
+.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.scell{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center}
+.scell .dn{font-size:10px;color:var(--faint);letter-spacing:1px}
+.scell .num{font-size:24px;font-weight:900;font-family:monospace;color:var(--ice);line-height:1.2}
+.scell .mx{font-size:10px;color:var(--faint)}
+
+/* ============ 商店格 ============ */
+.shop-item{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:8px;padding:12px;margin:8px 0;transition:all .2s}
+.shop-item:hover{border-color:var(--line-bright)}
+.shop-item .nm{font-weight:700;color:var(--ice);font-size:13px;display:flex;align-items:center;gap:6px}
+.shop-item .nm .lv{color:var(--gold);font-size:10px;margin-left:auto;font-weight:400}
+.shop-item .ds{font-size:11px;color:var(--dim);margin:5px 0;line-height:1.5}
+.shop-item .cost{font-size:11px;color:var(--gold);font-family:monospace}
+.shop-item.maxed{border-color:rgba(94,209,154,.4)}
+
+/* ============ 排行榜 ============ */
+.lb{display:flex;align-items:center;padding:8px 10px;border-bottom:1px solid rgba(94,200,248,.06);font-size:12px;gap:10px}
+.lb.me{background:rgba(94,200,248,.1);border-left:3px solid var(--ice)}
+.lb .rk{width:30px;font-weight:900;font-family:monospace;color:var(--gold)}
+.lb .rk.t1{color:#ffd700}.lb .rk.t2{color:#c0c0c0}.lb .rk.t3{color:#cd7f32}
+.lb .nm{flex:1;color:var(--text);display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.lb .tg{font-size:9px;padding:1px 6px;border-radius:3px}
+.lb .tg.raid{background:rgba(255,92,92,.2);color:var(--red)}
+.lb .tg.order{background:rgba(94,209,154,.2);color:var(--green)}
+.lb .tg.lone{background:rgba(138,165,192,.2);color:var(--dim)}
+.lb .sc{font-family:monospace;color:var(--ice)}
+
+/* ============ 库存格 ============ */
+.inv-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0}
+.icell{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.icell svg{width:24px;height:24px;opacity:.9}
+.icell .n{font-size:10px;color:var(--dim)}
+.icell .q{font-family:monospace;font-weight:700;color:var(--ice);font-size:14px}
+.icell.empty{opacity:.3}
+
+/* ============ 阶段标签 ============ */
+.ph-tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:10px;letter-spacing:1px;margin-bottom:10px;font-weight:700}
+.ph-tag.prep{background:rgba(255,213,106,.15);color:var(--gold);border:1px solid rgba(255,213,106,.3)}
+.ph-tag.apoc{background:rgba(255,122,69,.15);color:var(--ember);border:1px solid rgba(255,122,69,.3)}
+
+/* ============ toast ============ */
+#toast{
+  position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-10px);
+  background:rgba(20,40,68,.95);border:1px solid var(--ice);color:var(--ice);
+  padding:10px 20px;border-radius:8px;z-index:200;font-size:13px;opacity:0;
+  transition:all .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ============ 伤害飘字 ============ */
+.dmg-float{
+  position:fixed;font-family:monospace;font-weight:900;font-size:18px;z-index:150;
+  pointer-events:none;animation:dmgUp 1s ease-out forwards;text-shadow:0 2px 6px #000;
+}
+@keyframes dmgUp{
+  0%{opacity:1;transform:translateY(0) scale(.8)}
+  30%{transform:translateY(-20px) scale(1.2)}
+  100%{opacity:0;transform:translateY(-60px) scale(1)}
+}
+
+/* ============ 新手引导 ============ */
+.guide-mask{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:flex;align-items:center;justify-content:center;padding:24px}
+.guide-card{background:linear-gradient(180deg,#14253d,#0c1a2e);border:1px solid var(--gold);border-radius:14px;max-width:400px;padding:24px;text-align:center}
+.guide-card h3{font-family:var(--serif);color:var(--gold);margin-bottom:10px}
+
+/* ============ 底栏 ============ */
+#bottombar{
+  flex-shrink:0;display:flex;background:rgba(17,32,54,.9);border-top:1px solid var(--line);
+  backdrop-filter:blur(12px);position:relative;z-index:10;
+}
+.navb{flex:1;padding:8px 2px;text-align:center;cursor:pointer;border:none;background:transparent;color:var(--dim);font-size:10px;transition:all .2s;border-top:2px solid transparent}
+.navb svg{width:22px;height:22px;display:block;margin:0 auto 3px}
+.navb.active,.navb:hover{color:var(--ice);background:rgba(94,200,248,.06);border-top-color:var(--ice)}
+
+/* ============ 设置/成就 ============ */
+.ach-item{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid rgba(94,200,248,.06)}
+.ach-item.locked{opacity:.4}
+.ach-item .ic{width:36px;height:36px;flex-shrink:0;border-radius:8px;background:rgba(94,200,248,.1);display:flex;align-items:center;justify-content:center;font-size:18px}
+.ach-item .info{flex:1}
+.ach-item .info .t{font-size:12px;font-weight:700;color:var(--text)}
+.ach-item .info .d{font-size:10px;color:var(--dim)}
+
+/* 成就解锁弹窗 */
+.ach-toast{
+  position:fixed;top:120px;left:50%;transform:translateX(-50%);z-index:250;
+  background:linear-gradient(180deg,#2a2010,#1a1508);border:1px solid var(--gold);
+  padding:12px 20px;border-radius:10px;display:flex;gap:12px;align-items:center;
+  box-shadow:0 0 24px rgba(255,213,106,.3);animation:slideUp .4s;
+}
+
+/* 响应式 */
+@media(max-width:480px){
+  .hero h1{font-size:30px;letter-spacing:6px}
+  .top-stats{gap:10px}
+  .tstat .vl{font-size:12px}
+  #main{padding:12px 12px 90px}
+}
+</style>
+</head>
+<body>
+<div id="bgimg"></div>
+<div id="app">
+  <!-- 顶栏 -->
+  <div id="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#5ec8f8" stroke-width="2"><path d="M12 2v20M4 6l16 12M20 6L4 18M12 2l-2 4m2-4 2 4M12 22l-2-4m2 4 2-4"/></svg>
+      <div>
+        <div class="name">凛冬轮回</div>
+        <div class="ver">v3.0 · PRD完整版</div>
+      </div>
+    </div>
+    <div class="top-stats">
+      <div class="tstat"><div class="lb">轮回</div><div class="vl ice" id="tb-cycle">1</div></div>
+      <div class="tstat"><div class="lb">本源点</div><div class="vl gold" id="tb-origin">0</div></div>
+      <div class="tstat"><div class="lb">时间</div><div class="vl ember" id="tb-time">--</div></div>
+    </div>
+  </div>
+  <div id="main"></div>
+  <!-- 底栏 -->
+  <div id="bottombar">
+    <button class="navb" data-nav="inventory">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>库存
+    </button>
+    <button class="navb" data-nav="base">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>基地
+    </button>
+    <button class="navb" data-nav="leaderboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM7 6H4a2 2 0 002 4h1M17 6h3a2 2 0 01-2 4h-1"/></svg>榜单
+    </button>
+    <button class="navb" data-nav="shop">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 7h12l1 13H5L6 7zM6 7l2-4h8l2 4M9 11a3 3 0 006 0"/></svg>商店
+    </button>
+    <button class="navb" data-nav="status">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>状态
+    </button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   凛冬轮回 v2.0 · 重构引擎
+   ============================================================ */
+
+// ===== 工具 =====
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+const rnd=n=>Math.floor(Math.random()*n);
+const chance=p=>Math.random()<p;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const pick=a=>a[rnd(a.length)];
+const save=()=>{try{localStorage.setItem('lidong_v2',JSON.stringify(G))}catch(e){}};
+const load=()=>{try{
+  const s=localStorage.getItem('lidong_v2');
+  if(!s)return null;
+  const old=JSON.parse(s);
+  const merged=Object.assign(JSON.parse(JSON.stringify(DEF)),old);
+  // 深合并res和quality等嵌套对象
+  merged.res=Object.assign({},DEF.res,old.res||{});
+  merged.quality=Object.assign({},DEF.quality,old.quality||{});
+  merged.flags=Object.assign({},DEF.flags,old.flags||{});
+  merged.stats=Object.assign({},DEF.stats,old.stats||{});
+  merged.items=Object.assign({},DEF.items,old.items||{});
+  merged.talents=Object.assign({},DEF.talents,old.talents||{});
+  return merged;
+}catch(e){return null}};
+
+// ===== 音效系统（Web Audio 合成） =====
+let audioCtx=null;
+function beep(freq,dur=0.08,type='sine',vol=0.15){
+  if(!G.settings.sound) return;
+  try{
+    if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
+    o.connect(g);g.connect(audioCtx.destination);
+    o.start();o.stop(audioCtx.currentTime+dur);
+  }catch(e){}
+}
+const sfx={
+  click:()=>beep(600,.05,'sine',.08),
+  good:()=>{beep(660,.08,'sine',.12);setTimeout(()=>beep(880,.1,'sine',.12),80)},
+  bad:()=>{beep(200,.15,'sawtooth',.12);setTimeout(()=>beep(150,.2,'sawtooth',.1),100)},
+  alert:()=>{beep(440,.1,'square',.1);setTimeout(()=>beep(440,.1,'square',.1),200)},
+  buy:()=>{beep(880,.06,'sine',.1);setTimeout(()=>beep(1100,.08,'sine',.1),60)},
+  hit:()=>beep(120,.15,'sawtooth',.2),
+  win:()=>{[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.15,'sine',.12),i*100))},
+};
+
+// ===== 默认状态 =====
+const DEF={
+  v:3,
+  cycle:1, originPoints:0, phase:'start',
+  prepDay:1, prepTotal:30, apocDay:0,
+  money:1800000, attention:0, actionPoints:3,
+  baseLevel:1, baseIntegrity:100, storageCap:80,
+  res:{food:0,water:0,fuel:0,meds:0,building:0,weapons:0,ammo:0,clothes:0,scrap:0,tools:0,seeds:0,battery:0},
+  quality:{food:100,water:100},
+  diaryFound:false,diarySpared:false,
+  legacy:null,
+  pet:null,
+  hp:100, maxHp:100, temperature:-20, weather:'clear',
+  score:{reserve:0,wall:0,survive:0,world:0},
+  talents:{cold:0,intuition:0,wall:0,trade:0,body:0},
+  talentsUsed:[], starter:null,
+  items:{scoutMirror:0,hideArchive:0,storageBag:0,warmKit:0,archiveHidden:0,listener:0},
+  board:[], boardTab:'total', playerRank:100,
+  allies:[], rep:0,
+  stats:{exploredRate:0,maxRank:100,raidDefeated:0,beastKilled:0,helped:0,killed:0,daysSurvived:0,crafts:0},
+  achievements:[], unlockedEndings:[], currentEnding:null,
+  log:[], marketTimer:0, marketList:[], integral:0, wandererCd:0,
+  equipment:{weapon:{name:'拳头',damage:1,dur:0},armor:null},
+  settings:{sound:true,shake:true},
+  guideStep:0,
+  endlessSaves:[], mainSave:null,
+  playerTag:'幸存者-'+String(Math.floor(Math.random()*9000)+1000),
+  season:1, seasonDay:0, seasonRewards:[],
+  structDmg:0, mapMarked:[], behaviorTags:[],
+  scoutOn:false, listenerOn:false,
+  prepEventsSeen:[],
+  flags:{},
+};
+let G=load()||JSON.parse(JSON.stringify(DEF));
+
+// ===== 成就定义 =====
+const ACH=[
+  {id:'first_step',name:'初入凛冬',desc:'完成第一世轮回',icon:'❄'},
+  {id:'rich',name:'物资大亨',desc:'单局物资总数超过200',icon:'📦'},
+  {id:'fortress',name:'坚不可摧',desc:'基地升到5级堡垒',icon:'🏰'},
+  {id:'explorer',name:'探索者',desc:'地图探索率达到100%',icon:'🧭'},
+  {id:'slayer',name:'异兽猎手',desc:'击杀5只寒变异兽',icon:'⚔'},
+  {id:'savior',name:'善意回声',desc:'救助10名流浪者',icon:'🤝'},
+  {id:'tyrant',name:'冻土暴君',desc:'掠夺5名流浪者',icon:'💀'},
+  {id:'survivor',name:'百日生存',desc:'存活超过100天',icon:'📅'},
+  {id:'top10',name:'跻身前十',desc:'排行榜进入前10',icon:'👑'},
+  {id:'crafter',name:'工匠',desc:'制作5件物品',icon:'🔨'},
+];
+function unlockAch(id){
+  if(G.achievements.includes(id)) return;
+  G.achievements.push(id);
+  const a=ACH.find(x=>x.id===id);
+  const t=document.createElement('div');
+  t.className='ach-toast';
+  t.innerHTML=`<div style="font-size:28px">${a.icon}</div><div><div style="font-size:10px;color:var(--gold)">成就解锁</div><div style="font-size:14px;font-weight:700">${a.name}</div><div style="font-size:10px;color:var(--dim)">${a.desc}</div></div>`;
+  document.body.appendChild(t);
+  sfx.win();
+  setTimeout(()=>t.remove(),3000);
+  save();
+}
+
+// ===== 飘字 =====
+function floatDmg(text,color){
+  const d=document.createElement('div');
+  d.className='dmg-float';d.textContent=text;
+  d.style.color=color||'#ff5c5c';
+  d.style.left=(40+Math.random()*20)+'%';d.style.top='40%';
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(),1000);
+}
+
+// ===== 日志 =====
+function logMsg(m,type){
+  G.log.unshift({d:G.phase==='apoc'?`末世${G.apocDay}d`:G.phase==='prep'?`灾前${G.prepDay}d`:'--',m,t:type||''});
+  if(G.log.length>60)G.log.pop();
+}
+function renderLog(){
+  if(!G.log.length)return'<div style="color:var(--faint);font-size:12px;text-align:center;padding:14px">暂无记录</div>';
+  return G.log.slice(0,12).map(l=>`<div class="le ${l.t}"><span class="d">[${l.d}]</span>${l.m}</div>`).join('');
+}
+
+// ===== 顶栏 =====
+function refreshTop(){
+  $('#tb-cycle').textContent=G.cycle;
+  $('#tb-origin').textContent=G.originPoints;
+  $('#tb-time').textContent=G.phase==='prep'?`${G.prepDay}/30`:G.phase==='apoc'?`${G.apocDay}d`:'--';
+  const bg=$('#bgimg');
+  if(bg){
+    const cls=G.phase==='prep'?'prep':G.phase==='apoc'?'apoc':'start';
+    if(!bg.classList.contains(cls)){bg.className=cls}
+  }
+  // 不再强制滚动到顶部，保持用户当前位置
+}
+// 记录滚动位置，切页时恢复
+let _lastScroll={top:0,phase:''};
+function saveScroll(){_lastScroll={top:$('#main').scrollTop,phase:G.phase}}
+function restoreScroll(){if(_lastScroll.phase===G.phase)$('#main').scrollTop=_lastScroll.top}
+
+// ===== toast =====
+function toast(m){
+  const t=$('#toast');t.textContent=m;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1600);
+}
+
+/* ============================================================
+   视图：启动页
+   ============================================================ */
+function viewStart(){
+  refreshTop();
+  document.body.classList.remove('in-game');
+  const h=G.mainSave?`<span style="color:var(--ember)">主线存档：${G.mainSave.ending}</span>`:'无主线存档';
+  const starterHint=G.starter?'已选礼包：'+{food:'物资包',build:'基建包',crystal:'保命包'}[G.starter]:'未选开局礼包';
+  $('#main').innerHTML=`
+  <div class="hero" style="padding:50px 20px 40px;text-align:center">
+    <svg class="snow" viewBox="0 0 24 24" fill="none" stroke="#5ec8f8" stroke-width="1.5" style="width:56px;height:56px;margin:0 auto 14px;filter:drop-shadow(0 0 12px rgba(94,200,248,.6))"><path d="M12 2v20M3 6l18 12M21 6L3 18M12 2l-3 5m3-5 3 5M12 22l-3-5m3 5 3-5M5 9l-3-1m3 1 1-3M19 9l3-1m-3 1-1-3M5 15l-3 1m3-1 1 3M19 15l3 1m-3-1-1 3"/></svg>
+    <h1 style="font-size:40px;letter-spacing:6px;margin-bottom:6px">凛冬轮回</h1>
+    <div class="sub" style="font-size:10px;letter-spacing:3px;margin-bottom:20px;color:var(--faint)">FROZEN REINCARNATION · 2047</div>
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:300px;margin:0 auto">
+      <button class="btn ember" style="justify-content:center;padding:14px;font-size:14px" onclick="startGame()">▶ 开始第 ${G.cycle} 世</button>
+      <button class="btn" onclick="enterShop()">🏪 本源商店（${G.originPoints}点）</button>
+      <button class="btn" onclick="viewAch()">🏆 成就（${G.achievements.length}/${ACH.length}）</button>
+      <button class="btn" onclick="viewEndings()">📖 结局图鉴（${G.unlockedEndings.length}/6）</button>
+      <button class="btn" onclick="viewRules()">📜 规则说明</button>
+      <button class="btn" onclick="viewSettings()">⚙ 设置</button>
+      ${G.endlessSaves.length?`<button class="btn" onclick="viewEndless()">💾 无尽存档（${G.endlessSaves.length}/3）</button>`:''}
+    </div>
+    <div style="margin-top:20px;font-size:10px;color:var(--faint)">${starterHint} · ${h}</div>
+  </div>`;
+}
+
+function startGame(){
+  if(!G.starter){
+    toast('请先去本源商店选择开局礼包');
+    enterShop();
+    return;
+  }
+  enterPrep();
+}
+
+/* ============================================================
+   规则
+   ============================================================ */
+function viewRules(){
+  $('#main').innerHTML=`<div class="panel"><div class="ptitle">规则速查</div>
+  <div style="font-size:13px;line-height:2;color:var(--dim)">
+  <b style="color:var(--gold)">灾前30天</b>：3行动点/天。囤货、卖房、扩基地、侦察。关注度越高，末世越危险。<br>
+  <b style="color:var(--ember)">末世生存</b>：-45℃恒定。每天食5/水3/燃2。天气：晴/暴雪/寒潮/融冰。<br>
+  <b style="color:var(--ice)">战斗</b>：遭遇袭时二选一——固守（低风险少收益）/强攻（高风险高收益）。<br>
+  <b style="color:var(--gold)">四维评分</b>：储备/壁垒/存续/世域各25。主动恶行扣分，自卫不扣。<br>
+  <b style="color:var(--ember)">轮回</b>：总分1:1兑换本源点，购买永久天赋与开局道具。<br>
+  <b style="color:var(--green)">成就</b>：10个成就等你解锁，累计本源点奖励。
+  </div><button class="btn" onclick="viewStart()">← 返回</button></div>`;
+}
+
+/* ============================================================
+   结局图鉴
+   ============================================================ */
+const ENDINGS=[
+  {id:'survive',name:'寒岁苟活',desc:'存活62天+，低调求存，不滥杀无辜。'},
+  {id:'lord',name:'冻土领主',desc:'基地5级堡垒，盟友≥2，雄霸一方。'},
+  {id:'lone',name:'荒世独行',desc:'探索率70%+，无盟友，独来独往。'},
+  {id:'tyrant',name:'烬世枭主',desc:'世域≤5，掠夺流浪者≥3，击退掠夺≥5。'},
+  {id:'eternal',name:'静域长生',desc:'存活100天+，基地≥3级，从未倒下。'},
+  {id:'death',name:'冰封寂灭',desc:'死亡结局。所有失败都归此处。'},
+];
+function viewEndings(){
+  $('#main').innerHTML=`<div class="panel"><div class="ptitle">结局图鉴</div>
+  ${ENDINGS.map(e=>{const u=G.unlockedEndings.includes(e.id);
+    return `<div class="shop-item" style="${u?'':'opacity:.45'}">
+    <div class="nm">${u?e.name:'？？？'}<span class="lv">${u?'已解锁':'未解锁'}</span></div>
+    <div class="ds">${u?e.desc:'未知结局'}</div></div>`}).join('')}
+  <button class="btn" onclick="viewStart()">← 返回</button></div>`;
+}
+
+/* ============================================================
+   设置
+   ============================================================ */
+function viewSettings(){
+  $('#main').innerHTML=`<div class="panel"><div class="ptitle">设置</div>
+  <div class="srow"><span class="k">音效</span><span class="v">${G.settings.sound?'开':'关'}</span></div>
+  <button class="btn mini" onclick="toggleSound()">${G.settings.sound?'🔇 关闭音效':'🔊 开启音效'}</button>
+  <div style="margin-top:14px;padding:12px;background:rgba(255,92,92,.1);border-radius:8px;border:1px solid rgba(255,92,92,.3)">
+    <div style="font-size:12px;color:var(--red);font-weight:700;margin-bottom:6px">⚠ 危险操作</div>
+    <button class="btn mini danger" onclick="wipeSave()">清空所有存档与进度</button>
+  </div>
+  <button class="btn" onclick="viewStart()">← 返回</button></div>`;
+}
+function toggleSound(){G.settings.sound=!G.settings.sound;save();viewSettings();if(G.settings.sound)sfx.click()}
+function editTag(){
+  const n=prompt('输入你的代号（4-12字）：',G.playerTag);
+  if(!n)return;
+  const clean=n.replace(/[<>"'&]/g,'').trim().slice(0,12);
+  if(clean.length<2){toast('代号至少2字');return}
+  G.playerTag=clean;save();viewStart();toast('代号已更新');
+}
+function wipeSave(){
+  if(confirm('确定要清空所有存档、成就、本源点吗？此操作不可撤销。')){
+    localStorage.removeItem('lidong_v2');
+    G=JSON.parse(JSON.stringify(DEF));
+    save();viewStart();toast('已重置');
+  }
+}
+
+/* ============================================================
+   无尽存档
+   ============================================================ */
+function viewEndless(){
+  if(!G.endlessSaves.length){toast('暂无无尽存档');return}
+  $('#main').innerHTML=`<div class="panel"><div class="ptitle">无尽养老存档</div>
+  ${G.endlessSaves.map((s,i)=>`<div class="shop-item">
+  <div class="nm">存档${i+1} · ${s.ending}</div>
+  <div class="ds">轮回${s.cycle} · 存活${s.apocDay}天 · 基地${s.baseLevel}级 · 总分${s.score}</div>
+  <div class="ds">${s.time}</div>
+  <button class="btn mini danger" onclick="delEndless(${i})">删除</button></div>`).join('')}
+  <button class="btn" onclick="viewStart()">← 返回</button></div>`;
+}
+function delEndless(i){G.endlessSaves.splice(i,1);save();viewEndless();toast('已删除')}
+
+/* ============================================================
+   本源商店
+   ============================================================ */
+const TALENTS=[
+  {key:'cold',name:'极寒抗性',desc:'每级-20%低温伤害'},
+  {key:'intuition',name:'资源直觉',desc:'每级+15%探索稀有物资'},
+  {key:'wall',name:'壁垒天赋',desc:'每级基地初始防御+10%'},
+  {key:'trade',name:'交易洞察',desc:'每级+8%交易优惠'},
+  {key:'body',name:'生存体魄',desc:'每级+15生命上限'},
+];
+const STARTER={
+  food:{name:'物资补给包',desc:'食物80/净水60/药品20/衣服10'},
+  base:{name:'基建速成套件',desc:'建材60/武器3/弹药10/初始完整+20'},
+  survive:{name:'绝境保命结晶',desc:'药品30/燃料40/保温套件x1'},
+};
+const CONSUMABLES=[
+  {key:'scoutMirror',name:'侦查窥镜',desc:'解锁袭击一级预警',cost:30},
+  {key:'hideArchive',name:'档案隐藏药剂',desc:'隐藏榜单15天',cost:40},
+  {key:'storageBag',name:'临时储物包',desc:'库存上限+40',cost:20},
+];
+
+function enterShop(){G.phase='shop';document.body.classList.add('in-game');refreshTop();renderShop()}
+function renderShop(){
+  refreshTop();
+  const uc=G.talentsUsed.length;
+  const step=G.starter?2:1;
+  $('#main').innerHTML=`
+  <div class="panel" style="text-align:center;padding:20px">
+    <div style="font-size:11px;color:var(--dim);letter-spacing:2px">REINCARNATION SHOP</div>
+    <h2 style="font-size:24px;margin:6px 0">重生本源商店</h2>
+    <div style="font-size:10px;color:var(--faint)">第 ${G.cycle} 世轮回 · 每世仅1次采购机会</div>
+    <div style="margin:16px auto;display:flex;align-items:center;justify-content:center;gap:8px">
+      <div style="width:32px;height:32px;border-radius:50%;background:${step>=1?'var(--ice)':'rgba(94,200,248,.2)'};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px">1</div>
+      <div style="width:40px;height:1px;background:var(--line-bright)"></div>
+      <div style="width:32px;height:32px;border-radius:50%;background:${step>=2?'var(--ember)':'rgba(255,122,69,.2)'};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px">2</div>
+      <div style="font-size:10px;color:var(--faint);margin-left:4px">${G.starter?'✓ 礼包已选':'← 先选天赋，再选礼包'}</div>
+    </div>
+    <div style="display:inline-block;padding:8px 20px;background:rgba(255,213,106,.1);border:1px solid rgba(255,213,106,.3);border-radius:20px">
+      <span style="font-size:12px;color:var(--gold)">本源点</span>
+      <span style="font-size:20px;font-weight:900;color:var(--gold);font-family:monospace;margin-left:8px">${G.originPoints}</span>
+    </div>
+  </div>
+  <div class="panel"><div class="ptitle">Step 1 · 永久天赋 <span class="right">本轮回已升 ${uc}/2</span></div>
+  <div style="font-size:10px;color:var(--faint);margin-bottom:8px">天赋跨轮回永久生效，每世最多升级2种</div>
+  ${TALENTS.map(t=>{const lv=G.talents[t.key],mx=lv>=5,ut=G.talentsUsed.includes(t.key),cost=50*(lv+1);
+    const can=!mx&&(uc<2||ut)&&G.originPoints>=cost;
+    return `<div class="shop-item ${mx?'maxed':''}">
+    <div class="nm">${t.name}<span class="lv">Lv.${lv}/5${ut?' · 本轮回已升':''}</span></div>
+    <div class="ds">${t.desc}</div>
+    ${mx?'<div class="cost" style="color:var(--green)">已满级</div>':`<div class="cost">升级：${cost} 本源点</div>
+    <button class="btn mini ${can?'ember':''}" ${can?'':'disabled'} onclick="buyTalent('${t.key}')">升级</button>`}
+    </div>`}).join('')}</div>
+  <div class="panel"><div class="ptitle">Step 2 · 开局三选一 <span class="right">${G.starter?'✓ 已选':'必选'}</span></div>
+  ${Object.keys(STARTER).map(k=>{const p=STARTER[k],c=G.starter===k;
+    return `<button class="btn ${c?'ember':''}" style="flex-direction:column;align-items:flex-start;text-align:left;padding:12px" ${G.starter&&!c?'disabled':''} onclick="chooseStarter('${k}')">
+    <span style="font-weight:700">${p.name}${c?' ✓':''}</span>
+    <span class="bd" style="font-size:11px;color:var(--dim)">${p.desc}</span></button>`}).join('')}</div>
+  ${CONSUMABLES.length?`<div class="panel"><div class="ptitle">消耗道具</div>
+  ${CONSUMABLES.map(c=>{const o=G.items[c.key]||0,can=G.originPoints>=c.cost;
+    return `<div class="shop-item ${o?'maxed':''}">
+    <div class="nm">${c.name}${o?`<span class="lv">x${o}</span>`:''}</div>
+    <div class="ds">${c.desc}</div>
+    <div class="cost">${c.cost} 本源点</div>
+    <button class="btn mini" ${can?'':'disabled'} onclick="buyCons('${c.key}',${c.cost})">购买</button></div>`}).join('')}</div>`:''}
+  <button class="btn ember" style="padding:16px;font-size:15px" ${G.starter?'':'disabled'} onclick="enterPrep()">${G.starter?'✓ 进入灾前30天 →':'← 请先选择开局礼包'}</button>
+  <button class="btn" style="margin-top:8px" onclick="viewStart()">返回主菜单</button>`;
+}
+function buyTalent(k){
+  const lv=G.talents[k],cost=50*(lv+1);
+  if(G.originPoints<cost){toast('本源点不足');sfx.bad();return}
+  if(!G.talentsUsed.includes(k)&&G.talentsUsed.length>=2){toast('本轮回最多升2种天赋');return}
+  G.originPoints-=cost;G.talents[k]++;
+  if(!G.talentsUsed.includes(k))G.talentsUsed.push(k);
+  sfx.buy();save();renderShop();toast('升级成功');
+}
+function buyCons(k,c){
+  if(G.originPoints<c){toast('本源点不足');return}
+  G.originPoints-=c;G.items[k]=(G.items[k]||0)+1;sfx.buy();save();renderShop();
+}
+function chooseStarter(k){G.starter=k;save();renderShop();sfx.click()}
+function enterPrep(){
+  if(G.starter==='food'){G.res.food=80;G.res.water=60;G.res.meds=20;G.res.clothes=10}
+  else if(G.starter==='base'){G.res.building=60;G.res.weapons=3;G.res.ammo=10;G.baseIntegrity=100}
+  else{G.res.meds=30;G.res.fuel=40;G.items.warmKit=(G.items.warmKit||0)+1}
+  if(G.items.storageBag)G.storageCap+=40;
+  if(G.talents.wall>0)G.baseIntegrity+=G.talents.wall*10;
+  G.maxHp=100+G.talents.body*15;G.hp=G.maxHp;
+  // 轮回继承奖励
+  if(G.legacy){
+    if(G.legacy.savedDoctor){G.allies.push({name:'医生-老友',trust:80});logMsg('【继承】上一世救的医生这世来找你了','good')}
+    if(G.legacy.raidedCamp){G.attention=clamp(G.attention+10,0,100);logMsg('【继承】掠夺者的仇恨延续到了这一世','warn')}
+    if(G.legacy.foundCache){G.res.food+=30;G.res.water+=20;logMsg('【继承】你记得那个秘密仓库位置','good')}
+  }
+  G.phase='prep';G.prepDay=1;G.actionPoints=3+(G.talents.body>0?1:0);
+  logMsg(`第${G.cycle}世轮回开启，灾前30天倒计时启动`,'ice');
+  save();viewPrep();
+}
+
+/* ============================================================
+   灾前筹备
+   ============================================================ */
+function viewPrep(){
+  refreshTop();const ap=G.actionPoints;
+  $('#main').innerHTML=`
+  <span class="ph-tag prep">灾前筹备 · 第${G.prepDay}/30天</span>
+  <!-- 灾前场景图 -->
+  <div style="position:relative;border-radius:12px;overflow:hidden;margin-bottom:12px;border:1px solid var(--line)">
+    <img src="assets/city.jpg" style="width:100%;height:120px;object-fit:cover;opacity:.7">
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(5,11,20,.95))"></div>
+    <div style="position:absolute;bottom:8px;left:12px">
+      <div style="font-size:14px;font-weight:700">🌆 灾前城市</div>
+      <div style="font-size:10px;color:var(--dim)">气温${G.prepDay<=15?'28℃':'15℃'} · 还有${30-G.prepDay}天</div>
+    </div>
+  </div>
+  <div class="panel"><div class="ptitle">基础面板</div>
+    <div class="srow"><span class="k">资金</span><span class="v gold">¥${(G.money/10000).toFixed(1)}万</span></div>
+    <div class="srow"><span class="k">关注度</span><span class="v ${G.attention>30?'warn':''}">${G.attention}/100</span></div>
+    <div style="margin:8px 0"><div class="bar"><i class="attn" style="width:${G.attention}%"></i><div class="bar-lb">${G.attention}</div></div></div>
+    <div class="srow"><span class="k">基地</span><span class="v ice">${['','毛坯','简易','保温','完整','堡垒'][G.baseLevel]} · 上限${G.storageCap}</span></div>
+    <div style="margin-top:10px"><div style="font-size:10px;color:var(--faint);margin-bottom:4px">今日行动点</div>
+    <div class="ap-row">${Array.from({length:3+(G.talents.body>0?1:0)},(_,i)=>`<div class="ap ${i<ap?'on':''}">${i<ap?'●':'○'}</div>`).join('')}</div></div>
+  </div>
+  <div class="panel"><div class="ptitle">💼 经营</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="act-card" onclick="prepAct('business')">
+        <div style="font-size:24px">💼</div>
+        <div style="font-size:12px;font-weight:700">经营门店</div>
+        <div style="font-size:10px;color:var(--dim)">每日+2万</div>
+      </div>
+      <div class="act-card" onclick="prepAct('sellHouse')">
+        <div style="font-size:24px">🏠</div>
+        <div style="font-size:12px;font-weight:700">变卖房产</div>
+        <div style="font-size:10px;color:var(--warn)">+50万 · 关注+15</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel"><div class="ptitle">📦 囤货渠道</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="act-card" onclick="prepAct('buyOnline')">
+        <div style="font-size:24px">📱</div>
+        <div style="font-size:12px;font-weight:700">线上电商</div>
+        <div style="font-size:10px;color:var(--dim)">食30/水20/药5 · 10万</div>
+      </div>
+      <div class="act-card" onclick="prepAct('buyStore')">
+        <div style="font-size:24px">🏪</div>
+        <div style="font-size:12px;font-weight:700">线下门店</div>
+        <div style="font-size:10px;color:var(--dim)">衣10/建材10 · 8万</div>
+      </div>
+      <div class="act-card" onclick="prepAct('buySecond')">
+        <div style="font-size:24px">♻</div>
+        <div style="font-size:12px;font-weight:700">二手市场</div>
+        <div style="font-size:10px;color:var(--warn)">食45/水30/燃15 · 5万</div>
+      </div>
+      <div class="act-card" onclick="prepAct('buySite')">
+        <div style="font-size:24px">🏗</div>
+        <div style="font-size:12px;font-weight:700">工地尾料</div>
+        <div style="font-size:10px;color:var(--warn)">建材30/武器1 · 3万</div>
+      </div>
+      <div class="act-card" style="grid-column:span 2" onclick="prepAct('buyWholesale')">
+        <div style="font-size:24px">📦</div>
+        <div style="font-size:12px;font-weight:700">批发仓库</div>
+        <div style="font-size:10px;color:var(--warn)">食60/水40/药10/燃20 · 9万 · 关注+5</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel"><div class="ptitle">🏠 基地 & 情报</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="act-card" onclick="prepAct('expand')">
+        <div style="font-size:24px">🏗</div>
+        <div style="font-size:12px;font-weight:700">扩建储物</div>
+        <div style="font-size:10px;color:var(--dim)">上限+30 · 8万</div>
+      </div>
+      <div class="act-card" onclick="prepAct('upgrade')">
+        <div style="font-size:24px">🔨</div>
+        <div style="font-size:12px;font-weight:700">升级基地</div>
+        <div style="font-size:10px;color:var(--dim)">15万 · 等级+1</div>
+      </div>
+      <div class="act-card" onclick="prepAct('mask')">
+        <div style="font-size:24px">👤</div>
+        <div style="font-size:12px;font-weight:700">伪装降关注</div>
+        <div style="font-size:10px;color:var(--green)">关注-8</div>
+      </div>
+      <div class="act-card" onclick="prepAct('scout')">
+        <div style="font-size:24px">🗺</div>
+        <div style="font-size:12px;font-weight:700">侦察地图</div>
+        <div style="font-size:10px;color:var(--dim)">标记3资源点</div>
+      </div>
+    </div>
+  </div>
+  ${ap<=0?'<button class="btn ember" style="padding:16px;font-size:15px" onclick="endPrepDay()">结束今日 → 第'+(G.prepDay+1)+'天</button>':''}
+  <div class="panel"><div class="ptitle">日志</div><div id="logbox">${renderLog()}</div></div>`;
+}
+function prepAct(t){
+  if(G.actionPoints<=0){toast('行动点已用完');return}
+  let msg='',c='';
+  if(t==='business'){G.money+=20000;msg='门店+2万';c='good'}
+  else if(t==='sellHouse'){
+    if(G.prepDay>10){toast('已过最佳时机');return}
+    G.money+=500000;G.attention=clamp(G.attention+15,0,100);
+    msg='卖房+50万，关注+15';c='warn';
+  }
+  else if(t==='buyOnline'){
+    if(G.money<100000){toast('资金不足');return}
+    G.money-=100000;G.res.food+=30;G.res.water+=20;G.res.meds+=5;
+    msg='线上电商：食30/水20/药5';c='ice';
+  }
+  else if(t==='buyStore'){
+    if(G.money<80000){toast('资金不足');return}
+    G.money-=80000;G.res.clothes+=10;G.res.building+=10;
+    msg='线下门店：衣10/建材10';c='ice';
+  }
+  else if(t==='buySecond'){
+    if(G.money<50000){toast('资金不足');return}
+    G.money-=50000;G.res.food+=45;G.res.water+=30;G.res.fuel+=15;
+    G.attention=clamp(G.attention+2,0,100);msg='二手市场：食45/水30/燃15，关注+2';c='warn';
+  }
+  else if(t==='buySite'){
+    if(G.money<30000){toast('资金不足');return}
+    G.money-=30000;G.res.building+=30;G.res.weapons+=1;
+    G.attention=clamp(G.attention+3,0,100);msg='工地尾料：建材30/武器1，关注+3';c='warn';
+  }
+  else if(t==='buyWholesale'){
+    if(G.money<90000){toast('资金不足');return}
+    G.money-=90000;G.res.food+=60;G.res.water+=40;G.res.meds+=10;G.res.fuel+=20;
+    G.attention=clamp(G.attention+5,0,100);msg='批发仓库：食60/水40/药10/燃20，关注+5';c='warn';
+  }
+  else if(t==='expand'){
+    if(G.money<80000){toast('资金不足');return}
+    G.money-=80000;G.storageCap+=30;msg='储物上限+30';c='ice';
+  }
+  else if(t==='upgrade'){
+    if(G.baseLevel>=5){toast('已满级');return}
+    if(G.money<150000){toast('资金不足');return}
+    G.money-=150000;G.baseLevel++;
+    msg='基地升为：'+['','毛坯','简易','保温','完整','堡垒'][G.baseLevel];c='good';
+  }
+  else if(t==='mask'){
+    if(G.attention<=0){toast('关注已为0');G.actionPoints++;return}
+    G.attention=clamp(G.attention-8,0,100);msg='伪装，关注-8';c='good';
+  }
+  else if(t==='scout'){
+    G.stats.exploredRate=clamp(G.stats.exploredRate+10,0,100);
+    msg='侦察完成，探索率+10%';c='ice';
+  }
+  G.actionPoints--;logMsg(msg,c);sfx.click();save();viewPrep();toast(msg);
+}
+function endPrepDay(){
+  if(G.attention>0)G.attention=clamp(G.attention-1,0,100);
+  prepEvent();
+  G.prepDay++;G.actionPoints=3+(G.talents.body>0?1:0);
+  if(G.prepDay>G.prepTotal)triggerApoc();
+  else{save();viewPrep()}
+}
+function prepEvent(){
+  if(!chance(0.5))return;
+  const ev=[
+    ()=>{G.money+=50000;logMsg('【事件】理财收益+5万','good')},
+    ()=>{G.money-=30000;logMsg('【事件】汽车维修-3万','bad')},
+    ()=>{G.res.food+=20;logMsg('【事件】超市打折食物+20','good')},
+    ()=>{G.attention=clamp(G.attention+3,0,100);logMsg('【事件】邻居注意到你，关注+3','warn')},
+    ()=>{G.res.meds+=5;logMsg('【事件】药店清仓，药品+5','good')},
+    ()=>{G.res.scrap+=10;logMsg('【事件】捡到电子废料+10','ice')},
+    ()=>{G.money+=80000;logMsg('【事件】股票意外收益+8万','good')},
+    ()=>{G.res.clothes+=10;logMsg('【事件】外贸店清仓，衣物+10','good')},
+    ()=>{G.res.fuel+=15;logMsg('【事件】加油站促销，燃料+15','good')},
+    ()=>{G.attention=clamp(G.attention+5,0,100);logMsg('【事件】快递频繁上门，关注+5','warn')},
+    ()=>{G.res.water+=25;logMsg('【事件】囤到特价瓶装水+25','good')},
+    ()=>{G.money-=20000;logMsg('【事件】房东突然涨租-2万','bad')},
+    ()=>{G.res.building+=15;logMsg('【事件】建材市场尾货，建材+15','good')},
+    ()=>{G.res.weapons+=1;logMsg('【事件】网购到货一把砍刀','ice')},
+    ()=>{G.attention=clamp(G.attention-2,0,100);logMsg('【事件】小区没人注意你','good')},
+    ()=>{G.res.ammo+=8;logMsg('【事件】户外店弹药特价+8','ice')},
+    ()=>{G.money+=30000;G.attention=clamp(G.attention+4,0,100);logMsg('【事件】二手平台倒卖赚3万，但被人盯上','warn')},
+    ()=>{G.res.food-=10;logMsg('【事件】冰箱坏了，食物-10','bad')},
+  ];
+  pick(ev)();
+}
+
+/* ============================================================
+   末世触发
+   ============================================================ */
+function triggerApoc(){
+  G.phase='apoc';G.apocDay=1;G.weather='clear';
+  generateBoard();
+  logMsg('灾变！72小时暴跌至-45℃','bad');
+  logMsg('解锁：探索/商城/战斗/榜单/种植','ice');
+  save();
+  showModal(`
+  <h3 class="ember">⚠ 骤然凛冬 ⚠</h3>
+  <div style="font-size:13px;line-height:2;color:var(--dim);text-align:center">
+    2047年7月15日，盛夏正午。<br>
+    气温在72小时内从38℃暴跌至<b style="color:var(--ice)">-45℃</b>。<br><br>
+    电网瘫痪。供水冻结。城市冰封。<br>
+    你的避难所室内：<b style="color:var(--ember)">${G.temperature}℃</b><br>
+    <b style="color:var(--gold)">你不是唯一的幸存者。</b>
+  </div>
+  <button class="btn ember" style="margin-top:16px" onclick="closeModal();viewApoc()">进入凛冬 →</button>`);
+}
+
+/* ============================================================
+   末世生存
+   ============================================================ */
+/* ===== 地点定义 ===== */
+const LOCATIONS={
+  base:{name:'避难所',img:'assets/bunker.jpg',desc:'安全温暖的家',actions:['repair','farm','rest']},
+  supermarket:{name:'超市',img:'assets/loc_supermarket.jpg',desc:'食物和水的宝库',actions:['loot_food','loot_water']},
+  pharmacy:{name:'药店',img:'assets/loc_pharmacy.jpg',desc:'药品和医疗物资',actions:['loot_meds']},
+  construction:{name:'工地',img:'assets/loc_construction.jpg',desc:'建材和武器',actions:['loot_building','loot_weapon']},
+  gas:{name:'加油站',img:'assets/loc_gas.jpg',desc:'燃料和废料',actions:['loot_fuel','loot_scrap']},
+  city:{name:'城区',img:'assets/scene_city.jpg',desc:'综合物资，高风险',actions:['loot_mixed','meet_wanderer']},
+  deep:{name:'冻土深处',img:'assets/scene_deep.jpg',desc:'稀有物资，极高风险',actions:['loot_rare','meet_beast']},
+};
+function viewApoc(){
+  refreshTop();
+  const hpPct=G.hp/G.maxHp*100;
+  const integPct=clamp(G.baseIntegrity,0,100);
+  const ts=totalScore();
+  const fm=G.weather==='cold'?2:1;
+  const wn={clear:'晴朗',snow:'暴雪',cold:'寒潮',ice:'融冰'}[G.weather];
+  const loc=LOCATIONS[G.currentLoc||'base'];
+  $('#main').innerHTML=`
+  <span class="ph-tag apoc">末世第${G.apocDay}天 · ${wn}</span>
+  <!-- 当前场景图 -->
+  <div style="position:relative;border-radius:12px;overflow:hidden;margin-bottom:12px;border:1px solid var(--line)">
+    <img src="${loc.img}" style="width:100%;height:140px;object-fit:cover">
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(5,11,20,.95))"></div>
+    <div style="position:absolute;bottom:8px;left:12px;right:12px">
+      <div style="font-size:16px;font-weight:700">📍 ${loc.name}</div>
+      <div style="font-size:10px;color:var(--dim)">${loc.desc} · 室内${G.temperature}℃</div>
+    </div>
+  </div>
+  <!-- 生存状态条 -->
+  <div class="panel" style="padding:10px 14px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <span style="font-size:11px;color:var(--dim)">HP</span>
+        <span style="font-size:14px;font-weight:700;color:var(--ember);margin-left:4px">${G.hp}/${G.maxHp}</span>
+      </div>
+      <div>
+        <span style="font-size:11px;color:var(--dim)">完整度</span>
+        <span style="font-size:14px;font-weight:700;color:var(--ice);margin-left:4px">${Math.round(G.baseIntegrity)}%</span>
+      </div>
+      <div>
+        <span style="font-size:11px;color:var(--dim)">行动点</span>
+        <span style="font-size:14px;font-weight:700;color:var(--gold);margin-left:4px">${G.actionPoints}</span>
+      </div>
+    </div>
+  </div>
+  <!-- 地点地图 -->
+  <div class="panel"><div class="ptitle">🗺 地图 · 选择前往</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    ${Object.entries(LOCATIONS).map(([k,l])=>{
+      const isHere=k===(G.currentLoc||'base');
+      return `<div class="act-card" style="${isHere?'border-color:var(--ice);background:rgba(94,200,248,.1)':''}" onclick="travelTo('${k}')">
+        <img src="${l.img}" style="width:100%;height:40px;object-fit:cover;border-radius:6px;margin-bottom:6px">
+        <div style="font-size:12px;font-weight:700">${isHere?'📍 ':''}${l.name}</div>
+        <div style="font-size:9px;color:var(--dim)">${l.desc}</div>
+      </div>`;
+    }).join('')}
+    </div>
+  </div>
+  <!-- 当前地点操作 -->
+  <div class="panel"><div class="ptitle">⚡ 可操作</div>
+    ${loc.actions.map(a=>`<button class="btn" onclick="doAction('${a}')">${ACTION_LABELS[a]||a}</button>`).join('')}
+  </div>
+  ${G.actionPoints<=0?'<button class="btn ember" style="padding:16px;font-size:15px" onclick="endApocDay()">结束今日 → 第'+(G.apocDay+1)+'天</button>':''}
+  <div class="panel"><div class="ptitle">日志</div><div id="logbox">${renderLog()}</div></div>`;
+}
+const ACTION_LABELS={
+  repair:'🔧 维修供暖',farm:'🌾 种植采收',rest:'💤 休息恢复',
+  loot_food:'🍖 搜刮食物',loot_water:'💧 搜刮净水',loot_meds:'💊 搜刮药品',
+  loot_building:'🏗 搜刮建材',loot_weapon:'⚔ 搜刮武器',loot_fuel:'⛽ 搜刮燃料',
+  loot_scrap:'🔩 搜刮废料',loot_mixed:'📦 综合搜刮',meet_wanderer:'🚶 遇到流浪者',
+  loot_rare:'✨ 稀有物资',meet_beast:'👾 遭遇异兽',
+};
+function travelTo(loc){
+  if(G.actionPoints<=0){toast('行动点不足');return}
+  G.currentLoc=loc;
+  G.actionPoints--;
+  const l=LOCATIONS[loc];
+  logMsg(`前往${l.name}`,'ice');
+  save();viewApoc();
+}
+function doAction(action){
+  if(G.actionPoints<=0){toast('行动点不足');return}
+  G.actionPoints--;
+  // 执行具体行动
+  let msg='',c='';
+  if(action==='loot_food'){const f=rnd(8)+5;G.res.food+=f;G.quality.food=100;msg=`搜刮食物+${f}`;c='good'}
+  else if(action==='loot_water'){const w=rnd(6)+3;G.res.water+=w;G.quality.water=100;msg=`搜刮净水+${w}`;c='good'}
+  else if(action==='loot_meds'){const m=rnd(5)+2;G.res.meds+=m;msg=`搜刮药品+${m}`;c='good'}
+  else if(action==='loot_building'){const b=rnd(10)+5;G.res.building+=b;msg=`搜刮建材+${b}`;c='good'}
+  else if(action==='loot_weapon'){if(chance(.6)){G.res.weapons+=1;msg='搜刮到武器+1';c='good'}else{G.res.scrap+=10;msg='只搜到废料+10';c='warn'}}
+  else if(action==='loot_fuel'){const f=rnd(8)+4;G.res.fuel+=f;msg=`搜刮燃料+${f}`;c='good'}
+  else if(action==='loot_scrap'){const s=rnd(15)+10;G.res.scrap+=s;msg=`搜刮废料+${s}`;c='good'}
+  else if(action==='loot_mixed'){G.res.food+=rnd(10);G.res.building+=rnd(8);msg='综合搜刮完成';c='good'}
+  else if(action==='loot_rare'){G.res.weapons+=1;G.res.ammo+=rnd(15);G.res.meds+=rnd(8);msg='稀有物资大丰收！';c='good';sfx.good()}
+  else if(action==='meet_wanderer'){openWanderer();return}
+  else if(action==='meet_beast'){triggerBeast();return}
+  else if(action==='repair'){if(G.res.building<3||G.res.fuel<2){toast('资源不足');G.actionPoints++;return}G.res.building-=3;G.res.fuel-=2;G.baseIntegrity=clamp(G.baseIntegrity+15,0,100);msg='维修+15%';c='good'}
+  else if(action==='farm'){if(G.baseLevel<2){toast('需2级基地');G.actionPoints++;return}G.res.food+=10;G.quality.food=100;msg='种植采收+10食物';c='good'}
+  else if(action==='rest'){G.hp=clamp(G.hp+10,0,G.maxHp);msg='休息恢复+10HP';c='good'}
+  logMsg(msg,c);
+  save();viewApoc();
+}
+function totalScore(){return clamp(G.score.reserve+G.score.wall+G.score.survive+G.score.world,0,100)}
+
+function apocAct(t){
+  if(G.actionPoints<=0){toast('行动点已用完');return}
+  let msg='',c='';
+  if(t==='repair'){
+    if(G.res.building<3||G.res.fuel<2){toast('资源不足');return}
+    G.res.building-=3;G.res.fuel-=2;
+    const h=15+G.talents.wall*5;
+    G.baseIntegrity=clamp(G.baseIntegrity+h,0,100);
+    G.temperature=clamp(G.temperature+5,-30,-5);
+    msg=`维修+${h}%，温度${G.temperature}℃`;c='good';sfx.buy();
+  }
+  else if(t==='exploreSuburb'||t==='exploreCity'||t==='exploreDeep'){
+    const risk=t==='exploreSuburb'?0:t==='exploreCity'?1:2;
+    const zones=['近郊','城区','冻土深处'],danger=[.12,.3,.55][risk];
+    const fg=[8,16,28][risk]+G.talents.intuition*2,wg=[6,10,20][risk],bg=[3,8,15][risk];
+    G.res.food+=fg;G.res.water+=wg;G.res.building+=bg;G.res.scrap+=rnd(3+risk*2);
+    G.quality.food=100;G.quality.water=100; // 新物资重置新鲜度
+    if(risk===2){G.res.weapons+=chance(.3)?1:0;G.res.ammo+=chance(.4)?4:0}
+    G.stats.exploredRate=clamp(G.stats.exploredRate+[3,6,10][risk],0,100);
+    if(G.stats.exploredRate>=100)unlockAch('explorer');
+    msg=`探索${zones[risk]}：食+${fg} 水+${wg} 建材+${bg}`;
+    if(chance(danger)){
+      if(chance(.5)){msg+='；遭遇异兽！';c='warn';G.actionPoints--;triggerBeast();save();viewApoc();return}
+      else{const d=[4,8,18][risk];G.hp=clamp(G.hp-d,0,G.maxHp);msg+=`；冻伤-${d}`;c='bad';floatDmg('-'+d,'#ff5c5c')}
+    }else c='ice';
+    // 日记残页
+    if(chance(.12)&&!G.diaryFound){
+      G.diaryFound=true;
+      setTimeout(()=>showModal(`
+      <h3>📖 捡到一本日记</h3>
+      <div style="font-size:13px;line-height:2;color:var(--dim);text-align:left;margin:10px 0;padding:12px;background:rgba(0,0,0,.3);border-radius:8px">
+      <i>"10月15日<br>我女儿发烧了，药品用完了。<br>听说东边营地有抗生素，但他们不让我进...<br>我只能去抢了，对不起。<br><br>—— 冻土拾荒者-17"</i>
+      </div>
+      <div style="font-size:12px;color:var(--faint);text-align:center">读完后你对掠夺者的看法改变了...</div>
+      <button class="btn" style="width:100%" onclick="diaryChoice('spare')">🤝 以后遇到他放一马</button>
+      <button class="btn danger" style="width:100%" onclick="diaryChoice('hate')">⚔ 他是罪犯，继续仇恨</button>`),500);
+    }
+    // 宠物偶遇
+    if(chance(.10)&&!G.pet){
+      const pets=[
+        {name:'冰原幼狼',desc:'毛色灰白，眼神警惕但不凶恶',power:15,img:'assets/pet_wolf.jpg'},
+        {name:'雪狐',desc:'通体雪白，尾巴蓬松',power:10,img:'assets/pet_fox.jpg'},
+        {name:'北极熊幼崽',desc:'体型比成年的小，但爪子锋利',power:20,img:'assets/pet_bear.jpg'},
+      ];
+      const p=pick(pets);
+      setTimeout(()=>showModal(`
+      <h3>🐾 偶遇一只${p.name}</h3>
+      <div style="text-align:center;margin:10px 0">
+      <img src="${p.img}" style="width:120px;border-radius:12px;border:2px solid rgba(94,209,154,.3)">
+      </div>
+      <div style="font-size:13px;line-height:2;color:var(--dim);text-align:center;margin:10px 0">
+      ${p.desc}<br>
+      它看起来饿坏了，盯着你的食物...
+      </div>
+      <div style="font-size:11px;color:var(--faint);text-align:center;margin-bottom:10px">投喂后它可能暂时跟随你（3天），战斗中会协助你</div>
+      <button class="btn" style="width:100%" onclick="petFeed('${p.name}',${p.power})">🍖 投喂食物（消耗食物10）</button>
+      <button class="btn" style="width:100%" onclick="petLeave()">🚶 无视离开</button>`),600);
+    }
+  }
+  else if(t==='market'){openMarket();return}
+  else if(t==='craft'){openCraft();return}
+  else if(t==='wanderer'){triggerWanderer();return}
+  else if(t==='farm'){
+    if(G.baseLevel<2){toast('需2级基地');return}
+    const f=6+G.baseLevel*2,m=chance(.5)?2:0;
+    G.res.food+=f;G.res.meds+=m;
+    msg=`种植：食物+${f}${m?` 药+${m}`:''}`;c='good';
+  }
+  else if(t==='meds'){
+    if(G.res.meds<1){toast('无药品');return}
+    G.res.meds--;const h=20+G.talents.body*5;
+    G.hp=clamp(G.hp+h,0,G.maxHp);
+    msg=`用药+${h}生命`;c='good';floatDmg('+'+h,'#5ed19a');sfx.good();
+  }
+  G.actionPoints--;logMsg(msg,c);save();viewApoc();toast(msg);
+}
+
+/* ===== 制作台 ===== */
+const RECIPES=[
+  {key:'bandage',name:'简易绷带',need:{meds:1,scrap:2},give:{meds:3},desc:'药品1+废料2 → 药品3'},
+  {key:'fuel',name:'燃料块',need:{scrap:3,building:1},give:{fuel:5},desc:'废料3+建材1 → 燃料5'},
+  {key:'ammo',name:'简易弹药',need:{scrap:4,building:2},give:{ammo:6},desc:'废料4+建材2 → 弹药6'},
+  {key:'trap',name:'防御陷阱',need:{building:5,scrap:3},give:{},custom:'trap',desc:'建材5+废料3 → 基地防御+10%'},
+];
+function openCraft(){
+  showModal(`<h3>🔨 制作台</h3>
+  <div style="font-size:11px;color:var(--faint);text-align:center;margin-bottom:10px">废料：${G.res.scrap} · 建材：${G.res.building}</div>
+  ${RECIPES.map((r,i)=>{
+    const can=Object.entries(r.need).every(([k,v])=>(G.res[k]||0)>=v);
+    return `<div class="shop-item">
+    <div class="nm">${r.name}</div><div class="ds">${r.desc}</div>
+    <button class="btn mini ${can?'ember':''}" ${can?'':'disabled'} onclick="doCraft(${i})">制作</button></div>`}).join('')}
+  <button class="btn" onclick="closeModal()">关闭</button>`);
+}
+function doCraft(i){
+  const r=RECIPES[i];
+  for(const[k,v]of Object.entries(r.need))G.res[k]-=v;
+  if(r.custom==='trap'){G.baseIntegrity=clamp(G.baseIntegrity+10,0,120);logMsg('布置防御陷阱，基地+10%','good')}
+  else{for(const[k,v]of Object.entries(r.give))G.res[k]=(G.res[k]||0)+v;logMsg(`制作${r.name}完成`,'good')}
+  G.stats.crafts++;if(G.stats.crafts>=5)unlockAch('crafter');
+  sfx.buy();save();closeModal();openCraft();
+}
+
+/* ===== 商城 ===== */
+function openMarket(){
+  if(G.marketTimer<=0||!G.marketList.length){
+    const items=[
+      {key:'food',name:'压缩食物',q:15,price:800},{key:'water',name:'净水片',q:12,price:600},
+      {key:'fuel',name:'燃料桶',q:10,price:1000},{key:'meds',name:'医疗包',q:4,price:1500},
+      {key:'building',name:'建材包',q:10,price:900},{key:'weapons',name:'冷兵器',q:1,price:2000},
+      {key:'ammo',name:'弹药盒',q:8,price:1200},{key:'scrap',name:'电子废料',q:8,price:500},
+    ];
+    G.marketList=items.sort(()=>Math.random()-.5).slice(0,4);G.marketTimer=10;
+  }
+  const td=1-G.talents.trade*.08;
+  showModal(`<h3>🛒 天衍商城</h3>
+  <div style="font-size:10px;color:var(--faint);text-align:center;margin-bottom:8px">轮换倒计时：${G.marketTimer}天</div>
+  ${G.marketList.map((it,i)=>`<div class="shop-item">
+  <div class="nm">${it.name} <span class="lv">x${it.q}</span></div>
+  <div class="cost">${Math.round(it.price*td)} 积分</div>
+  <button class="btn mini" onclick="buyMarket(${i})">购买</button></div>`).join('')}
+  <div style="text-align:center;font-size:12px;margin:8px 0;color:var(--dim)">积分：<b style="color:var(--gold)">${G.integral}</b></div>
+  <button class="btn" onclick="closeModal()">关闭</button>`);
+}
+function buyMarket(i){
+  const it=G.marketList[i],p=Math.round(it.price*(1-G.talents.trade*.08));
+  if(G.integral<p){toast('积分不足');return}
+  G.integral-=p;G.res[it.key]=(G.res[it.key]||0)+it.q;
+  logMsg(`购入${it.name}x${it.q}`,'good');sfx.buy();
+  save();closeModal();openMarket();
+}
+
+/* ===== 流浪者 ===== */
+function triggerWanderer(){
+  if(G.wandererCd>0){toast('附近无流浪者');return}
+  const f=chance(.6),canAlly=f&&G.allies.length<2;
+  const wname=pick(['冻土拾荒者','雪区旅人','冰原猎人','废墟医生','寒潮行者'])+'-'+String(rnd(99)).padStart(2,'0');
+  showModal(`<h3>${f?'遇到友善流浪者':'遇到中立流浪者'}</h3>
+  <div style="font-size:13px;color:var(--dim);text-align:center;margin:10px 0">${f?`一个叫<b style="color:var(--ice)">${wname}</b>的幸存者请求食物。`:'一个流浪者警惕地观察你的避难所。'}</div>
+  ${f?`<button class="btn" onclick="wandererAct('help','${wname}')">🤝 救助（食5，换声望）</button>`:''}
+  ${canAlly?`<button class="btn" onclick="wandererAct('ally','${wname}')">⚔ 提议结盟（信任60，需食10）</button>`:''}
+  <button class="btn" onclick="wandererAct('ignore')">🚪 无视</button>
+  <button class="btn danger" onclick="wandererAct('rob')">💀 掠夺（世域-5）</button>`);
+}
+function wandererAct(a,wname){
+  G.wandererCd=3;
+  if(a==='help'){
+    if(G.res.food<5){toast('食物不足');return}
+    G.res.food-=5;G.rep=clamp(G.rep+2,-10,10);G.score.world=clamp(G.score.world+1,0,25);
+    if(chance(.7)){const r=rnd(3);
+      if(r===0){G.res.meds+=3;logMsg('流浪者赠医疗包x3','good')}
+      else if(r===1){G.res.building+=8;logMsg('流浪者赠建材x8','good')}
+      else{G.res.ammo+=5;logMsg('流浪者赠弹药x5','good')}}
+    G.stats.helped++;
+    if(G.stats.helped>=10)unlockAch('savior');
+    logMsg('救助了流浪者','good');
+  }else if(a==='ally'){
+    if(G.allies.length>=2){toast('盟友已满');return}
+    if(G.res.food<10){toast('食物不足');return}
+    G.res.food-=10;
+    G.allies.push({name:wname,trust:60});
+    G.rep=clamp(G.rep+3,-10,10);
+    logMsg(`与${wname}结盟，信任60`,'good');sfx.good();
+  }else if(a==='ignore'){logMsg('闭门不见','')}
+  else{
+    G.res.food+=15;G.res.water+=8;G.score.world=clamp(G.score.world-5,0,25);
+    G.rep=clamp(G.rep-3,-10,10);G.stats.killed++;
+    if(G.stats.killed>=5)unlockAch('tyrant');
+    logMsg('掠夺流浪者，世域-5','bad');sfx.bad();
+  }
+  G.actionPoints--;save();closeModal();viewApoc();
+}
+
+/* ===== 战斗 ===== */
+function triggerBeast(){
+  const beasts=[
+    {name:'冰原狼',hp:30,atk:8},
+    {name:'畸变熊',hp:50,atk:12},
+    {name:'雪蝎',hp:20,atk:15},
+  ];
+  const b=pick(beasts);
+  startBattle(b.name,b.hp,b.atk);
+}
+function battle(mode,enemy){
+  closeModal();
+  let win=false,msg='',c='';
+  if(mode==='defend'){
+    if(G.res.fuel<8||G.res.building<4){toast('资源不足');viewApoc();return}
+    G.res.fuel-=8;G.res.building-=4;win=chance(.85);
+    if(win){G.res.food+=5;G.res.water+=3;msg=`固守${enemy==='beast'?'异兽':'掠夺者'}胜利`;c='good'}
+    else{G.baseIntegrity=clamp(G.baseIntegrity-10,0,100);G.hp=clamp(G.hp-10,0,G.maxHp);msg='固守失败，-10HP';c='bad';floatDmg('-10')}
+  }else{
+    if(G.res.weapons<2||G.res.ammo<6){toast('武器/弹药不足');viewApoc();return}
+    G.res.weapons-=2;G.res.ammo-=6;
+    win=chance(clamp(.5+G.res.weapons*.03+G.talents.body*.02,0,.95));
+    if(win){
+      if(enemy==='beast'){G.res.food+=15;G.res.meds+=3;G.res.building+=5;G.stats.beastKilled++;if(G.stats.beastKilled>=5)unlockAch('slayer')}
+      else{G.res.food+=22;G.res.water+=10;G.res.building+=8;G.stats.raidDefeated++}
+      msg=`强攻胜利！击退${enemy==='beast'?'异兽':'掠夺者'}`;c='good';sfx.hit();floatDmg('胜利！','#ffd56a');
+    }else{
+      G.baseIntegrity=clamp(G.baseIntegrity-25,0,100);G.hp=clamp(G.hp-30,0,G.maxHp);
+      msg='强攻惨败！-25%基地，-30HP';c='bad';floatDmg('-30');sfx.bad();
+    }
+  }
+  logMsg(msg,c);
+  if(G.hp<=0)setTimeout(()=>gameOver('death'),500);
+  save();viewApoc();
+}
+
+/* ===== 排行榜 ===== */
+function generateBoard(){
+  const names=['冻土拾荒者','冰原独行者','雪区守墙人','寒潮旅人','废土猎手','冰封守望','极寒漫游者','冻土商队','雪原浪人','冰穴隐者','寒域游骑','雪线猎手','冰封行者','冰原流浪者','霜堡领主','雪原孤魂','冻土信使','寒区幸存者','暴雪过客','冻土拾荒者-07'];
+  G.board=Array.from({length:100},(_,i)=>({
+    name:pick(names)+'-'+String(rnd(99)).padStart(2,'0'),
+    score:clamp(100-i-rnd(10),0,100),
+    type:chance(.4)?'raid':(chance(.5)?'order':'lone'),
+  }));
+  G.playerRank=80+rnd(15);G.stats.maxRank=G.playerRank;
+}
+function viewBoard(){
+  refreshTop();
+  const tabs=[{k:'total',n:'综合'},{k:'reserve',n:'储备'},{k:'wall',n:'壁垒'},{k:'survive',n:'存续'},{k:'world',n:'探索'}];
+  const dimMap={total:totalScore,reserve:()=>G.score.reserve,wall:()=>G.score.wall,survive:()=>G.score.survive,world:()=>G.stats.exploredRate};
+  const myScore=dimMap[G.boardTab]();
+  // 生成当前Tab的榜单（基于总分偏移）
+  const offset={total:0,reserve:-15,wall:-10,survive:-20,world:-25}[G.boardTab];
+  const b=G.board.map(r=>({...r,score:clamp(r.score+offset+rnd(8)-4,0,100)}));
+  const meRank=Math.max(1,Math.min(100,b.findIndex(r=>r.score<myScore)+1));
+  const top=b.slice(0,meRank+5).concat([{name:G.playerTag,score:myScore,type:'me',isMe:true}]).sort((a,c)=>c.score-a.score).slice(Math.max(0,meRank-8),meRank+5);
+  $('#main').innerHTML=`<div class="panel"><div class="ptitle">天衍排行榜<span class="right">第${G.season}赛季 · ${G.seasonDay}/120天</span></div>
+  <div style="display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap">
+  ${tabs.map(t=>`<button class="btn mini" style="flex:1;min-width:60px;text-align:center;justify-content:center;${G.boardTab===t.k?'background:rgba(94,200,248,.2);border-color:var(--ice);color:var(--ice)':''}" onclick="G.boardTab='${t.k}';save();viewBoard()">${t.n}</button>`).join('')}
+  </div>
+  ${G.items.archiveHidden>0?`<div style="text-align:center;font-size:11px;color:var(--ice);margin-bottom:6px">档案隐藏中（${G.items.archiveHidden}天）</div>`:''}
+  <div style="max-height:380px;overflow-y:auto">
+  ${top.map((r,i)=>{
+    const rk=Math.max(1,meRank-8)+i;
+    return `<div class="lb ${r.isMe?'me':''}">
+    <div class="rk ${rk===1?'t1':rk===2?'t2':rk===3?'t3':''}">${rk}</div>
+    <div class="nm">${r.name}${r.isMe?' <span style="color:var(--ice);font-size:10px">(你)</span>':''}<span style="font-size:9px;color:var(--faint);margin-left:6px">???</span></div>
+    <div class="sc">${r.score}</div></div>`}).join('')}
+  </div>
+  <div style="margin-top:8px;font-size:10px;color:var(--faint);text-align:center">你的排名：#${meRank} · 代号：${G.playerTag}</div>
+  <button class="btn" onclick="viewApoc()">← 返回</button></div>`;
+}
+
+/* ===== 库存 ===== */
+const RES_ICONS={
+  food:'<svg viewBox="0 0 24 24" fill="none" stroke="#f0a050" stroke-width="2"><path d="M6 3h12v4H6zM8 7v14h8V7M10 11h4M10 15h4"/></svg>',
+  water:'<svg viewBox="0 0 24 24" fill="none" stroke="#5ec8f8" stroke-width="2"><path d="M12 2C12 2 5 10 5 15a7 7 0 0014 0C19 10 12 2 12 2z"/></svg>',
+  fuel:'<svg viewBox="0 0 24 24" fill="none" stroke="#f06050" stroke-width="2"><path d="M5 3h10v18H5zM15 8h3v10a2 2 0 01-4 0M8 7h4M8 11h4"/></svg>',
+  meds:'<svg viewBox="0 0 24 24" fill="none" stroke="#60e080" stroke-width="2"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M12 10v6M9 13h6M8 6V4h8v2"/></svg>',
+  building:'<svg viewBox="0 0 24 24" fill="none" stroke="#c0a060" stroke-width="2"><rect x="3" y="14" width="18" height="7"/><path d="M6 14V10h4v4M12 14V7h4v7"/></svg>',
+  weapons:'<svg viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" stroke-width="2"><path d="M3 18l9-9M12 9l3-3 3 3-3 3M15 12l6 6M9 15l-3 3"/></svg>',
+  ammo:'<svg viewBox="0 0 24 24" fill="none" stroke="#f0d050" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>',
+  clothes:'<svg viewBox="0 0 24 24" fill="none" stroke="#a080f0" stroke-width="2"><path d="M8 3l-4 4 3 3v11h10V10l3-3-4-4-2 2h-4l-2-2z"/></svg>',
+  scrap:'<svg viewBox="0 0 24 24" fill="none" stroke="#80a0b0" stroke-width="2"><circle cx="8" cy="8" r="4"/><circle cx="16" cy="16" r="4"/></svg>',
+  tools:'<svg viewBox="0 0 24 24" fill="none" stroke="#e0a040" stroke-width="2"><path d="M14 6a4 4 0 015 5l-8 8-4 1 1-4 8-8z"/></svg>',
+  seeds:'<svg viewBox="0 0 24 24" fill="none" stroke="#60c060" stroke-width="2"><path d="M12 22V12M12 12C12 8 8 6 4 6c0 4 4 6 8 6zM12 12c0-4 4-6 8-6 0 4-4 6-8 6z"/></svg>',
+  battery:'<svg viewBox="0 0 24 24" fill="none" stroke="#f0c050" stroke-width="2"><rect x="2" y="8" width="16" height="8" rx="1"/><path d="M20 11v2M6 12h4"/></svg>',
+};
+const RES_NAMES={food:'食物',water:'净水',fuel:'燃料',meds:'药品',building:'建材',weapons:'武器',ammo:'弹药',clothes:'衣物',scrap:'废料',tools:'工具',seeds:'种子',battery:'电池'};
+function viewInventory(){
+  refreshTop();
+  const total=Object.values(G.res).reduce((a,b)=>a+b,0);
+  const keys=Object.keys(RES_ICONS);
+  $('#main').innerHTML=`<div class="panel"><div class="ptitle">物资（${total}/${G.storageCap}）</div>
+  <div class="inv-grid">${keys.map(k=>{
+    const v=G.res[k]||0;
+    return `<div class="icell ${v===0?'empty':''}">${RES_ICONS[k]}<span class="q">${v}</span><span class="n">${RES_NAMES[k]}</span></div>`;
+  }).join('')}</div></div>
+  <div class="panel"><div class="ptitle">特殊道具</div>
+  <div class="inv-grid">
+  <div class="icell">${RES_ICONS.scoutMirror||RES_ICONS.tools}<span class="q">${G.items.scoutMirror||0}</span><span class="n">窥镜</span></div>
+  <div class="icell">${RES_ICONS.meds}<span class="q">${G.items.hideArchive||0}</span><span class="n">隐藏药</span></div>
+  <div class="icell">${RES_ICONS.building}<span class="q">${G.items.storageBag||0}</span><span class="n">储物包</span></div>
+  <div class="icell">${RES_ICONS.fuel}<span class="q">${G.items.warmKit||0}</span><span class="n">保温套</span></div>
+  </div>
+  ${G.items.scoutMirror>0?'<button class="btn mini" onclick="useScout()">使用窥镜</button>':''}
+  ${G.items.hideArchive>0?'<button class="btn mini" onclick="useHide()">使用隐藏药剂</button>':''}
+  </div>
+  <button class="btn" onclick="${backNav()}">← 返回</button>`;
+}
+function useScout(){G.items.scoutMirror--;G.scoutOn=true;logMsg('窥镜已激活','ice');save();viewInventory();toast('预警已解锁')}
+function useHide(){G.items.hideArchive--;G.items.archiveHidden=15;logMsg('档案隐藏15天','ice');save();viewInventory();toast('已隐藏')}
+
+/* ===== 基地 ===== */
+function viewBase(){
+  refreshTop();
+  const bn=['','毛坯','简易','保温','完整','堡垒'];
+  $('#main').innerHTML=`<div class="panel"><div class="ptitle">基地详情</div>
+  <div class="srow"><span class="k">等级</span><span class="v ice">${G.baseLevel}级 · ${bn[G.baseLevel]}</span></div>
+  <div class="srow"><span class="k">完整度</span><span class="v">${Math.round(G.baseIntegrity)}%</span></div>
+  <div class="srow"><span class="k">库存</span><span class="v">${G.storageCap}</span></div>
+  <div class="srow"><span class="k">温度</span><span class="v ember">${G.temperature}℃</span></div>
+  <div class="srow"><span class="k">种植</span><span class="v">${G.baseLevel>=2?'有':'无'}</span></div>
+  <div class="srow"><span class="k">防御天赋</span><span class="v ice">+${G.talents.wall*10}%</span></div>
+  ${G.baseLevel>=5?unlockAch('fortress'):''}
+  ${G.baseIntegrity<30?'<div style="margin-top:10px;padding:10px;background:rgba(255,92,92,.1);border-radius:8px;color:var(--red);font-size:12px">⚠ 基地破损严重！</div>':''}
+  </div><button class="btn" onclick="${backNav()}">← 返回</button></div>`;
+}
+
+/* ===== 状态/四维 ===== */
+function viewStatus(){
+  refreshTop();const t=totalScore();
+  $('#main').innerHTML=`<div class="panel"><div class="ptitle">四维评分</div>
+  <div class="score-grid">
+  <div class="scell"><div class="dn">储备</div><div class="num">${G.score.reserve}</div><div class="mx">/25</div></div>
+  <div class="scell"><div class="dn">壁垒</div><div class="num">${G.score.wall}</div><div class="mx">/25</div></div>
+  <div class="scell"><div class="dn">存续</div><div class="num">${G.score.survive}</div><div class="mx">/25</div></div>
+  <div class="scell"><div class="dn">世域</div><div class="num">${G.score.world}</div><div class="mx">/25</div></div>
+  </div>
+  <div style="text-align:center;padding:12px;background:rgba(0,0,0,.3);border-radius:8px">
+  <div style="font-size:11px;color:var(--faint)">总分</div>
+  <div style="font-size:36px;font-weight:900;color:var(--gold);font-family:monospace">${t}<span style="font-size:14px;color:var(--faint)">/100</span></div></div>
+  </div>
+  <div class="panel"><div class="ptitle">本局数据</div>
+  <div class="srow"><span class="k">存活</span><span class="v ice">${G.apocDay}天</span></div>
+  <div class="srow"><span class="k">基地</span><span class="v">${G.baseLevel}级</span></div>
+  <div class="srow"><span class="k">探索率</span><span class="v">${G.stats.exploredRate}%</span></div>
+  <div class="srow"><span class="k">最高排名</span><span class="v ice">#${G.stats.maxRank}</span></div>
+  <div class="srow"><span class="k">击退掠夺</span><span class="v">${G.stats.raidDefeated}</span></div>
+  <div class="srow"><span class="k">击杀异兽</span><span class="v">${G.stats.beastKilled}</span></div>
+  <div class="srow"><span class="k">救助</span><span class="v good">${G.stats.helped}</span></div>
+  <div class="srow"><span class="k">掠夺</span><span class="v ${G.stats.killed>0?'warn':''}">${G.stats.killed}</span></div>
+  <div class="srow"><span class="k">声望</span><span class="v ${G.rep>=0?'good':'warn'}">${G.rep>=0?'友善':'恶名'} ${G.rep}</span></div>
+  </div>
+  <button class="btn" onclick="${backNav()}">← 返回</button></div>`;
+}
+
+/* ===== 成就 ===== */
+function viewAch(){
+  refreshTop();
+  $('#main').innerHTML=`<div class="panel"><div class="ptitle">成就（${G.achievements.length}/${ACH.length}）</div>
+  ${ACH.map(a=>{const u=G.achievements.includes(a.id);
+    return `<div class="ach-item ${u?'':'locked'}">
+    <div class="ic">${a.icon}</div>
+    <div class="info"><div class="t">${a.name}</div><div class="d">${a.desc}</div></div>
+    <div style="color:${u?'var(--gold)':'var(--faint)'};font-size:11px">${u?'✓':'🔒'}</div></div>`}).join('')}
+  <button class="btn" onclick="${backNav()}">← 返回</button></div>`;
+}
+
+function backNav(){return G.phase==='apoc'?'viewApoc()':G.phase==='prep'?'viewPrep()':'viewStart()'}
+
+/* ===== 末日结束一天 ===== */
+function endApocDay(){
+  const fm=G.weather==='cold'?1.5:1;
+  G.res.food-=3;G.res.water-=2;G.res.fuel-=Math.round(1.5*fm);
+  let dmg=0;
+  if(G.res.food<0){dmg+=6;G.res.food=0}
+  if(G.res.water<0){dmg+=6;G.res.water=0}
+  if(G.res.fuel<0){dmg+=4;G.res.fuel=0;G.temperature=clamp(G.temperature-5,-40,-5)}
+  dmg=Math.max(0,dmg*(1-G.talents.cold*.2));
+  if(dmg>0){G.hp=clamp(G.hp-dmg,0,G.maxHp);logMsg(`物资短缺-${Math.round(dmg)}HP`,'bad');G.score.survive=clamp(G.score.survive-1,0,25)}
+  rollWeather();
+  if(G.weather==='snow'&&chance(.3)){G.baseIntegrity=clamp(G.baseIntegrity-5,0,100);logMsg('暴雪压顶-5%','warn')}
+  if(G.weather==='ice'&&chance(.3)){G.baseIntegrity=clamp(G.baseIntegrity-4,0,100);logMsg('融冰渗水-4%','warn')}
+  if(G.baseIntegrity<30){
+    G.structDmg++;
+    if(G.structDmg>=3){
+      G.baseIntegrity=clamp(G.baseIntegrity-15,0,100);
+      logMsg('连锁破损爆发！-15%完整度','bad');sfx.bad();
+      G.structDmg=0;
+    }
+  }else{G.structDmg=0}
+  // 盟友每日结算
+  G.allies.forEach(a=>{
+    a.trust=clamp(a.trust-2,0,100);
+    if(chance(.15)){
+      if(G.res.food>=5){G.res.food-=5;a.trust=clamp(a.trust+5,0,100);logMsg(`${a.name}索要食物，已供给`,'good')}
+      else{a.trust=clamp(a.trust-10,0,100);logMsg(`${a.name}因缺物资信任下降`,'warn')}
+    }
+  });
+  G.allies=G.allies.filter(a=>{
+    if(a.trust<=0){logMsg(`${a.name}断盟离开`,'bad');return false}
+    return true;
+  });
+  // 污染度衰减
+  G.quality.food=clamp(G.quality.food-3,0,100);
+  G.quality.water=clamp(G.quality.water-2,0,100);
+  if(G.quality.food<30&&G.res.food>0){
+    logMsg(`食物质量恶化（${Math.round(G.quality.food)}%）`,'warn');
+    if(chance(.2)){G.hp=clamp(G.hp-5,0,G.maxHp);logMsg('吃了变质食物-5HP','bad');floatDmg('-5')}
+  }
+  // 动态评分
+  const totalItems=Object.values(G.res).reduce((a,b)=>a+b,0);
+  G.score.reserve=clamp(5+Math.floor(totalItems/10),0,25);
+  G.score.wall=clamp(G.baseLevel*4+Math.floor(G.baseIntegrity/25),0,25);
+  if(totalItems>=200)unlockAch('rich');
+  if(G.attention>0)G.attention=clamp(G.attention-2,0,100);
+  if(G.marketTimer>0)G.marketTimer--;
+  if(G.items.archiveHidden>0)G.items.archiveHidden--;
+  if(G.wandererCd>0)G.wandererCd--;
+  // 宠物天数递减
+  if(G.pet){
+    G.pet.daysLeft--;
+    if(G.pet.daysLeft<=0){logMsg(`【宠物】${G.pet.name}离开了...`,'warn');G.pet=null}
+  }
+  G.integral+=10+G.baseLevel*2+(G.weather==='clear'?5:0);
+  G.seasonDay++;
+  if(G.seasonDay>=120){G.season++;G.seasonDay=0;logMsg(`第${G.season}赛季开始`,'ice')}
+  G.apocDay++;G.actionPoints=3;
+  // 黑市拍卖会（每10天）
+  if(G.apocDay%10===0&&G.apocDay>0){
+    setTimeout(()=>auctionEvent(),300);
+  }
+  G.stats.daysSurvived=G.apocDay;
+  if(G.apocDay>=100)unlockAch('survivor');
+  if(G.playerRank<=10)unlockAch('top10');
+  if(G.hp<=0){gameOver('death');return}
+  raiderAttack();
+  apocRandomEvent();
+  checkEnding();save();viewApoc();
+}
+function apocRandomEvent(){
+  if(!chance(0.35))return;
+  // 剧情事件（按天数触发）
+  if(G.apocDay===3&&!G.flags.helpSignal){
+    G.flags.helpSignal=true;
+    showModal(`
+    <h3>📡 求救信号</h3>
+    <div style="font-size:13px;line-height:1.8;color:var(--dim);text-align:center;margin:10px 0">
+    收音机里传来断续的求救信号：<br>
+    <i>"这里是...第三医院...我们还有...伤员...请求食物和药品..."</i><br><br>
+    信号来自2公里外。你要去吗？
+    </div>
+    <button class="btn" style="width:100%" onclick="eventHelpSignal('go')">🚶 前往救援（食5/药3，可能获得盟友）</button>
+    <button class="btn" style="width:100%" onclick="eventHelpSignal('ignore')">🚪 关闭收音机</button>`);
+    return;
+  }
+  if(G.apocDay===7&&!G.flags.campFound){
+    G.flags.campFound=true;
+    showModal(`
+    <h3>🏕 发现幸存者营地</h3>
+    <div style="font-size:13px;line-height:1.8;color:var(--dim);text-align:center;margin:10px 0">
+    你在城区边缘发现一个小型幸存者营地，约5人。<br>
+    他们有多余的建材和工具，但似乎在等什么人来交易。
+    </div>
+    <button class="btn" style="width:100%" onclick="eventCamp('trade')">🤝 用食物换建材（食10→建材15）</button>
+    <button class="btn" style="width:100%" onclick="eventCamp('raid')">⚔ 掠夺营地（世域-8，获得大量物资）</button>
+    <button class="btn" style="width:100%" onclick="eventCamp('leave')">🚶 悄悄离开</button>`);
+    return;
+  }
+  if(G.apocDay===15&&!G.flags.beastWave){
+    G.flags.beastWave=true;
+    showModal(`
+    <h3 class="ember">⚠ 异兽潮前兆</h3>
+    <div style="font-size:13px;line-height:1.8;color:var(--dim);text-align:center;margin:10px 0">
+    远处传来密集的嘶吼声，地面在微微震动。<br>
+    你观察到远处冰原上有大片黑影在移动——<br>
+    <b style="color:var(--ember)">异兽潮正在逼近你的避难所！</b>
+    </div>
+    <button class="btn ember" style="width:100%" onclick="eventBeastWave('fortify')">🏗 紧急加固（建材10，抵御成功率70%）</button>
+    <button class="btn" style="width:100%" onclick="eventBeastWave('hide')">🏃 躲进地下室（风险50%，损失小）</button>`);
+    return;
+  }
+  // 普通随机事件（弹窗提示）
+  const ev=[
+    {t:'废弃便利店',d:'你路过一家废弃便利店，货架上还剩些罐头',r:()=>{G.res.food+=8;return '食物+8'}},
+    {t:'融雪取水',d:'屋顶的积雪融化了，你收集到一些净水',r:()=>{G.res.water+=6;return '净水+6'}},
+    {t:'电子废料',d:'废墟里捡到一堆还能用的电子零件',r:()=>{G.res.scrap+=8;return '废料+8'}},
+    {t:'墙体裂缝',d:'寒风从墙缝里灌进来，避难所保温层受损',r:()=>{G.baseIntegrity=clamp(G.baseIntegrity-6,0,100);return '完整度-6%'}},
+    {t:'炊烟被看见',d:'远处似乎有人看到了你家烟囱冒出的烟',r:()=>{G.attention=clamp(G.attention+3,0,100);return '关注度+3'}},
+    {t:'急救箱',d:'在废弃诊所找到一个还能用的急救箱',r:()=>{G.res.meds+=3;return '药品+3'}},
+    {t:'废弃警车',d:'一辆被雪掩埋的警车，后备箱里有弹药',r:()=>{G.res.ammo+=5;return '弹药+5'}},
+    {t:'拆车得建材',d:'拆掉一辆废弃汽车，得到不少金属建材',r:()=>{G.res.building+=8;return '建材+8'}},
+    {t:'夜间骤寒',d:'夜里温度骤降到-55℃，你被冻伤了',r:()=>{G.hp=clamp(G.hp-8,0,G.maxHp);floatDmg('-8');return 'HP-8'}},
+    {t:'油罐车残骸',d:'一辆翻倒的油罐车，还能抽到不少燃料',r:()=>{G.res.fuel+=10;return '燃料+10'}},
+    {t:'商城优惠券',d:'天衍商城推送了一张限时优惠券',r:()=>{G.integral+=15;return '积分+15'}},
+    {t:'暴雪掩护',d:'一场大暴雪掩盖了你最近的活动痕迹',r:()=>{G.attention=clamp(G.attention-3,0,100);return '关注度-3'}},
+  ];
+  const e=pick(ev);
+  const result=e.r();
+  showModal(`
+  <h3>📢 随机事件</h3>
+  <div style="font-size:14px;font-weight:700;margin:10px 0">${e.t}</div>
+  <div style="font-size:13px;line-height:1.8;color:var(--dim);text-align:center;margin:10px 0">${e.d}</div>
+  <div style="font-size:16px;font-weight:900;color:var(--gold);text-align:center;margin:10px 0">${result}</div>
+  <button class="btn ember" style="width:100%" onclick="closeModal()">继续生存 →</button>`);
+}
+function eventHelpSignal(act){
+  closeModal();
+  if(act==='go'){
+    if(G.res.food<5||G.res.meds<3){toast('物资不足，无法前往');return}
+    G.res.food-=5;G.res.meds-=3;
+    if(chance(.6)){
+      G.allies.push({name:'医生-'+rnd(99),trust:70});
+      logMsg('【剧情】你救出了医生，她加入了你的避难所','good');sfx.good();
+    }else{
+      G.res.meds+=5;logMsg('【剧情】医生给了你额外的药品+5','good');
+    }
+  }else{
+    logMsg('【剧情】你关掉了收音机...希望他们能撑住','warn');
+  }
+  save();viewApoc();
+}
+function eventCamp(act){
+  closeModal();
+  if(act==='trade'){
+    if(G.res.food<10){toast('食物不足');return}
+    G.res.food-=10;G.res.building+=15;
+    logMsg('【剧情】交易成功，建材+15','good');
+  }else if(act==='raid'){
+    G.res.food+=20;G.res.building+=10;G.res.meds+=5;
+    G.score.world=clamp(G.score.world-8,0,25);
+    G.attention=clamp(G.attention+10,0,100);
+    logMsg('【剧情】你掠夺了营地，世域-8','bad');sfx.bad();
+  }else{
+    logMsg('【剧情】你悄悄离开了营地','');
+  }
+  save();viewApoc();
+}
+function eventBeastWave(act){
+  closeModal();
+  if(act==='fortify'){
+    if(G.res.building<10){toast('建材不足');G.hp=clamp(G.hp-30,0,G.maxHp);G.baseIntegrity=clamp(G.baseIntegrity-20,0,100);logMsg('【剧情】加固失败！异兽潮突破防线','bad');viewApoc();return}
+    G.res.building-=10;
+    if(chance(.7)){
+      logMsg('【剧情】加固成功，异兽潮被击退','good');sfx.good();
+    }else{
+      G.hp=clamp(G.hp-15,0,G.maxHp);logMsg('【剧情】异兽潮突破了部分防线-15HP','bad');
+    }
+  }else{
+    if(chance(.5)){
+      logMsg('【剧情】你在地下室躲过了异兽潮','good');
+    }else{
+      G.hp=clamp(G.hp-20,0,G.maxHp);G.baseIntegrity=clamp(G.baseIntegrity-10,0,100);
+      logMsg('【剧情】异兽潮袭击了避难所-20HP','bad');
+    }
+  }
+  save();viewApoc();
+}
+function diaryChoice(act){
+  closeModal();
+  if(act==='spare'){
+    G.diarySpared=true;
+    G.rep=clamp(G.rep+2,-10,10);
+    logMsg('【日记】你选择放他一马...','good');
+  }else{
+    logMsg('【日记】你合上了日记...','warn');
+  }
+  save();viewApoc();
+}
+function petFeed(name,power){
+  closeModal();
+  if(G.res.food<10){toast('食物不足');viewApoc();return}
+  G.res.food-=10;
+  G.pet={name:name,power:power,daysLeft:3};
+  logMsg(`【宠物】${name}决定跟随你（3天）`,'good');
+  sfx.good();
+  save();viewApoc();
+}
+function petLeave(){
+  closeModal();
+  logMsg('【宠物】你绕过了它...','');
+  save();viewApoc();
+}
+/* ===== 回合制战斗 ===== */
+const BEAST_IMAGES={
+  '冰原狼':'assets/beast_wolf.jpg',
+  '畸变熊':'assets/beast_bear.jpg',
+  '雪蝎':'assets/beast_scorpion.jpg',
+};
+const PET_IMAGES={
+  '冰原幼狼':'assets/pet_wolf.jpg',
+  '雪狐':'assets/pet_fox.jpg',
+  '北极熊幼崽':'assets/pet_bear.jpg',
+};
+function startBattle(enemyName,enemyHp,enemyAtk){
+  const playerHp=G.hp;
+  const playerAtk=10+G.res.weapons*2;
+  const petPower=G.pet?G.pet.power:0;
+  const battleState={
+    enemyName:enemyName,
+    enemyHp:enemyHp,
+    enemyMaxHp:enemyHp,
+    enemyAtk:enemyAtk,
+    enemyImg:BEAST_IMAGES[enemyName]||'assets/beast_wolf.jpg',
+    playerHp:playerHp,
+    playerMaxHp:G.maxHp,
+    playerAtk:playerAtk,
+    petPower:petPower,
+    petName:G.pet?G.pet.name:null,
+    petImg:G.pet?PET_IMAGES[G.pet.name]:null,
+    round:1,
+    maxRounds:3,
+    log:[],
+  };
+  showBattleUI(battleState);
+}
+function showBattleUI(bs){
+  const enemyPct=bs.enemyHp/bs.enemyMaxHp*100;
+  const playerPct=bs.playerHp/bs.playerMaxHp*100;
+  $('#mmask').remove();
+  showModal(`
+  <h3 style="text-align:center;color:var(--red)">⚔ 战斗 · 第${bs.round}/${bs.maxRounds}回合</h3>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0">
+    <div style="text-align:center;flex:1">
+      <img src="${bs.enemyImg}" style="width:100%;max-width:140px;border-radius:12px;border:2px solid rgba(255,92,92,.3);margin-bottom:8px;object-fit:cover;aspect-ratio:1">
+      <div style="font-size:12px;color:var(--dim)">${bs.enemyName}</div>
+      <div style="font-size:20px;font-weight:900;color:var(--red)">${bs.enemyHp}/${bs.enemyMaxHp}</div>
+      <div class="bar" style="margin-top:4px"><i class="enemy" style="width:${enemyPct}%"></i></div>
+    </div>
+    <div style="font-size:24px;color:var(--red);font-weight:900">VS</div>
+    <div style="text-align:center;flex:1">
+      <div style="width:100%;max-width:140px;height:140px;border-radius:12px;border:2px solid rgba(94,200,248,.3);margin-bottom:8px;background:rgba(94,200,248,.1);display:flex;align-items:center;justify-content:center;font-size:48px">🧑</div>
+      <div style="font-size:12px;color:var(--dim)">你${bs.petName?` + 🐾${bs.petName}`:''}</div>
+      <div style="font-size:20px;font-weight:900;color:var(--ice)">${bs.playerHp}/${bs.playerMaxHp}</div>
+      <div class="bar" style="margin-top:4px"><i class="ice" style="width:${playerPct}%"></i></div>
+    </div>
+  </div>
+  <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:10px;margin:10px 0;min-height:60px;font-size:12px;line-height:1.8">
+  ${bs.log.slice(-4).map(l=>`<div>${l}</div>`).join('')}
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <button class="btn ember" onclick="battleAction('attack',${JSON.stringify(bs).replace(/"/g,'&quot;')})">⚔ 攻击<br><span style="font-size:10px;opacity:.7">伤害 ${bs.playerAtk+bs.petPower}</span></button>
+    <button class="btn" onclick="battleAction('defend',${JSON.stringify(bs).replace(/"/g,'&quot;')})">🛡 防御<br><span style="font-size:10px;opacity:.7">减伤50%</span></button>
+    <button class="btn" onclick="battleAction('item',${JSON.stringify(bs).replace(/"/g,'&quot;')})">💊 药品<br><span style="font-size:10px;opacity:.7">回复20HP</span></button>
+    <button class="btn danger" onclick="battleAction('flee',${JSON.stringify(bs).replace(/"/g,'&quot;')})">🏃 逃跑<br><span style="font-size:10px;opacity:.7">50%成功率</span></button>
+  </div>`);
+}
+function battleAction(action,bs){
+  // 解析bs（JSON字符串）
+  try{bs=JSON.parse(bs)}catch(e){}
+  let logLine='';
+  let enemyDmg=0;
+  let playerDmg=0;
+  // 玩家行动
+  if(action==='attack'){
+    enemyDmg=bs.playerAtk+bs.petPower+rnd(5);
+    logLine=`⚔ 你发动攻击，造成${enemyDmg}伤害！`;
+    if(bs.petPower>0)logLine+=`（🐾宠物协助+${bs.petPower}）`;
+  }else if(action==='defend'){
+    logLine=`🛡 你举起盾牌防御，本回合减伤50%`;
+  }else if(action==='item'){
+    if(G.res.meds<10){toast('药品不足');return}
+    G.res.meds-=10;
+    const heal=20;
+    bs.playerHp=Math.min(bs.playerMaxHp,bs.playerHp+heal);
+    logLine=`💊 使用药品，回复${heal}HP`;
+  }else if(action==='flee'){
+    if(chance(.5)){
+      logLine=`🏃 你成功逃跑了！`;
+      bs.log.push(logLine);
+      endBattle(bs,'flee');
+      return;
+    }else{
+      logLine=`🏃 逃跑失败！`;
+    }
+  }
+  bs.enemyHp-=enemyDmg;
+  bs.log.push(logLine);
+  // 检查敌方是否死亡
+  if(bs.enemyHp<=0){
+    bs.log.push(`🎉 你击败了${bs.enemyName}！`);
+    endBattle(bs,'win');
+    return;
+  }
+  // 敌方行动
+  let ed=bs.enemyAtk+rnd(3);
+  if(action==='defend')ed=Math.floor(ed/2);
+  bs.playerHp-=ed;
+  bs.log.push(`👾 ${bs.enemyName}反击，造成${ed}伤害`);
+  // 检查玩家是否死亡
+  if(bs.playerHp<=0){
+    bs.log.push(`💀 你被击败了...`);
+    endBattle(bs,'lose');
+    return;
+  }
+  // 回合数
+  bs.round++;
+  if(bs.round>bs.maxRounds){
+    bs.log.push(`⏰ 战斗超时，双方撤退`);
+    endBattle(bs,'timeout');
+    return;
+  }
+  showBattleUI(bs);
+}
+function endBattle(bs,result){
+  closeModal();
+  if(result==='win'){
+    G.hp=bs.playerHp;
+    G.res.food+=rnd(10)+5;
+    G.res.meds+=rnd(5);
+    logMsg(`【战斗胜利】击败${bs.enemyName}，获得物资`,'good');
+    sfx.good();
+    unlockAch('killer');
+  }else if(result==='lose'){
+    G.hp=Math.max(10,bs.playerHp);
+    G.baseIntegrity=clamp(G.baseIntegrity-15,0,100);
+    logMsg(`【战斗失败】被${bs.enemyName}击败，基地受损`,'bad');
+    sfx.bad();
+  }else if(result==='flee'){
+    logMsg(`【战斗】你成功逃跑`,'warn');
+  }else{
+    G.hp=bs.playerHp;
+    logMsg(`【战斗】超时结束`,'');
+  }
+  save();viewApoc();
+}
+function auctionEvent(){
+  const items=[
+    {name:'军用医疗包',desc:'药品+15',price:200,give:()=>{G.res.meds+=15}},
+    {name:'冻土武器箱',desc:'武器+2，弹药+20',price:350,give:()=>{G.res.weapons+=2;G.res.ammo+=20}},
+    {name:'保温燃料桶',desc:'燃料+30',price:150,give:()=>{G.res.fuel+=30}},
+    {name:'科技废料堆',desc:'废料+25',price:100,give:()=>{G.res.scrap+=25}},
+  ];
+  const item=pick(items);
+  const rivalBid=item.price+rnd(100);
+  showModal(`
+  <h3>🔨 黑市拍卖会 · 第${G.apocDay}天</h3>
+  <div style="font-size:13px;line-height:1.8;color:var(--dim);text-align:center;margin:10px 0">
+  拍卖品：<b style="color:var(--gold)">${item.name}</b><br>
+  ${item.desc}<br><br>
+  其他AI出价：<b style="color:var(--ember)">${rivalBid}积分</b><br>
+  你当前积分：<b style="color:var(--ice)">${G.integral}</b>
+  </div>
+  <button class="btn ember" style="width:100%" onclick="auctionBid(${item.price+50},${item.give.toString().length})">⚔ 出价${item.price+50}积分</button>
+  <button class="btn" style="width:100%" onclick="auctionPass()">🚪 放弃竞拍</button>`);
+}
+function auctionBid(bid){
+  if(G.integral<bid){toast('积分不足');return}
+  G.integral-=bid;
+  closeModal();
+  // 执行奖励
+  const items=[
+    {give:()=>{G.res.meds+=15}},
+    {give:()=>{G.res.weapons+=2;G.res.ammo+=20}},
+    {give:()=>{G.res.fuel+=30}},
+    {give:()=>{G.res.scrap+=25}},
+  ];
+  // 简单处理：随机给一个奖励
+  pick(items).give();
+  logMsg(`【拍卖】竞拍成功，消耗${bid}积分`,'good');sfx.good();
+  save();viewApoc();
+}
+function auctionPass(){
+  closeModal();
+  logMsg('【拍卖】你放弃了竞拍','');
+  save();viewApoc();
+}
+function rollWeather(){
+  const r=Math.random();
+  G.weather=r<.5?'clear':r<.75?'snow':r<.9?'cold':'ice';
+}
+function raiderAttack(){
+  if(G.items.archiveHidden>0)return;
+  const rc=G.attention/200+(G.playerRank<20?.05:0);
+  if(!chance(rc))return;
+  const e=G.board[Math.max(0,G.playerRank-2)];
+  if(!e||e.type!=='raid')return;
+  sfx.alert();
+  if(G.scoutOn||G.items.scoutMirror>0){
+    showModal(`<h3 class="ember">⚠ 袭击预警</h3>
+    <div style="text-align:center;color:var(--dim);margin:10px 0">${e.name} 正在靠近！</div>
+    <button class="btn ember" onclick="closeModal();triggerRaider('${e.name}')">迎击</button>`);
+  }else{
+    logMsg(`${e.name} 的掠夺小队突袭！`,'bad');
+    setTimeout(()=>triggerRaider(e.name),800);
+  }
+}
+function triggerRaider(name){
+  showModal(`<h3 class="ember">${name} 进攻！</h3>
+  <div style="text-align:center;color:var(--dim);margin:10px 0">掠夺小队破门而入！</div>
+  <button class="btn" onclick="battle('defend','raider')">🛡 固守<span class="bd">燃10建材5</span></button>
+  <button class="btn danger" onclick="battle('attack','raider')">⚔ 强攻<span class="bd">武器3弹药5</span></button>`);
+}
+
+/* ===== 结局判定 ===== */
+function checkEnding(){
+  let e=null;
+  if(G.apocDay>=62&&G.stats.killed===0&&G.playerRank>30)e='survive';
+  if(G.baseLevel>=5&&G.allies.length>=2)e='lord';
+  if(G.stats.exploredRate>=70&&G.allies.length===0&&G.apocDay>=40)e='lone';
+  if(G.score.world<=5&&G.stats.killed>=3&&G.stats.raidDefeated>=5)e='tyrant';
+  if(G.apocDay>=100&&G.baseLevel>=3)e='eternal';
+  if(e)gameOver(e);
+}
+function gameOver(eid){
+  const e=ENDINGS.find(x=>x.id===eid),t=totalScore();
+  const first=!G.unlockedEndings.includes(eid),bonus=first?20:5;
+  G.currentEnding=eid;G.unlockedEndings.push(eid);
+  G.originPoints+=t+bonus;
+  G.phase='ending';
+  unlockAch('first_step');
+  save();
+  const color=eid==='death'?'ember':eid==='tyrant'?'ember':eid==='eternal'?'gold':'ice';
+  $('#main').innerHTML=`
+  <div class="ending-hero">
+    <div class="tag">— 轮回结算 —</div>
+    <h2 class="${color}">${e.name}</h2>
+    <p>${e.desc}</p>
+  </div>
+  <div class="panel">
+    <div class="score-grid">
+    <div class="scell"><div class="dn">储备</div><div class="num">${G.score.reserve}</div></div>
+    <div class="scell"><div class="dn">壁垒</div><div class="num">${G.score.wall}</div></div>
+    <div class="scell"><div class="dn">存续</div><div class="num">${G.score.survive}</div></div>
+    <div class="scell"><div class="dn">世域</div><div class="num">${G.score.world}</div></div>
+    </div>
+    <div class="srow"><span class="k">总分</span><span class="v gold">${t}/100</span></div>
+    <div class="srow"><span class="k">本源点</span><span class="v ice">+${t}</span></div>
+    <div class="srow"><span class="k">${first?'首通奖励':'重复奖励'}</span><span class="v good">+${bonus}</span></div>
+    <div class="srow" style="border-top:2px solid var(--ice)"><span class="k">累计本源</span><span class="v gold">${G.originPoints}</span></div>
+  </div>
+  <div class="panel"><div class="ptitle">本局数据</div>
+  <div class="srow"><span class="k">存活</span><span class="v ice">${G.apocDay}天</span></div>
+  <div class="srow"><span class="k">基地</span><span class="v">${G.baseLevel}级</span></div>
+  <div class="srow"><span class="k">探索率</span><span class="v">${G.stats.exploredRate}%</span></div>
+  <div class="srow"><span class="k">最高排名</span><span class="v">#${G.stats.maxRank}</span></div>
+  <div class="srow"><span class="k">救助/掠夺</span><span class="v">${G.stats.helped} / ${G.stats.killed}</span></div>
+  <div class="srow"><span class="k">盟友</span><span class="v">${G.allies.length}人</span></div>
+  <div style="margin-top:10px;padding:10px;background:rgba(94,200,248,.06);border-radius:8px">
+  <div style="font-size:10px;color:var(--faint);margin-bottom:6px">行为标签</div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px">
+  ${genTags().map(t=>`<span style="font-size:11px;padding:3px 10px;background:rgba(94,200,248,.15);border-radius:12px;color:var(--ice)">${t}</span>`).join('')}
+  </div></div>
+  </div>
+  <button class="btn ember" onclick="newCycle()">固化存档，开启第${G.cycle+1}世</button>
+  ${eid!=='death'&&G.endlessSaves.length<3?'<button class="btn" onclick="saveEndless()">存入无尽存档</button>':''}`;
+}
+function genTags(){
+  const tags=[];
+  if(G.apocDay>=100)tags.push('百日求生');
+  else if(G.apocDay>=60)tags.push('老油条');
+  else if(G.apocDay>=30)tags.push('勉强活过');
+  else tags.push('短命鬼');
+  if(G.stats.killed>=3)tags.push('掠夺者');
+  else if(G.stats.helped>=5)tags.push('善人');
+  else tags.push('独行者');
+  if(G.baseLevel>=4)tags.push('基建狂魔');
+  if(G.stats.exploredRate>=70)tags.push('地图全开');
+  if(G.allies.length>=2)tags.push('社交牛X');
+  if(G.attention>50)tags.push('招摇过市');
+  else if(G.attention<10)tags.push('低调潜行');
+  if(G.stats.raidDefeated>=3)tags.push('击退掠夺');
+  if(G.score.world<=5)tags.push('世域崩坏');
+  return tags;
+}
+function saveEndless(){
+  G.endlessSaves.push({cycle:G.cycle,ending:ENDINGS.find(e=>e.id===G.currentEnding).name,apocDay:G.apocDay,baseLevel:G.baseLevel,score:totalScore(),time:new Date().toLocaleString('zh-CN')});
+  save();toast('已存入无尽存档');resetStart();
+}
+function newCycle(){
+  G.cycle++;
+  // 轮回继承：记录这一世的关键选择
+  const legacy={
+    savedDoctor: G.allies.some(a=>a.name.startsWith('医生')),
+    raidedCamp: G.score.world<10,
+    foundCache: G.stats.exploredRate>50,
+  };
+  const keep={cycle:G.cycle,originPoints:G.originPoints,talents:G.talents,unlockedEndings:G.unlockedEndings,endlessSaves:G.endlessSaves,achievements:G.achievements,settings:G.settings,mainSave:{cycle:G.cycle-1,ending:G.currentEnding},legacy:legacy,playerTag:G.playerTag};
+  G=Object.assign(JSON.parse(JSON.stringify(DEF)),keep);
+  G.talentsUsed=[];G.starter=null;save();enterShop();
+}
+function resetStart(){
+  const keep={cycle:G.cycle,originPoints:G.originPoints,talents:G.talents,unlockedEndings:G.unlockedEndings,endlessSaves:G.endlessSaves,achievements:G.achievements,settings:G.settings};
+  G=Object.assign(JSON.parse(JSON.stringify(DEF)),keep);save();viewStart();
+}
+
+/* ===== 模态 ===== */
+function showModal(h){
+  const m=document.createElement('div');m.className='mmask';m.id='mmask';
+  m.innerHTML=`<div class="modal">${h}</div>`;document.body.appendChild(m);
+}
+function closeModal(){const m=$('#mmask');if(m)m.remove()}
+
+/* ===== 底栏导航 ===== */
+$$('#bottombar .navb').forEach(b=>{
+  b.addEventListener('click',()=>{
+    $$('#bottombar .navb').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');sfx.click();
+    const n=b.dataset.nav;
+    if(G.phase==='shop'){toast('商店阶段');return}
+    if(n==='inventory')viewInventory();
+    else if(n==='base')viewBase();
+    else if(n==='leaderboard'){if(G.phase==='apoc')viewBoard();else toast('末世解锁榜单')}
+    else if(n==='shop'){
+      if(G.phase==='shop'||G.phase==='start')enterShop();
+      else if(G.phase==='prep')toast('本轮采购期已过');
+      else toast('末世阶段商店关闭，每轮回仅开局一次');
+    }
+    else if(n==='status')viewStatus();
+  });
+});
+
+viewStart();
+</script>
+</body>
+</html>

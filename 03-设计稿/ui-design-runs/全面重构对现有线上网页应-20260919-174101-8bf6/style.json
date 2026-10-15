@@ -1,0 +1,27 @@
+{
+  "query": "全面重构：对现有线上网页应用《个人使用说明书》（语音记录+AI复盘+行为计时分析工具，含产品介绍首页、注册登录页、用户工作台、语音记录、计时记录、AI复盘、个人使用说明书、内测问卷等页面，已有独立注册登录与数据库）进行 UI 全面重构，改善电脑端与手机端的视觉与交互体验",
+  "signature": {
+    "ground": "paper",
+    "typeVoice": "sans-cool",
+    "imageWorld": "graphic-abstract",
+    "layoutLogic": null,
+    "colorStrategy": "tri-role",
+    "motionVoice": "parallax"
+  },
+  "why": {
+    "ground": "语义命中 1 个线索",
+    "typeVoice": "语义命中 2 个线索",
+    "imageWorld": "语义命中 2 个线索",
+    "layoutLogic": "query 没给这一维的信号 —— 由你按内容定",
+    "colorStrategy": "语义命中 1 个线索",
+    "motionVoice": "语义命中 1 个线索"
+  },
+  "open": [
+    "layoutLogic"
+  ],
+  "divergence": {
+    "vsRecent": [],
+    "min": null,
+    "require": 3
+  }
+}

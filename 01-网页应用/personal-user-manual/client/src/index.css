@@ -1,0 +1,33 @@
+@import '@lark-apaas/client-toolkit/lib/index.css';
+@import "tw-animate-css";
+@import "./tailwind-theme.css";
+@import "./typography.css";
+
+html, body {
+  overflow-x: hidden;
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  min-width: 0;
+}
+
+/* 永久移除平台水印徽标（妙搭生成 / 豆包工作AI生成） */
+[data-custom-element*="watermark"] {
+  display: none !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+[data-custom-element*="watermark"] * {
+  display: none !important;
+}
+
+@config "../../tailwind.config.ts";

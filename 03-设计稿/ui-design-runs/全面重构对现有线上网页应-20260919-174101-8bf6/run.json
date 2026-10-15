@@ -1,0 +1,1299 @@
+{
+  "version": 1,
+  "created": "2026-09-19T17:41:01",
+  "query": "全面重构：对现有线上网页应用《个人使用说明书》（语音记录+AI复盘+行为计时分析工具，含产品介绍首页、注册登录页、用户工作台、语音记录、计时记录、AI复盘、个人使用说明书、内测问卷等页面，已有独立注册登录与数据库）进行 UI 全面重构，改善电脑端与手机端的视觉与交互体验",
+  "contract": {
+    "query": "全面重构：对现有线上网页应用《个人使用说明书》（语音记录+AI复盘+行为计时分析工具，含产品介绍首页、注册登录页、用户工作台、语音记录、计时记录、AI复盘、个人使用说明书、内测问卷等页面，已有独立注册登录与数据库）进行 UI 全面重构，改善电脑端与手机端的视觉与交互体验",
+    "artifactClass": "mobile",
+    "surface": "mobile-app",
+    "provenance": "inferred",
+    "operation": "create",
+    "handoff": [
+      "html",
+      "doc"
+    ],
+    "count": {
+      "unit": "屏",
+      "n": null,
+      "mode": "target",
+      "source": "载体默认"
+    },
+    "canvas": {
+      "w": 390,
+      "h": 844,
+      "source": "载体默认"
+    },
+    "ledger": [],
+    "attachments": [],
+    "skeleton": "app",
+    "title": "全面重构：对现有线上网页应用《个人使用说… · 设计方案",
+    "workdir": "D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6",
+    "deliverables": {
+      "doc": {
+        "proposal": "doc/proposal.xml",
+        "canvases": [
+          "doc/canvas-a.html",
+          "doc/canvas-b.html"
+        ],
+        "cover": "doc/cover.html",
+        "coverImage": "shots/cover.jpg",
+        "required": true,
+        "note": "设计思路、设计想法、设计语言、为什么这么设计；窄栏排版画布，像一份印出来的专题"
+      },
+      "product": {
+        "path": "app/index.html",
+        "profile": "app-screen",
+        "required": true,
+        "shape": "产品界面",
+        "h5Shape": "产品界面",
+        "note": "**真实产品界面原型**：首屏就是用户日常会看到的那一屏，不是关于它的说明"
+      }
+    },
+    "assetPlan": [
+      {
+        "role": "hero-bg",
+        "how": "image_gen",
+        "slot": "full-bleed",
+        "why": "首屏满版氛围，文字压在上面"
+      },
+      {
+        "role": "icon-set",
+        "how": "svg",
+        "slot": "inline",
+        "why": "图标必须用 SVG——生图出不了透明底"
+      },
+      {
+        "role": "texture",
+        "how": "css",
+        "slot": "layer",
+        "why": "底纹用 CSS 画，不占素材预算"
+      },
+      {
+        "role": "product-01",
+        "how": "image_gen",
+        "slot": "full-bleed",
+        "why": "产品主图，装在满版容器里"
+      },
+      {
+        "role": "product-02",
+        "how": "image_gen",
+        "slot": "full-bleed",
+        "why": "第二视角，和主图不同机位"
+      },
+      {
+        "role": "material-detail",
+        "how": "image_gen",
+        "slot": "full-bleed",
+        "why": "材质微距，讲工艺"
+      },
+      {
+        "role": "scene-01",
+        "how": "fetch_photos",
+        "slot": "full-bleed",
+        "why": "真人场景——生图容易出手指瑕疵，用实拍"
+      },
+      {
+        "role": "portrait-01",
+        "how": "fetch_photos",
+        "slot": "full-bleed",
+        "why": "人像，锁定同一种光线"
+      },
+      {
+        "role": "data-visual",
+        "how": "svg",
+        "slot": "layer",
+        "why": "图表用 SVG 画——生图画不了精确数字"
+      },
+      {
+        "role": "number-plate",
+        "how": "css",
+        "slot": "layer",
+        "why": "巨数字版面用 CSS，字要能选中"
+      }
+    ],
+    "minVisualAssets": 5,
+    "frozen": "2026-09-19T17:41:01",
+    "hash": "80564bf2bb67e082"
+  },
+  "style": {
+    "query": "全面重构：对现有线上网页应用《个人使用说明书》（语音记录+AI复盘+行为计时分析工具，含产品介绍首页、注册登录页、用户工作台、语音记录、计时记录、AI复盘、个人使用说明书、内测问卷等页面，已有独立注册登录与数据库）进行 UI 全面重构，改善电脑端与手机端的视觉与交互体验",
+    "signature": {
+      "ground": "paper",
+      "typeVoice": "sans-cool",
+      "imageWorld": "graphic-abstract",
+      "layoutLogic": null,
+      "colorStrategy": "tri-role",
+      "motionVoice": "parallax"
+    },
+    "why": {
+      "ground": "语义命中 1 个线索",
+      "typeVoice": "语义命中 2 个线索",
+      "imageWorld": "语义命中 2 个线索",
+      "layoutLogic": "query 没给这一维的信号 —— 由你按内容定",
+      "colorStrategy": "语义命中 1 个线索",
+      "motionVoice": "语义命中 1 个线索"
+    },
+    "open": [
+      "layoutLogic"
+    ],
+    "divergence": {
+      "vsRecent": [],
+      "min": null,
+      "require": 3
+    }
+  },
+  "receipts": {
+    "shot": [
+      {
+        "ts": "2026-09-19T17:50:51",
+        "path": "shots\\app-full.png",
+        "source": "app/index.html",
+        "sha256": "d025e2cbd4a5499e29858e3ca977d7e7114f8daa2a0e1a3b3afb5e15075ee3e7",
+        "viewport": "390x844",
+        "mode": "full",
+        "bytes": 388395
+      },
+      {
+        "ts": "2026-09-19T17:50:56",
+        "path": "shots\\app-screens\\p01.png",
+        "source": "app/index.html",
+        "sha256": "d025e2cbd4a5499e29858e3ca977d7e7114f8daa2a0e1a3b3afb5e15075ee3e7",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 388395
+      },
+      {
+        "ts": "2026-09-19T17:50:57",
+        "path": "shots\\app-screens\\p02.png",
+        "source": "app/index.html",
+        "sha256": "00da42ea054c85317b1bdc134e3f160e90e8b6a49a5f3b20f61443a508f4b514",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 388986
+      },
+      {
+        "ts": "2026-09-19T17:50:58",
+        "path": "shots\\app-screens\\p03.png",
+        "source": "app/index.html",
+        "sha256": "4f2088507ccd79e6b36e6b17cfba35c4141e48b9b0a4350e7f320712cfa33516",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 395438
+      },
+      {
+        "ts": "2026-09-19T17:50:59",
+        "path": "shots\\app-screens\\p04.png",
+        "source": "app/index.html",
+        "sha256": "3ef2a625d2981d4eeac24fb8e42435a356cc6c753c1444fe628d4087361a0adb",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 405687
+      },
+      {
+        "ts": "2026-09-19T17:51:00",
+        "path": "shots\\app-screens\\p05.png",
+        "source": "app/index.html",
+        "sha256": "b725d7b2804f59e824147e6bf2de040a86c5d7177919d32c35cb3b65d32368dc",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 151779
+      },
+      {
+        "ts": "2026-09-19T17:51:02",
+        "path": "shots\\app-screens\\p06.png",
+        "source": "app/index.html",
+        "sha256": "fb85d6ce481b5efec1daafca31317c3fffbeb04216c5d4ffb8db2a7eed15ff27",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 128376
+      },
+      {
+        "ts": "2026-09-19T17:52:30",
+        "path": "shots\\app-full.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "full",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T17:52:36",
+        "path": "shots\\app-screens\\p01.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T17:52:37",
+        "path": "shots\\app-screens\\p02.png",
+        "source": "app/index.html",
+        "sha256": "f5e99e9575507f88b712bc9f77da832aceea04defd1af6e9767beb807323892c",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 390033
+      },
+      {
+        "ts": "2026-09-19T17:52:38",
+        "path": "shots\\app-screens\\p03.png",
+        "source": "app/index.html",
+        "sha256": "b3aed1041c93cfc2a9b823bb9a393bcb1ae0bd567889df24425365018ba686ae",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 373084
+      },
+      {
+        "ts": "2026-09-19T17:52:39",
+        "path": "shots\\app-screens\\p04.png",
+        "source": "app/index.html",
+        "sha256": "3c09fd67cd8e2d7a24f9e56c9ac45335a423d49e07e04acebb90ef3e5c3b1e95",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 384054
+      },
+      {
+        "ts": "2026-09-19T17:52:40",
+        "path": "shots\\app-screens\\p05.png",
+        "source": "app/index.html",
+        "sha256": "b725d7b2804f59e824147e6bf2de040a86c5d7177919d32c35cb3b65d32368dc",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 151779
+      },
+      {
+        "ts": "2026-09-19T17:52:42",
+        "path": "shots\\app-screens\\p06.png",
+        "source": "app/index.html",
+        "sha256": "fb85d6ce481b5efec1daafca31317c3fffbeb04216c5d4ffb8db2a7eed15ff27",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 128376
+      },
+      {
+        "ts": "2026-09-19T17:58:04",
+        "path": "shots\\app-full.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "full",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T17:58:09",
+        "path": "shots\\app-screens\\p01.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T17:58:11",
+        "path": "shots\\app-screens\\p02.png",
+        "source": "app/index.html",
+        "sha256": "f5e99e9575507f88b712bc9f77da832aceea04defd1af6e9767beb807323892c",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 390033
+      },
+      {
+        "ts": "2026-09-19T17:58:12",
+        "path": "shots\\app-screens\\p03.png",
+        "source": "app/index.html",
+        "sha256": "1b8dff80aa13b757c86253182cecedb5f3cdc05cbcbf2396be5628d114ee50e5",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 373259
+      },
+      {
+        "ts": "2026-09-19T17:58:13",
+        "path": "shots\\app-screens\\p04.png",
+        "source": "app/index.html",
+        "sha256": "c257df5d7e91ca4ca6a87a4a2dc248a490b140ebfed0be7e69404886926c20f3",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 384344
+      },
+      {
+        "ts": "2026-09-19T17:58:14",
+        "path": "shots\\app-screens\\p05.png",
+        "source": "app/index.html",
+        "sha256": "b725d7b2804f59e824147e6bf2de040a86c5d7177919d32c35cb3b65d32368dc",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 151779
+      },
+      {
+        "ts": "2026-09-19T17:58:15",
+        "path": "shots\\app-screens\\p06.png",
+        "source": "app/index.html",
+        "sha256": "fb85d6ce481b5efec1daafca31317c3fffbeb04216c5d4ffb8db2a7eed15ff27",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 128376
+      },
+      {
+        "ts": "2026-09-19T18:02:18",
+        "path": "shots\\app-full.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "full",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T18:02:22",
+        "path": "shots\\app-screens\\p01.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T18:02:23",
+        "path": "shots\\app-screens\\p02.png",
+        "source": "app/index.html",
+        "sha256": "f5e99e9575507f88b712bc9f77da832aceea04defd1af6e9767beb807323892c",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 390033
+      },
+      {
+        "ts": "2026-09-19T18:02:24",
+        "path": "shots\\app-screens\\p03.png",
+        "source": "app/index.html",
+        "sha256": "1b8dff80aa13b757c86253182cecedb5f3cdc05cbcbf2396be5628d114ee50e5",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 373259
+      },
+      {
+        "ts": "2026-09-19T18:02:26",
+        "path": "shots\\app-screens\\p04.png",
+        "source": "app/index.html",
+        "sha256": "c257df5d7e91ca4ca6a87a4a2dc248a490b140ebfed0be7e69404886926c20f3",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 384344
+      },
+      {
+        "ts": "2026-09-19T18:02:27",
+        "path": "shots\\app-screens\\p05.png",
+        "source": "app/index.html",
+        "sha256": "16a6e740ccb3043b8464736425ca1bb09e65f5cd863856547c2f0dd736742d07",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 151305
+      },
+      {
+        "ts": "2026-09-19T18:02:28",
+        "path": "shots\\app-screens\\p06.png",
+        "source": "app/index.html",
+        "sha256": "fb85d6ce481b5efec1daafca31317c3fffbeb04216c5d4ffb8db2a7eed15ff27",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 128376
+      },
+      {
+        "ts": "2026-09-19T18:03:42",
+        "path": "shots\\app-full.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "full",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T18:03:47",
+        "path": "shots\\app-screens\\p01.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T18:03:48",
+        "path": "shots\\app-screens\\p02.png",
+        "source": "app/index.html",
+        "sha256": "f5e99e9575507f88b712bc9f77da832aceea04defd1af6e9767beb807323892c",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 390033
+      },
+      {
+        "ts": "2026-09-19T18:03:49",
+        "path": "shots\\app-screens\\p03.png",
+        "source": "app/index.html",
+        "sha256": "1b8dff80aa13b757c86253182cecedb5f3cdc05cbcbf2396be5628d114ee50e5",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 373259
+      },
+      {
+        "ts": "2026-09-19T18:03:51",
+        "path": "shots\\app-screens\\p04.png",
+        "source": "app/index.html",
+        "sha256": "c539709196611c370c8c38d0c18bfa0f9a0c63a84af30d2e4cee7c85bc304702",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 384285
+      },
+      {
+        "ts": "2026-09-19T18:03:52",
+        "path": "shots\\app-screens\\p05.png",
+        "source": "app/index.html",
+        "sha256": "16a6e740ccb3043b8464736425ca1bb09e65f5cd863856547c2f0dd736742d07",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 151305
+      },
+      {
+        "ts": "2026-09-19T18:03:53",
+        "path": "shots\\app-screens\\p06.png",
+        "source": "app/index.html",
+        "sha256": "fb85d6ce481b5efec1daafca31317c3fffbeb04216c5d4ffb8db2a7eed15ff27",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 128376
+      },
+      {
+        "ts": "2026-09-19T18:04:28",
+        "path": "shots\\app-full.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "full",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T18:04:32",
+        "path": "shots\\app-screens\\p01.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T18:04:34",
+        "path": "shots\\app-screens\\p02.png",
+        "source": "app/index.html",
+        "sha256": "f5e99e9575507f88b712bc9f77da832aceea04defd1af6e9767beb807323892c",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 390033
+      },
+      {
+        "ts": "2026-09-19T18:04:35",
+        "path": "shots\\app-screens\\p03.png",
+        "source": "app/index.html",
+        "sha256": "1b8dff80aa13b757c86253182cecedb5f3cdc05cbcbf2396be5628d114ee50e5",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 373259
+      },
+      {
+        "ts": "2026-09-19T18:04:36",
+        "path": "shots\\app-screens\\p04.png",
+        "source": "app/index.html",
+        "sha256": "3373861aff54510d733f6cbea3818497364c1ef0f92ab363ea1127414e23843f",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 384291
+      },
+      {
+        "ts": "2026-09-19T18:04:37",
+        "path": "shots\\app-screens\\p05.png",
+        "source": "app/index.html",
+        "sha256": "16a6e740ccb3043b8464736425ca1bb09e65f5cd863856547c2f0dd736742d07",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 151305
+      },
+      {
+        "ts": "2026-09-19T18:04:38",
+        "path": "shots\\app-screens\\p06.png",
+        "source": "app/index.html",
+        "sha256": "fb85d6ce481b5efec1daafca31317c3fffbeb04216c5d4ffb8db2a7eed15ff27",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 128376
+      },
+      {
+        "ts": "2026-09-19T18:11:20",
+        "path": "shots\\cover.jpg",
+        "source": "doc/cover.html",
+        "sha256": "08b7185b32340fe5860d3cf459e9caaeb53f7efe9bb16069758d53031d7e32f6",
+        "viewport": "1600x900",
+        "mode": "full",
+        "bytes": 494209
+      },
+      {
+        "ts": "2026-09-19T18:11:23",
+        "path": "shots\\canvas-a-698.png",
+        "source": "doc/canvas-a.html",
+        "sha256": "bc056403a56bc2f34765892d5cdb8b910592b7beab27b4f656e3b8d1724887ff",
+        "viewport": "698x900",
+        "mode": "full",
+        "bytes": 1369498
+      },
+      {
+        "ts": "2026-09-19T18:11:59",
+        "path": "shots\\canvas-b-698.png",
+        "source": "doc/canvas-b.html",
+        "sha256": "30896c6d58e7303d27df1353b230efdf5fd51715d82bd74d82fd938704df20f5",
+        "viewport": "698x900",
+        "mode": "full",
+        "bytes": 349080
+      },
+      {
+        "ts": "2026-09-19T18:13:27",
+        "path": "shots\\cover.jpg",
+        "source": "doc/cover.html",
+        "sha256": "08b7185b32340fe5860d3cf459e9caaeb53f7efe9bb16069758d53031d7e32f6",
+        "viewport": "1600x900",
+        "mode": "full",
+        "bytes": 494209
+      },
+      {
+        "ts": "2026-09-19T18:13:30",
+        "path": "shots\\canvas-a-698.png",
+        "source": "doc/canvas-a.html",
+        "sha256": "bc056403a56bc2f34765892d5cdb8b910592b7beab27b4f656e3b8d1724887ff",
+        "viewport": "698x900",
+        "mode": "full",
+        "bytes": 1369498
+      },
+      {
+        "ts": "2026-09-19T18:13:46",
+        "path": "shots\\canvas-b-698.png",
+        "source": "doc/canvas-b.html",
+        "sha256": "98fb6562a805ad9c1a6742238ad96582ecd4bb1bb3dfbd50178e24f6635450d0",
+        "viewport": "698x900",
+        "mode": "full",
+        "bytes": 1460404
+      },
+      {
+        "ts": "2026-09-19T18:14:49",
+        "path": "shots\\cover.jpg",
+        "source": "doc/cover.html",
+        "sha256": "08b7185b32340fe5860d3cf459e9caaeb53f7efe9bb16069758d53031d7e32f6",
+        "viewport": "1600x900",
+        "mode": "full",
+        "bytes": 494209
+      },
+      {
+        "ts": "2026-09-19T18:14:52",
+        "path": "shots\\canvas-a-698.png",
+        "source": "doc/canvas-a.html",
+        "sha256": "bc056403a56bc2f34765892d5cdb8b910592b7beab27b4f656e3b8d1724887ff",
+        "viewport": "698x900",
+        "mode": "full",
+        "bytes": 1369498
+      },
+      {
+        "ts": "2026-09-19T18:15:08",
+        "path": "shots\\canvas-b-698.png",
+        "source": "doc/canvas-b.html",
+        "sha256": "c398eb4c7a7e8d9d65a62043e0153ef7e9e5710af5dbe34e2c42e5b13f7998f3",
+        "viewport": "698x900",
+        "mode": "full",
+        "bytes": 717042
+      },
+      {
+        "ts": "2026-09-19T18:19:26",
+        "path": "shots\\doc-screens\\p01.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T18:19:27",
+        "path": "shots\\doc-screens\\p02.png",
+        "source": "app/index.html",
+        "sha256": "f5e99e9575507f88b712bc9f77da832aceea04defd1af6e9767beb807323892c",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 390033
+      },
+      {
+        "ts": "2026-09-19T18:19:28",
+        "path": "shots\\doc-screens\\p03.png",
+        "source": "app/index.html",
+        "sha256": "1b8dff80aa13b757c86253182cecedb5f3cdc05cbcbf2396be5628d114ee50e5",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 373259
+      },
+      {
+        "ts": "2026-09-19T18:19:29",
+        "path": "shots\\doc-screens\\p04.png",
+        "source": "app/index.html",
+        "sha256": "c257df5d7e91ca4ca6a87a4a2dc248a490b140ebfed0be7e69404886926c20f3",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 384344
+      },
+      {
+        "ts": "2026-09-19T18:19:31",
+        "path": "shots\\doc-screens\\p05.png",
+        "source": "app/index.html",
+        "sha256": "1bbef96846ae416ec37ee27246ee82d0e7eac2c13a85f4f588b3c55023c8d85a",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 149931
+      },
+      {
+        "ts": "2026-09-19T18:19:32",
+        "path": "shots\\doc-screens\\p06.png",
+        "source": "app/index.html",
+        "sha256": "fb85d6ce481b5efec1daafca31317c3fffbeb04216c5d4ffb8db2a7eed15ff27",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 128376
+      },
+      {
+        "ts": "2026-09-19T18:26:32",
+        "path": "shots\\app-full.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "full",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T18:26:37",
+        "path": "shots\\app-screens\\p01.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T18:26:38",
+        "path": "shots\\app-screens\\p02.png",
+        "source": "app/index.html",
+        "sha256": "f5e99e9575507f88b712bc9f77da832aceea04defd1af6e9767beb807323892c",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 390033
+      },
+      {
+        "ts": "2026-09-19T18:26:39",
+        "path": "shots\\app-screens\\p03.png",
+        "source": "app/index.html",
+        "sha256": "1b8dff80aa13b757c86253182cecedb5f3cdc05cbcbf2396be5628d114ee50e5",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 373259
+      },
+      {
+        "ts": "2026-09-19T18:26:41",
+        "path": "shots\\app-screens\\p04.png",
+        "source": "app/index.html",
+        "sha256": "3373861aff54510d733f6cbea3818497364c1ef0f92ab363ea1127414e23843f",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 384291
+      },
+      {
+        "ts": "2026-09-19T18:26:42",
+        "path": "shots\\app-screens\\p05.png",
+        "source": "app/index.html",
+        "sha256": "16a6e740ccb3043b8464736425ca1bb09e65f5cd863856547c2f0dd736742d07",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 151305
+      },
+      {
+        "ts": "2026-09-19T18:26:43",
+        "path": "shots\\app-screens\\p06.png",
+        "source": "app/index.html",
+        "sha256": "fb85d6ce481b5efec1daafca31317c3fffbeb04216c5d4ffb8db2a7eed15ff27",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 128376
+      },
+      {
+        "ts": "2026-09-19T18:27:15",
+        "path": "shots\\app-full.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "full",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T18:27:20",
+        "path": "shots\\app-screens\\p01.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T18:27:21",
+        "path": "shots\\app-screens\\p02.png",
+        "source": "app/index.html",
+        "sha256": "f5e99e9575507f88b712bc9f77da832aceea04defd1af6e9767beb807323892c",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 390033
+      },
+      {
+        "ts": "2026-09-19T18:27:22",
+        "path": "shots\\app-screens\\p03.png",
+        "source": "app/index.html",
+        "sha256": "1b8dff80aa13b757c86253182cecedb5f3cdc05cbcbf2396be5628d114ee50e5",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 373259
+      },
+      {
+        "ts": "2026-09-19T18:27:23",
+        "path": "shots\\app-screens\\p04.png",
+        "source": "app/index.html",
+        "sha256": "95f6960580d33c8e1089ba944e7b292a49430c9a943cfc97ede14cf7bc01b999",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 384375
+      },
+      {
+        "ts": "2026-09-19T18:27:24",
+        "path": "shots\\app-screens\\p05.png",
+        "source": "app/index.html",
+        "sha256": "16a6e740ccb3043b8464736425ca1bb09e65f5cd863856547c2f0dd736742d07",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 151305
+      },
+      {
+        "ts": "2026-09-19T18:27:26",
+        "path": "shots\\app-screens\\p06.png",
+        "source": "app/index.html",
+        "sha256": "fb85d6ce481b5efec1daafca31317c3fffbeb04216c5d4ffb8db2a7eed15ff27",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 128376
+      },
+      {
+        "ts": "2026-09-19T18:28:04",
+        "path": "shots\\doc-screens\\p01.png",
+        "source": "app/index.html",
+        "sha256": "dc3d908be92eefb3b36f9ef354f133c004b2b612ed2a378298f6993cd6c750be",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 389443
+      },
+      {
+        "ts": "2026-09-19T18:28:05",
+        "path": "shots\\doc-screens\\p02.png",
+        "source": "app/index.html",
+        "sha256": "f5e99e9575507f88b712bc9f77da832aceea04defd1af6e9767beb807323892c",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 390033
+      },
+      {
+        "ts": "2026-09-19T18:28:06",
+        "path": "shots\\doc-screens\\p03.png",
+        "source": "app/index.html",
+        "sha256": "1b8dff80aa13b757c86253182cecedb5f3cdc05cbcbf2396be5628d114ee50e5",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 373259
+      },
+      {
+        "ts": "2026-09-19T18:28:07",
+        "path": "shots\\doc-screens\\p04.png",
+        "source": "app/index.html",
+        "sha256": "95f6960580d33c8e1089ba944e7b292a49430c9a943cfc97ede14cf7bc01b999",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 384375
+      },
+      {
+        "ts": "2026-09-19T18:28:09",
+        "path": "shots\\doc-screens\\p05.png",
+        "source": "app/index.html",
+        "sha256": "16a6e740ccb3043b8464736425ca1bb09e65f5cd863856547c2f0dd736742d07",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 151305
+      },
+      {
+        "ts": "2026-09-19T18:28:10",
+        "path": "shots\\doc-screens\\p06.png",
+        "source": "app/index.html",
+        "sha256": "fb85d6ce481b5efec1daafca31317c3fffbeb04216c5d4ffb8db2a7eed15ff27",
+        "viewport": "390x844",
+        "mode": "states",
+        "bytes": 128376
+      }
+    ],
+    "observe": [
+      {
+        "ts": "2026-09-19T18:04:11",
+        "url": "app/index.html",
+        "observed": "D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\observed-app.json",
+        "count": 5,
+        "resolved": false,
+        "resolvedCount": 0
+      },
+      {
+        "ts": "2026-09-19T18:04:56",
+        "url": "app/index.html",
+        "observed": "D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\observed-app.json",
+        "count": 5,
+        "resolved": true,
+        "resolvedCount": 1
+      },
+      {
+        "ts": "2026-09-19T18:15:21",
+        "url": "doc/canvas-a.html",
+        "count": 0,
+        "resolved": false,
+        "via": "doc-canvas-shot"
+      },
+      {
+        "ts": "2026-09-19T18:15:21",
+        "url": "doc/canvas-b.html",
+        "count": 0,
+        "resolved": false,
+        "via": "doc-canvas-shot"
+      },
+      {
+        "ts": "2026-09-19T18:27:01",
+        "url": "app/index.html",
+        "observed": "D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\observed-app.json",
+        "count": 5,
+        "resolved": true,
+        "resolvedCount": 1
+      },
+      {
+        "ts": "2026-09-19T18:27:43",
+        "url": "app/index.html",
+        "observed": "D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\observed-app.json",
+        "count": 5,
+        "resolved": true,
+        "resolvedCount": 1
+      }
+    ],
+    "check": [
+      {
+        "ts": "2026-09-19T17:48:15",
+        "profile": "app-screen",
+        "target": "app/index.html",
+        "sha": {
+          "app/index.html": "f03030358584"
+        },
+        "block": [],
+        "report": [],
+        "assetCount": null,
+        "passed": true
+      },
+      {
+        "ts": "2026-09-19T17:51:12",
+        "profile": "app-screen",
+        "target": "app/index.html",
+        "sha": {
+          "app/index.html": "f03030358584"
+        },
+        "block": [
+          "img-broken",
+          "element-overlap",
+          "prototype-not-deck"
+        ],
+        "report": [],
+        "assetCount": 5,
+        "passed": false
+      },
+      {
+        "ts": "2026-09-19T17:52:52",
+        "profile": "app-screen",
+        "target": "app/index.html",
+        "sha": {
+          "app/index.html": "c434fbe7317d"
+        },
+        "block": [
+          "img-broken",
+          "prototype-not-deck"
+        ],
+        "report": [],
+        "assetCount": 5,
+        "passed": false
+      },
+      {
+        "ts": "2026-09-19T17:58:28",
+        "profile": "app-screen",
+        "target": "app/index.html",
+        "sha": {
+          "app/index.html": "abef7f35379c"
+        },
+        "block": [],
+        "report": [],
+        "assetCount": 8,
+        "passed": true
+      },
+      {
+        "ts": "2026-09-19T18:02:40",
+        "profile": "app-screen",
+        "target": "app/index.html",
+        "sha": {
+          "app/index.html": "c8facf31f065"
+        },
+        "block": [],
+        "report": [],
+        "assetCount": 8,
+        "passed": true
+      },
+      {
+        "ts": "2026-09-19T18:04:07",
+        "profile": "app-screen",
+        "target": "app/index.html",
+        "sha": {
+          "app/index.html": "c8facf31f065"
+        },
+        "block": [],
+        "report": [],
+        "assetCount": 8,
+        "passed": true
+      },
+      {
+        "ts": "2026-09-19T18:04:51",
+        "profile": "app-screen",
+        "target": "app/index.html",
+        "sha": {
+          "app/index.html": "c8facf31f065"
+        },
+        "block": [],
+        "report": [],
+        "assetCount": 8,
+        "passed": true
+      },
+      {
+        "ts": "2026-09-19T18:11:37",
+        "profile": "doc",
+        "target": "doc/canvas-a.html",
+        "sha": {
+          "doc/canvas-a.html": "5cd2e5c4d168"
+        },
+        "block": [],
+        "report": [],
+        "assetCount": null,
+        "passed": true
+      },
+      {
+        "ts": "2026-09-19T18:12:48",
+        "profile": "doc",
+        "target": "doc/canvas-b.html",
+        "sha": {
+          "doc/canvas-b.html": "005199b182cf"
+        },
+        "block": [
+          "img-broken"
+        ],
+        "report": [
+          "doc-reading-axis"
+        ],
+        "assetCount": null,
+        "passed": false
+      },
+      {
+        "ts": "2026-09-19T18:13:44",
+        "profile": "doc",
+        "target": "doc/canvas-a.html",
+        "sha": {
+          "doc/canvas-a.html": "5cd2e5c4d168"
+        },
+        "block": [],
+        "report": [],
+        "assetCount": null,
+        "passed": true
+      },
+      {
+        "ts": "2026-09-19T18:13:59",
+        "profile": "doc",
+        "target": "doc/canvas-b.html",
+        "sha": {
+          "doc/canvas-b.html": "1f648c3967cc"
+        },
+        "block": [
+          "img-upscaled",
+          "device-scale"
+        ],
+        "report": [
+          "doc-reading-axis"
+        ],
+        "assetCount": null,
+        "passed": false
+      },
+      {
+        "ts": "2026-09-19T18:15:06",
+        "profile": "doc",
+        "target": "doc/canvas-a.html",
+        "sha": {
+          "doc/canvas-a.html": "5cd2e5c4d168"
+        },
+        "block": [],
+        "report": [],
+        "assetCount": null,
+        "passed": true
+      },
+      {
+        "ts": "2026-09-19T18:15:21",
+        "profile": "doc",
+        "target": "doc/canvas-b.html",
+        "sha": {
+          "doc/canvas-b.html": "aa1484791978"
+        },
+        "block": [],
+        "report": [
+          "doc-reading-axis"
+        ],
+        "assetCount": null,
+        "passed": true
+      },
+      {
+        "ts": "2026-09-19T18:19:33",
+        "profile": "web",
+        "target": "doc/canvas-a.html,doc/canvas-b.html",
+        "sha": {
+          "doc/canvas-a.html": "f2783a7b662b",
+          "doc/canvas-b.html": "aa1484791978"
+        },
+        "block": [
+          "canvas-structure()"
+        ],
+        "report": [
+          "canvas-comment-tags",
+          "doc-voice-thesis",
+          "doc-voice-title",
+          "doc-voice-thesis",
+          "doc-has-素材与数据说明",
+          "doc-has-设计系统"
+        ],
+        "assetCount": null,
+        "passed": false
+      },
+      {
+        "ts": "2026-09-19T18:26:56",
+        "profile": "app-screen",
+        "target": "app/index.html",
+        "sha": {
+          "app/index.html": "c8facf31f065"
+        },
+        "block": [],
+        "report": [],
+        "assetCount": 8,
+        "passed": true
+      },
+      {
+        "ts": "2026-09-19T18:27:38",
+        "profile": "app-screen",
+        "target": "app/index.html",
+        "sha": {
+          "app/index.html": "c8facf31f065"
+        },
+        "block": [],
+        "report": [],
+        "assetCount": 8,
+        "passed": true
+      },
+      {
+        "ts": "2026-09-19T18:28:11",
+        "profile": "web",
+        "target": "doc/canvas-a.html,doc/canvas-b.html",
+        "sha": {
+          "doc/canvas-a.html": "0e708bc77698",
+          "doc/canvas-b.html": "87be8139f2ba"
+        },
+        "block": [],
+        "report": [
+          "doc-voice-title",
+          "doc-voice-thesis",
+          "doc-has-素材与数据说明"
+        ],
+        "assetCount": null,
+        "passed": true
+      }
+    ],
+    "publish": [
+      {
+        "ts": "2026-09-19T18:29:02",
+        "url": "https://my.feishu.cn/docx/UNoDdEmEMo3FtjxlGx3cP53Tn2b",
+        "documentId": "UNoDdEmEMo3FtjxlGx3cP53Tn2b",
+        "blocks": 2,
+        "reconciled": true,
+        "coverInserted": false,
+        "cover": "D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\shots\\cover.jpg",
+        "coverUrl": null,
+        "coverVia": "media-insert",
+        "gaps": []
+      },
+      {
+        "ts": "2026-09-19T18:35:14",
+        "url": "https://bytedance.larkoffice.com/docx/UNoDdEmEMo3FtjxlGx3cP53Tn2b",
+        "documentId": "UNoDdEmEMo3FtjxlGx3cP53Tn2b",
+        "blocks": 2,
+        "reconciled": true,
+        "coverInserted": true,
+        "cover": null,
+        "coverUrl": "https://aka.doubaocdn.com/s/g06oizZeFQ",
+        "coverVia": "inline",
+        "via": "update",
+        "gaps": []
+      }
+    ],
+    "read": [],
+    "pack": [
+      {
+        "ts": "2026-09-19T18:07:11",
+        "slot": "cover",
+        "displayWidth": 1601,
+        "targetWidth": 1600,
+        "qualityFloor": 72,
+        "images": [
+          {
+            "name": "hero-cover",
+            "width": 1600,
+            "quality": 92,
+            "bytes": 236452,
+            "widthStep": 2.0,
+            "qualityFloorHit": false
+          }
+        ],
+        "base64Total": 315269,
+        "withinBlockLimit": true,
+        "underWidth": [],
+        "failed": []
+      },
+      {
+        "ts": "2026-09-19T18:07:12",
+        "slot": "plate",
+        "displayWidth": 420,
+        "targetWidth": 840,
+        "qualityFloor": 72,
+        "images": [
+          {
+            "name": "rhythm-art",
+            "width": 840,
+            "quality": 92,
+            "bytes": 105956,
+            "widthStep": 2.0,
+            "qualityFloorHit": false
+          },
+          {
+            "name": "manual-art",
+            "width": 840,
+            "quality": 92,
+            "bytes": 99953,
+            "widthStep": 2.0,
+            "qualityFloorHit": false
+          }
+        ],
+        "base64Total": 274545,
+        "withinBlockLimit": true,
+        "underWidth": [],
+        "failed": []
+      },
+      {
+        "ts": "2026-09-19T18:07:24",
+        "slot": "device",
+        "displayWidth": 227,
+        "targetWidth": 454,
+        "qualityFloor": 72,
+        "images": [
+          {
+            "name": "p01",
+            "width": 454,
+            "quality": 92,
+            "bytes": 78593,
+            "widthStep": 2.0,
+            "qualityFloorHit": false
+          },
+          {
+            "name": "p03",
+            "width": 454,
+            "quality": 92,
+            "bytes": 84313,
+            "widthStep": 2.0,
+            "qualityFloorHit": false
+          },
+          {
+            "name": "p05",
+            "width": 454,
+            "quality": 92,
+            "bytes": 59232,
+            "widthStep": 2.0,
+            "qualityFloorHit": false
+          }
+        ],
+        "base64Total": 296184,
+        "withinBlockLimit": true,
+        "underWidth": [],
+        "failed": []
+      },
+      {
+        "ts": "2026-09-19T18:08:52",
+        "slot": "cover",
+        "displayWidth": 1601,
+        "targetWidth": 1600,
+        "qualityFloor": 72,
+        "images": [
+          {
+            "name": "paper-texture",
+            "width": 1600,
+            "quality": 92,
+            "bytes": 323958,
+            "widthStep": 2.0,
+            "qualityFloorHit": false
+          }
+        ],
+        "base64Total": 431944,
+        "withinBlockLimit": true,
+        "underWidth": [],
+        "failed": []
+      },
+      {
+        "ts": "2026-09-19T18:19:33",
+        "mode": "doc-screens",
+        "n": 6,
+        "targetWidth": 454,
+        "qualityFloor": 72,
+        "base64Total": 484713,
+        "withinBlockLimit": true
+      },
+      {
+        "ts": "2026-09-19T18:28:11",
+        "mode": "doc-screens",
+        "n": 6,
+        "targetWidth": 454,
+        "qualityFloor": 72,
+        "base64Total": 485664,
+        "withinBlockLimit": true
+      }
+    ],
+    "upload": [
+      {
+        "ts": "2026-09-19T18:31:27",
+        "map": {
+          "D:\\\\Project\\\\ui-design-runs\\\\全面重构对现有线上网页应-20260919-174101-8bf6\\\\app\\\\assets\\\\hero-cover.jpg": "https://aka.doubaocdn.com/s/n01yW0aw3e",
+          "D:\\\\Project\\\\ui-design-runs\\\\全面重构对现有线上网页应-20260919-174101-8bf6\\\\app\\\\assets\\\\voice-art.jpg": "https://aka.doubaocdn.com/s/iER3qykVoe",
+          "D:\\\\Project\\\\ui-design-runs\\\\全面重构对现有线上网页应-20260919-174101-8bf6\\\\app\\\\assets\\\\manual-art.jpg": "https://aka.doubaocdn.com/s/IOKE2SMs83",
+          "D:\\\\Project\\\\ui-design-runs\\\\全面重构对现有线上网页应-20260919-174101-8bf6\\\\app\\\\assets\\\\rhythm-art.jpg": "https://aka.doubaocdn.com/s/YspFTM8Zth",
+          "D:\\\\Project\\\\ui-design-runs\\\\全面重构对现有线上网页应-20260919-174101-8bf6\\\\app\\\\assets\\\\paper-texture.jpg": "https://aka.doubaocdn.com/s/bDCkPoUUIv"
+        },
+        "n": 5
+      }
+    ]
+  },
+  "delivery": null
+}
