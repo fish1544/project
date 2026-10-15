@@ -3,98 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>STEP SYNC · 霓虹步数同步</title>
+    <title>步数同步工具</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+            font-family: 'Courier New', 'PingFang SC', monospace;
         }
         body {
-            background: #0a0a0f;
+            background: #e8e4d8;
+            background-image: 
+                linear-gradient(#d8d4c8 1px, transparent 1px),
+                linear-gradient(90deg, #d8d4c8 1px, transparent 1px);
+            background-size: 8px 8px;
             min-height: 100vh;
-            padding: 24px 16px;
-            position: relative;
-            overflow-x: hidden;
-        }
-        /* 动态霓虹光斑背景 */
-        .bg-glow {
-            position: fixed;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.3;
-            z-index: 0;
-            animation: float 8s ease-in-out infinite;
-        }
-        .glow1 {
-            background: #10b981;
-            top: -100px;
-            left: -100px;
-        }
-        .glow2 {
-            background: #8b5cf6;
-            bottom: -100px;
-            right: -100px;
-            animation-delay: 2s;
-        }
-        .glow3 {
-            background: #06b6d4;
-            top: 40%;
-            left: 50%;
-            animation-delay: 4s;
-        }
-        @keyframes float {
-            0%,100% { transform: translate(0,0) scale(1); }
-            50% { transform: translate(30px,30px) scale(1.2); }
+            padding: 28px 16px;
         }
 
         .card {
-            position: relative;
-            z-index: 1;
             max-width: 440px;
             margin: 0 auto;
-            background: rgba(20, 20, 30, 0.7);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid rgba(16,185,129,0.3);
-            box-shadow: 
-                0 0 40px rgba(16,185,129,0.15),
-                inset 0 1px 0 rgba(255,255,255,0.1);
-            padding: 36px 28px;
+            background: #f8f6f0;
+            border: 3px solid #2d2a26;
+            box-shadow: 8px 8px 0 #2d2a26;
+            padding: 32px 24px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 36px;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 2px dashed #2d2a26;
         }
-        .logo {
-            font-size: 40px;
-            margin-bottom: 12px;
-            display: inline-block;
-            text-shadow: 0 0 20px #10b981;
-            animation: pulse 2s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%,100% { text-shadow: 0 0 20px #10b981; }
-            50% { text-shadow: 0 0 35px #10b981, 0 0 60px rgba(16,185,129,0.5); }
+        .pixel-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            background: #58a950;
+            border: 3px solid #2d2a26;
+            display: grid;
+            place-items: center;
+            font-size: 24px;
+            color: #fff;
         }
         h1 {
-            font-size: 24px;
-            background: linear-gradient(90deg, #10b981, #06b6d4, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 800;
+            font-size: 22px;
+            color: #2d2a26;
+            font-weight: bold;
             letter-spacing: 2px;
             margin-bottom: 6px;
         }
         .sub {
             font-size: 12px;
-            color: #9ca3af;
-            letter-spacing: 1px;
+            color: #6b6660;
         }
 
         .form-group {
@@ -102,189 +64,158 @@
         }
         label {
             display: block;
-            font-size: 13px;
-            color: #d1d5db;
+            font-size: 14px;
+            color: #2d2a26;
             margin-bottom: 8px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            font-weight: bold;
         }
         input {
             width: 100%;
-            padding: 14px 16px;
-            background: rgba(255,255,255,0.05);
-            border: 1.5px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            font-size: 16px;
-            color: #fff;
+            padding: 12px 14px;
+            background: #fff;
+            border: 2px solid #2d2a26;
+            border-radius: 0;
+            font-size: 15px;
+            color: #2d2a26;
             outline: none;
-            transition: all 0.3s ease;
+            box-shadow: 4px 4px 0 #c9c4b8;
         }
-        input::placeholder { color: #6b7280; }
         input:focus {
-            border-color: #10b981;
-            box-shadow: 0 0 15px rgba(16,185,129,0.3);
-            background: rgba(16,185,129,0.05);
+            background: #ffffe0;
+            box-shadow: 4px 4px 0 #58a950;
         }
 
-        .switch-row {
+        .check-row {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin: 24px 0 28px;
-            font-size: 13px;
-            color: #d1d5db;
+            gap: 10px;
+            margin: 22px 0 26px;
+            font-size: 14px;
+            color: #2d2a26;
         }
-        .switch {
-            width: 50px;
-            height: 28px;
-            background: rgba(16,185,129,0.2);
-            border: 1px solid #10b981;
-            border-radius: 14px;
-            position: relative;
-            cursor: pointer;
-            flex-shrink: 0;
-            box-shadow: 0 0 10px rgba(16,185,129,0.3);
-        }
-        .switch::after {
-            content: '';
-            position: absolute;
+        .pixel-check {
             width: 22px;
             height: 22px;
-            background: #10b981;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: all 0.2s;
-            box-shadow: 0 0 10px #10b981;
+            border: 2px solid #2d2a26;
+            background: #fff;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            cursor: pointer;
         }
-        .switch.off {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.2);
-            box-shadow: none;
+        .pixel-check.checked {
+            background: #58a950;
         }
-        .switch.off::after {
-            left: 24px;
-            background: #6b7280;
-            box-shadow: none;
+        .pixel-check.checked::after {
+            content: '✓';
+            color: #fff;
+            font-weight: bold;
         }
 
         .btn {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(90deg, #10b981, #059669);
+            padding: 14px;
+            background: #58a950;
+            border: 3px solid #2d2a26;
+            border-radius: 0;
             color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
+            font-size: 16px;
+            font-weight: bold;
             letter-spacing: 2px;
-            text-transform: uppercase;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(16,185,129,0.4);
-            transition: all 0.3s ease;
+            box-shadow: 4px 4px 0 #2d2a26;
+            transition: all 0.1s;
         }
         .btn:active {
-            transform: scale(0.98);
-            box-shadow: 0 0 30px rgba(16,185,129,0.6);
+            transform: translate(4px,4px);
+            box-shadow: 0 0 0 #2d2a26;
         }
         .btn:disabled {
-            background: #374151;
-            box-shadow: none;
-            color: #9ca3af;
+            background: #a0a0a0;
         }
 
         .result {
             margin-top: 20px;
             padding: 14px;
-            border-radius: 12px;
+            border: 2px solid #2d2a26;
             font-size: 13px;
             line-height: 1.6;
             display: none;
         }
         .result.success {
-            background: rgba(16,185,129,0.15);
-            border: 1px solid #10b981;
-            color: #6ee7b7;
-            box-shadow: 0 0 15px rgba(16,185,129,0.2);
+            background: #d0f0c0;
+            color: #2d5016;
             display: block;
         }
         .result.error {
-            background: rgba(239,68,68,0.15);
-            border: 1px solid #ef4444;
-            color: #fca5a5;
-            box-shadow: 0 0 15px rgba(239,68,68,0.2);
+            background: #f0c0c0;
+            color: #701616;
             display: block;
         }
 
         .tips {
             margin-top: 28px;
-            padding: 18px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
+            padding: 16px;
+            background: #fff;
+            border: 2px solid #2d2a26;
             font-size: 12px;
-            color: #9ca3af;
+            color: #5a5650;
             line-height: 1.8;
-            border-left: 3px solid #8b5cf6;
         }
         .tips h3 {
-            color: #a78bfa;
-            margin-bottom: 10px;
-            font-size: 13px;
-            letter-spacing: 1px;
+            color: #2d2a26;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div class="bg-glow glow1"></div>
-    <div class="bg-glow glow2"></div>
-    <div class="bg-glow glow3"></div>
-
     <div class="card">
         <div class="header">
-            <div class="logo">⚡</div>
-            <h1>STEP SYNC</h1>
-            <p class="sub">霓虹步数同步 · 微信/支付宝可用</p>
+            <div class="pixel-icon">🚶</div>
+            <h1>步数同步工具</h1>
+            <p class="sub">支持微信 / 支付宝运动</p>
         </div>
 
         <div class="form-group">
-            <label>Account</label>
-            <input type="text" id="account" placeholder="Zepp 账号 / 邮箱">
+            <label>Zepp 账号</label>
+            <input type="text" id="account" placeholder="邮箱 / 手机号">
         </div>
 
         <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="password" placeholder="Zepp 密码">
+            <label>Zepp 密码</label>
+            <input type="password" id="password" placeholder="账号密码">
         </div>
 
         <div class="form-group">
-            <label>Custom Steps</label>
-            <input type="number" id="steps" placeholder="留空自动随机安全步数">
+            <label>目标步数（选填）</label>
+            <input type="number" id="steps" placeholder="留空自动生成安全步数">
         </div>
 
-        <div class="switch-row">
-            <div class="switch" id="randomSwitch"></div>
-            <span>随机安全步数 · 防风险</span>
+        <div class="check-row">
+            <div class="pixel-check checked" id="checkBox"></div>
+            <span>自动生成安全步数，降低风险</span>
         </div>
 
-        <button class="btn" id="submitBtn">开始同步</button>
+        <button class="btn" id="submitBtn">立即同步</button>
 
         <div class="result" id="result"></div>
 
         <div class="tips">
-            <h3>使用指南</h3>
-            1. 下载「Zepp」APP，邮箱注册，不要绑定真实手环<br>
-            2. 第三方绑定微信/支付宝，等提示绑定成功<br>
-            3. 输入账号密码点同步，3-10分钟自动更新<br>
-            4. 一天一次，请勿重复提交。仅作技术分享。
+            <h3>使用说明</h3>
+            1. 应用商店下载「Zepp」，邮箱注册账号，无需绑定真实手环<br>
+            2. 我的 → 第三方账号绑定，绑定微信/支付宝，等提示绑定成功<br>
+            3. 输入账号密码后点同步，3-10分钟自动更新<br>
+            4. 每天仅提交一次，不要重复点击。本工具仅作技术分享。
         </div>
     </div>
 
     <script>
         let randomMode = true;
-        const switchEl = document.getElementById('randomSwitch');
-        switchEl.addEventListener('click', () => {
+        const checkBox = document.getElementById('checkBox');
+        checkBox.addEventListener('click', () => {
             randomMode = !randomMode;
-            switchEl.classList.toggle('off', !randomMode);
+            checkBox.classList.toggle('checked', randomMode);
         });
 
         document.getElementById('submitBtn').addEventListener('click', async function() {
@@ -295,7 +226,7 @@
             const btn = this;
 
             if (!account || !password) {
-                showResult('请输入账号和密码', 'error');
+                showResult('请填写账号和密码', 'error');
                 return;
             }
             if (randomMode || !steps) steps = Math.floor(Math.random()*9000)+7000;
@@ -303,7 +234,7 @@
             if (steps<100) steps=100;
 
             btn.disabled = true;
-            btn.textContent = '同步中...';
+            btn.textContent = '同步中';
 
             try {
                 const formData = new FormData();
@@ -314,15 +245,15 @@
                 const data = await res.json();
 
                 if (data.code === 200) {
-                    showResult(`✅ 同步成功！本次步数 ${steps}，3-10分钟后查看，请勿重复提交。`, 'success');
+                    showResult(`提交成功！本次步数 ${steps}，3-10分钟后查看，请勿重复提交。`, 'success');
                 } else {
-                    showResult(`❌ 失败：${data.msg}`, 'error');
+                    showResult(`提交失败：${data.msg}`, 'error');
                 }
             } catch (err) {
-                showResult('❌ 网络错误，请刷新重试。', 'error');
+                showResult('网络错误，请刷新重试。', 'error');
             } finally {
                 btn.disabled = false;
-                btn.textContent = '开始同步';
+                btn.textContent = '立即同步';
             }
         });
 
