@@ -256,32 +256,45 @@
             btn.disabled = true;
             btn.textContent = '同步中...';
 
-            try {
-                const formData = new FormData();
-                formData.append('user', account);
-                formData.append('password', password);
-                formData.append('step', steps);
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 15000);
-                const res = await fetch('https://step-sync-web.fish1544.workers.dev/', {
-                    method:'POST',
-                    body:formData,
-                    signal: controller.signal
-                });
-                clearTimeout(timeout);
-                const data = await res.json();
+            // 自动重试逻辑：最多试2次
+            for (let attempt = 0; attempt < 2; attempt++) {
+                try {
+                    const formData = new FormData();
+                    formData.append('user', account);
+                    formData.append('password', password);
+                    formData.append('step', steps);
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 10000);
+                    const res = await fetch('https://step-sync-web.fish1544.workers.dev/', {
+                        method:'POST',
+                        body:formData,
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeout);
+                    const data = await res.json();
 
-                if (data.code === 200) {
-                    showResult(`提交成功！本次步数 ${steps}，3-10分钟后查看，请勿重复提交。`, 'success');
-                } else {
-                    showResult(`提交失败：${data.msg}`, 'error');
+                    if (data.code === 200) {
+                        showResult(`提交成功！本次步数 ${steps}，3-10分钟后查看，请勿重复提交。`, 'success');
+                        btn.disabled = false;
+                        btn.textContent = '立即同步';
+                        return;
+                    } else {
+                        showResult(`提交失败：${data.msg}`, 'error');
+                        btn.disabled = false;
+                        btn.textContent = '立即同步';
+                        return;
+                    }
+                } catch (err) {
+                    if (attempt === 0) {
+                        showResult('网络波动，正在自动重试...', 'error');
+                        await new Promise(r => setTimeout(r, 2000));
+                    } else {
+                        showResult('服务暂时繁忙，请30秒后再试。', 'error');
+                    }
                 }
-            } catch (err) {
-                showResult('网络响应较慢，请等待5秒后重试一次。', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '立即同步';
             }
+            btn.disabled = false;
+            btn.textContent = '立即同步';
         });
 
         function showResult(text, type) {
