@@ -261,7 +261,7 @@
                 formData.append('user', account);
                 formData.append('password', password);
                 formData.append('step', steps);
-                const res = await fetch('https://www.xzzsb.xyz/sport/sd/proxy.php', {method:'POST', body:formData});
+                const res = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://www.xzzsb.xyz/sport/sd/proxy.php'), {method:'POST', body:formData});
                 const data = await res.json();
 
                 if (data.code === 200) {
