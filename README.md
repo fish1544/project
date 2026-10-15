@@ -15,6 +15,7 @@ AI 助手在此创建 / 整理文件时会自动读取并遵守 [AGENTS.md](./AG
 | `personal-user-manual` | 个人使用说明书（全栈工程，GitHub: fish1544/personal-user-manual） | 语音记录 + AI 复盘 + 行为计时分析；React 19 + NestJS + PostgreSQL | `npm install` 后 `npm run dev` |
 | `liangli-energy-tracker` | 亮力能量管理 · 减脂健身追踪（GitHub: fish1544/liangli-energy-tracker） | 标准 NestJS + Vite 独立可部署项目：体重/体脂/热量/训练计划追踪 | `npm install` 后 `npm run dev` |
 | `作品集-自律` | 自律舱 · 个人自律生活管家 | 自律生活管理单页 | 打开 `deepseek_html_20260706_3942fc.html` |
+| `step-sync-tool` | 本地刷步工具 | 单文件离线Zepp刷步工具，同步微信/支付宝运动，数据全本地存储无广告 | 直接打开 `index.html` |
 
 ## 🎮 02-小游戏与互动
 

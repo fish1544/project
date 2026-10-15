@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>本地刷步工具 - 微信/支付宝同步</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background: #f0f4f8;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 32px 24px;
+        }
+        h1 {
+            font-size: 22px;
+            color: #1a1a1a;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            border-color: #10b981;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            margin-top: 8px;
+        }
+        .btn:hover {
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        .result.success {
+            background: #dcfce7;
+            color: #166534;
+            display: block;
+        }
+        .result.error {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block;
+        }
+        .tips {
+            margin-top: 24px;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.6;
+        }
+        .tips h4 {
+            color: #334155;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .save-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>本地刷步工具</h1>
+        <p class="subtitle">完全本地运行 · 数据不上传 · 同步微信/支付宝运动</p>
+
+        <div class="form-group">
+            <label>Zepp 账号（手机号/邮箱）</label>
+            <input type="text" id="account" placeholder="请输入你的Zepp Life账号">
+        </div>
+
+        <div class="form-group">
+            <label>Zepp 密码</label>
+            <input type="password" id="password" placeholder="请输入Zepp Life密码">
+        </div>
+
+        <div class="form-group">
+            <label>目标步数</label>
+            <input type="number" id="steps" placeholder="例如：8000" min="100" max="99999">
+        </div>
+
+        <div class="save-row">
+            <input type="checkbox" id="saveInfo" checked>
+            <label for="saveInfo" style="margin:0; font-weight: normal;">记住账号密码（仅存在本地浏览器）</label>
+        </div>
+
+        <button class="btn" id="submitBtn">立即同步步数</button>
+
+        <div class="result" id="result"></div>
+
+        <div class="tips">
+            <h4>使用前必看：</h4>
+            1. 先在手机上安装「Zepp Life」APP，注册账号并登录<br>
+            2. 在Zepp Life APP → 我的 → 设置 → 第三方接入，绑定你的微信运动/支付宝运动<br>
+            3. 建议步数不要太夸张（5000-20000之间最安全）<br>
+            4. 每天不要频繁提交，1次就够了<br>
+            5. 本工具所有数据仅存储在你本地浏览器，不会上传到任何服务器
+        </div>
+    </div>
+
+    <script>
+        // 从本地存储读取已保存的账号
+        window.onload = function() {
+            const savedAccount = localStorage.getItem('zepp_account');
+            const savedPwd = localStorage.getItem('zepp_password');
+            if (savedAccount) document.getElementById('account').value = savedAccount;
+            if (savedPwd) document.getElementById('password').value = savedPwd;
+        }
+
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+            const account = document.getElementById('account').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const steps = parseInt(document.getElementById('steps').value.trim());
+            const saveInfo = document.getElementById('saveInfo').checked;
+            const resultEl = document.getElementById('result');
+            const btn = this;
+
+            // 表单校验
+            if (!account || !password || !steps) {
+                showResult('请填写完整信息', 'error');
+                return;
+            }
+            if (steps < 100 || steps > 99999) {
+                showResult('步数范围请在100-99999之间', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '正在提交...';
+
+            try {
+                // 保存账号密码到本地
+                if (saveInfo) {
+                    localStorage.setItem('zepp_account', account);
+                    localStorage.setItem('zepp_password', password);
+                } else {
+                    localStorage.removeItem('zepp_account');
+                    localStorage.removeItem('zepp_password');
+                }
+
+                // 第一步：登录Zepp获取token
+                const loginRes = await fetch('https://api-mifit.cn/user/auth/sign_in', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'User-Agent': 'Zepp/6.0.0 (iPhone; iOS 17.0; Scale/3.00)'
+                    },
+                    body: JSON.stringify({
+                        email: account,
+                        password: password,
+                        os_model: 'iPhone15,2',
+                        app_version: '6.9.0'
+                    })
+                });
+
+                if (!loginRes.ok) {
+                    throw new Error('登录失败，请检查账号密码是否正确');
+                }
+
+                const loginData = await loginRes.json();
+                const token = loginData.token;
+                const userId = loginData.user_id;
+
+                if (!token) throw new Error('登录失败：未获取到授权token');
+
+                // 第二步：提交今日步数
+                const today = new Date();
+                const dateStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+                
+                const stepRes = await fetch(`https://api-mifit.cn/v1/me/activity/step?user_id=${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'User-Agent': 'Zepp/6.0.0 (iPhone; iOS 17.0; Scale/3.00)'
+                    },
+                    body: JSON.stringify({
+                        date: dateStr,
+                        steps: steps
+                    })
+                });
+
+                if (!stepRes.ok) {
+                    throw new Error('步数提交失败，请稍后重试');
+                }
+
+                showResult(`✅ 成功！已同步 ${steps} 步，打开微信运动/支付宝运动查看（可能延迟1-10分钟）`, 'success');
+
+            } catch (err) {
+                showResult(`❌ 错误：${err.message}。如果提示跨域错误，请用Chrome浏览器打开本文件，或安装CORS插件。`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '立即同步步数';
+            }
+        });
+
+        function showResult(text, type) {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = text;
+            resultEl.className = `result ${type}`;
+        }
+    </script>
+</body>
+</html>
