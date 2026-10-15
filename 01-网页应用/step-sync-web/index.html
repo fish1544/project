@@ -9,161 +9,140 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Courier New', 'PingFang SC', monospace;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
         }
         body {
-            background: #e8e4d8;
-            background-image: 
-                linear-gradient(#d8d4c8 1px, transparent 1px),
-                linear-gradient(90deg, #d8d4c8 1px, transparent 1px);
-            background-size: 8px 8px;
+            background: linear-gradient(180deg, #f7f9fc 0%, #eef2f7 100%);
             min-height: 100vh;
-            padding: 28px 16px;
+            padding: 32px 20px;
         }
 
         .card {
-            max-width: 440px;
+            max-width: 420px;
             margin: 0 auto;
-            background: #f8f6f0;
-            border: 3px solid #2d2a26;
-            box-shadow: 8px 8px 0 #2d2a26;
-            padding: 32px 24px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 12px 40px rgba(100, 120, 150, 0.1);
+            padding: 36px 28px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 32px;
-            padding-bottom: 16px;
-            border-bottom: 2px dashed #2d2a26;
+            margin-bottom: 36px;
         }
-        .pixel-icon {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 12px;
-            background: #58a950;
-            border: 3px solid #2d2a26;
+        .icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 14px;
+            background: linear-gradient(135deg, #e0f2fe, #dcfce7);
+            border-radius: 20px;
             display: grid;
             place-items: center;
-            font-size: 24px;
-            color: #fff;
+            font-size: 30px;
         }
         h1 {
             font-size: 22px;
-            color: #2d2a26;
-            font-weight: bold;
-            letter-spacing: 2px;
+            color: #1e293b;
+            font-weight: 600;
             margin-bottom: 6px;
         }
         .sub {
-            font-size: 12px;
-            color: #6b6660;
+            font-size: 13px;
+            color: #94a3b8;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         label {
             display: block;
             font-size: 14px;
-            color: #2d2a26;
+            color: #475569;
             margin-bottom: 8px;
-            font-weight: bold;
+            font-weight: 500;
         }
         input {
             width: 100%;
-            padding: 12px 14px;
-            background: #fff;
-            border: 2px solid #2d2a26;
-            border-radius: 0;
+            padding: 14px 16px;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
             font-size: 15px;
-            color: #2d2a26;
+            color: #1e293b;
             outline: none;
-            box-shadow: 4px 4px 0 #c9c4b8;
+            transition: all 0.2s;
         }
         input:focus {
-            background: #ffffe0;
-            box-shadow: 4px 4px 0 #58a950;
+            background: #fff;
+            border-color: #7dd3fc;
+            box-shadow: 0 0 0 4px rgba(125, 211, 252, 0.15);
         }
 
-        .check-row {
+        .row {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin: 22px 0 26px;
+            margin: 22px 0 28px;
             font-size: 14px;
-            color: #2d2a26;
+            color: #64748b;
         }
-        .pixel-check {
-            width: 22px;
-            height: 22px;
-            border: 2px solid #2d2a26;
-            background: #fff;
-            display: grid;
-            place-items: center;
-            flex-shrink: 0;
-            cursor: pointer;
-        }
-        .pixel-check.checked {
-            background: #58a950;
-        }
-        .pixel-check.checked::after {
-            content: '✓';
-            color: #fff;
-            font-weight: bold;
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #0ea5e9;
         }
 
         .btn {
             width: 100%;
-            padding: 14px;
-            background: #58a950;
-            border: 3px solid #2d2a26;
-            border-radius: 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            border: none;
+            border-radius: 14px;
             color: #fff;
             font-size: 16px;
-            font-weight: bold;
-            letter-spacing: 2px;
+            font-weight: 600;
             cursor: pointer;
-            box-shadow: 4px 4px 0 #2d2a26;
-            transition: all 0.1s;
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.25);
+            transition: all 0.2s;
         }
         .btn:active {
-            transform: translate(4px,4px);
-            box-shadow: 0 0 0 #2d2a26;
+            transform: scale(0.98);
         }
         .btn:disabled {
-            background: #a0a0a0;
+            background: #94a3b8;
+            box-shadow: none;
         }
 
         .result {
             margin-top: 20px;
-            padding: 14px;
-            border: 2px solid #2d2a26;
-            font-size: 13px;
-            line-height: 1.6;
+            padding: 14px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.5;
             display: none;
         }
         .result.success {
-            background: #d0f0c0;
-            color: #2d5016;
+            background: #f0fdf4;
+            color: #166534;
             display: block;
         }
         .result.error {
-            background: #f0c0c0;
-            color: #701616;
+            background: #fef2f2;
+            color: #991b1b;
             display: block;
         }
 
         .tips {
             margin-top: 28px;
-            padding: 16px;
-            background: #fff;
-            border: 2px solid #2d2a26;
-            font-size: 12px;
-            color: #5a5650;
+            padding: 18px;
+            background: #f8fafc;
+            border-radius: 14px;
+            font-size: 12.5px;
+            color: #64748b;
             line-height: 1.8;
         }
         .tips h3 {
-            color: #2d2a26;
+            color: #334155;
             margin-bottom: 8px;
             font-size: 14px;
         }
@@ -172,7 +151,7 @@
 <body>
     <div class="card">
         <div class="header">
-            <div class="pixel-icon">🚶</div>
+            <div class="icon">🚶</div>
             <h1>步数同步工具</h1>
             <p class="sub">支持微信 / 支付宝运动</p>
         </div>
@@ -192,9 +171,9 @@
             <input type="number" id="steps" placeholder="留空自动生成安全步数">
         </div>
 
-        <div class="check-row">
-            <div class="pixel-check checked" id="checkBox"></div>
-            <span>自动生成安全步数，降低风险</span>
+        <div class="row">
+            <input type="checkbox" id="randomMode" checked>
+            <label for="randomMode" style="margin:0; font-weight: normal;">自动生成安全步数，降低风险</label>
         </div>
 
         <button class="btn" id="submitBtn">立即同步</button>
@@ -203,26 +182,19 @@
 
         <div class="tips">
             <h3>使用说明</h3>
-            1. 应用商店下载「Zepp」，邮箱注册账号，无需绑定真实手环<br>
+            1. 应用商店下载「Zepp」，邮箱注册，无需绑定真实手环<br>
             2. 我的 → 第三方账号绑定，绑定微信/支付宝，等提示绑定成功<br>
-            3. 输入账号密码后点同步，3-10分钟自动更新<br>
+            3. 输入账号密码点同步，3-10分钟自动更新<br>
             4. 每天仅提交一次，不要重复点击。本工具仅作技术分享。
         </div>
     </div>
 
     <script>
-        let randomMode = true;
-        const checkBox = document.getElementById('checkBox');
-        checkBox.addEventListener('click', () => {
-            randomMode = !randomMode;
-            checkBox.classList.toggle('checked', randomMode);
-        });
-
         document.getElementById('submitBtn').addEventListener('click', async function() {
             const account = document.getElementById('account').value.trim();
             const password = document.getElementById('password').value.trim();
             let steps = parseInt(document.getElementById('steps').value.trim());
-            const resultEl = document.getElementById('result');
+            const randomMode = document.getElementById('randomMode').checked;
             const btn = this;
 
             if (!account || !password) {
@@ -234,7 +206,7 @@
             if (steps<100) steps=100;
 
             btn.disabled = true;
-            btn.textContent = '同步中';
+            btn.textContent = '同步中...';
 
             try {
                 const formData = new FormData();
