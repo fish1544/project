@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>免费步数同步工具 - 微信/支付宝</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%);
+            min-height: 100vh;
+            padding: 20px 16px;
+        }
+        .card {
+            max-width: 480px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+            padding: 32px 24px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #111827;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .sub {
+            font-size: 14px;
+            color: #6b7280;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-size: 15px;
+            color: #374151;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            border-color: #10b981;
+        }
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #4b5563;
+        }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn:disabled {
+            background: #9ca3af;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            display: none;
+        }
+        .result.success {
+            background: #dcfce7;
+            color: #166534;
+            display: block;
+        }
+        .result.error {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block;
+        }
+        .tips {
+            margin-top: 28px;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.7;
+        }
+        .tips h3 {
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>免费步数同步工具</h1>
+        <p class="sub">无广告 · 无会员 · 支持微信/支付宝运动</p>
+
+        <div class="form-group">
+            <label>Zepp 账号（邮箱/手机号）</label>
+            <input type="text" id="account" placeholder="请输入Zepp账号">
+        </div>
+
+        <div class="form-group">
+            <label>Zepp 密码</label>
+            <input type="password" id="password" placeholder="请输入Zepp密码">
+        </div>
+
+        <div class="form-group">
+            <label>目标步数</label>
+            <input type="number" id="steps" placeholder="默认自动随机7000-16000安全步数">
+        </div>
+
+        <div class="row">
+            <input type="checkbox" id="randomMode" checked>
+            <label for="randomMode" style="margin:0; font-weight: normal;">自动随机安全步数（更稳定不风控）</label>
+        </div>
+
+        <button class="btn" id="submitBtn">立即同步步数</button>
+
+        <div class="result" id="result"></div>
+
+        <div class="tips">
+            <h3>使用步骤：</h3>
+            1. 先在应用商店下载「Zepp」APP，注册账号（优先邮箱注册，不要绑真实手环）<br>
+            2. 在Zepp APP → 我的 → 第三方账号绑定，绑定微信/支付宝，等公众号提示「绑定成功」<br>
+            3. 回到本页面输入账号密码，直接点提交即可<br>
+            4. 3-10分钟自动同步到微信/支付宝，一天只提交一次，不要重复点击<br>
+            本工具完全免费，仅做技术分享，请勿用于打卡、兑奖等违规场景。
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+            const account = document.getElementById('account').value.trim();
+            const password = document.getElementById('password').value.trim();
+            let steps = parseInt(document.getElementById('steps').value.trim());
+            const randomMode = document.getElementById('randomMode').checked;
+            const resultEl = document.getElementById('result');
+            const btn = this;
+
+            if (!account || !password) {
+                showResult('请填写账号和密码', 'error');
+                return;
+            }
+
+            // 随机安全步数
+            if (randomMode || !steps) {
+                steps = Math.floor(Math.random() * 9000) + 7000; // 7000-16000
+            }
+            if (steps > 30000) steps = 30000;
+            if (steps < 100) steps = 100;
+
+            btn.disabled = true;
+            btn.textContent = '正在提交...';
+
+            try {
+                const formData = new FormData();
+                formData.append('user', account);
+                formData.append('password', password);
+                formData.append('step', steps);
+
+                const res = await fetch('https://www.xzzsb.xyz/sport/sd/proxy.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.code === 200) {
+                    showResult(`✅ 提交成功！本次同步 ${steps} 步，3-10分钟后查看微信/支付宝即可，请勿重复提交。`, 'success');
+                } else {
+                    showResult(`❌ 提交失败：${data.msg}`, 'error');
+                }
+            } catch (err) {
+                showResult('❌ 网络错误，请检查网络后重试，或换浏览器打开。', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '立即同步步数';
+            }
+        });
+
+        function showResult(text, type) {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = text;
+            resultEl.className = `result ${type}`;
+        }
+    </script>
+</body>
+</html>

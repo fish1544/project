@@ -1,5 +1,6 @@
 ﻿{
+    "minSteps":  7000,
     "account":  "1640697763@qq.com",
-    "password":  "hy1498266",
-    "steps":  10000
+    "maxSteps":  16000,
+    "password":  "hy1498266"
 }
