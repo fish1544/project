@@ -43,16 +43,14 @@ if ($save -ne "n") {
 Write-Host ""
 Write-Host "Submitting steps..." -ForegroundColor Yellow
 
-# Pass parameters as body, PowerShell auto builds URL correctly
-$apiParams = @{
-    do = "shuabu"
+$body = @{
     user = $account
-    pass = $password
-    count = $steps
+    password = $password
+    step = $steps
 }
 
 try {
-    $result = Invoke-RestMethod -Uri "https://api.qhsou.com/api/sport.php" -Method GET -Body $apiParams -TimeoutSec 30
+    $result = Invoke-RestMethod -Uri "https://www.xzzsb.xyz/sport/sd/proxy.php" -Method POST -Body $body -TimeoutSec 30
 } catch {
     Write-Host "Request failed: $($_.Exception.Message)" -ForegroundColor Red
     Read-Host "Press Enter to exit"
