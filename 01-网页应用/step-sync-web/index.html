@@ -37,31 +37,18 @@
             border-bottom: 2px dashed #2d2a26;
         }
         .pixel-icon {
-            width: 56px;
-            height: 56px;
+            width: 80px;
+            height: 80px;
             margin: 0 auto 12px;
-            background: #58a950;
             border: 3px solid #2d2a26;
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            grid-template-rows: repeat(12, 1fr);
-            padding: 4px;
+            box-shadow: 4px 4px 0 #2d2a26;
+            overflow: hidden;
         }
-        .px { background: #fff; }
-        /* 头部 12x12精细 */
-        .h1 { grid-column: 5/9; grid-row: 1/3; }
-        .h2 { grid-column: 4/10; grid-row: 3/5; }
-        /* 身体 */
-        .b1 { grid-column: 4/10; grid-row: 5/8; }
-        /* 手臂 迈步姿态 */
-        .a1 { grid-column: 2/4; grid-row: 5/7; }
-        .a2 { grid-column: 10/12; grid-row: 6/8; }
-        /* 腿 迈步 */
-        .l1 { grid-column: 4/6; grid-row: 8/11; }
-        .l2 { grid-column: 8/10; grid-row: 8/11; }
-        /* 脚 */
-        .f1 { grid-column: 3/6; grid-row: 11/12; }
-        .f2 { grid-column: 8/11; grid-row: 11/12; }
+        .pixel-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
         h1 {
             font-size: 22px;
             color: #2d2a26;
@@ -188,15 +175,7 @@
     <div class="card">
         <div class="header">
             <div class="pixel-icon">
-                <div class="px h1"></div>
-                <div class="px h2"></div>
-                <div class="px b1"></div>
-                <div class="px a1"></div>
-                <div class="px a2"></div>
-                <div class="px l1"></div>
-                <div class="px l2"></div>
-                <div class="px f1"></div>
-                <div class="px f2"></div>
+                <img src="assets/walking-icon.png" alt="步行">
             </div>
             <h1>步数同步工具</h1>
             <p class="sub">支持微信 / 支付宝运动</p>
