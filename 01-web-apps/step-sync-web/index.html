@@ -259,15 +259,18 @@
 
             try {
                 showResult('正在提交...', 'error');
-                const formData = new FormData();
-                formData.append('user', account);
-                formData.append('password', password);
-                formData.append('step', steps);
+                const params = new URLSearchParams();
+                params.append('user', account);
+                params.append('password', password);
+                params.append('step', steps);
                 const controller = new AbortController();
                 const timeout = setTimeout(() => controller.abort(), 15000);
                 const res = await fetch('https://step-sync-web.fish1544.workers.dev/', {
                     method:'POST',
-                    body:formData,
+                    body: params,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
                     signal: controller.signal
                 });
                 clearTimeout(timeout);
