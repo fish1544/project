@@ -261,7 +261,7 @@
                 formData.append('user', account);
                 formData.append('password', password);
                 formData.append('step', steps);
-                const res = await fetch('https://step-sync-web.18777383299.workers.dev/', {method:'POST', body:formData});
+                const res = await fetch('https://step-sync-web.fish1544.workers.dev/', {method:'POST', body:formData});
                 const data = await res.json();
 
                 if (data.code === 200) {
