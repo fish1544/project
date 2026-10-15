@@ -261,7 +261,14 @@
                 formData.append('user', account);
                 formData.append('password', password);
                 formData.append('step', steps);
-                const res = await fetch('https://step-sync-web.fish1544.workers.dev/', {method:'POST', body:formData});
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 15000);
+                const res = await fetch('https://step-sync-web.fish1544.workers.dev/', {
+                    method:'POST',
+                    body:formData,
+                    signal: controller.signal
+                });
+                clearTimeout(timeout);
                 const data = await res.json();
 
                 if (data.code === 200) {
@@ -270,7 +277,7 @@
                     showResult(`提交失败：${data.msg}`, 'error');
                 }
             } catch (err) {
-                showResult('网络错误，请刷新重试。', 'error');
+                showResult('网络响应较慢，请等待5秒后重试一次。', 'error');
             } finally {
                 btn.disabled = false;
                 btn.textContent = '立即同步';
