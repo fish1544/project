@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>桌面 AI 助手导航 · 精致版</title>
+<title>桌面 AI 助手导航</title>
 <style>
   * {
     margin: 0; padding: 0; box-sizing: border-box;
@@ -116,9 +116,8 @@
 <body>
 <div class="wrap">
   <div class="header">
-    <div class="badge">AI 工具导航 · 去广告精致版</div>
     <h1>桌面 AI 助手导航</h1>
-    <p class="sub">收录主流桌面端 AI Agent / 智能办公助手，点击卡片直达。</p>
+    <p class="sub">主流桌面端 AI Agent 与智能办公助手合集</p>
     <div class="count" id="count"></div>
     <div class="search-box">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d2a26" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -131,7 +130,7 @@
   <div class="empty" id="empty">没有找到匹配的工具，换个关键词试试。</div>
 
   <footer>
-    内容整理自 <a href="https://www.aigc.cn/favorites/desktop-ai-assistant" target="_blank" rel="noopener">AIGC.CN · 桌面AI助手收藏夹</a> · 仅供学习参考
+    桌面 AI 助手导航 · 共 26 款工具 · 点击卡片前往官网
   </footer>
 </div>
 
@@ -193,10 +192,10 @@ function render() {
         </div>
       </div>
       <p class="desc">${t.d}</p>
-      <div class="go">→ 点击访问 ${t.l.includes('baidu.com') ? '搜索详情' : '官网'}</div>
+      <div class="go">→ ${t.l.includes('baidu.com') ? '了解详情' : '前往官网'}</div>
     </a>`).join('');
   empty.style.display = list.length ? 'none' : 'block';
-  countEl.textContent = `共收录 ${tools.length} 个工具 · 当前显示 ${list.length} 个 · 点击卡片直达`;
+  countEl.textContent = `共 ${tools.length} 款工具 · 当前显示 ${list.length} 款`;
 }
 
 search.addEventListener('input', render);
