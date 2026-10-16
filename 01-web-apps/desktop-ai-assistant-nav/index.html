@@ -135,34 +135,33 @@
 </div>
 
 <script>
-const bd = q => `https://www.baidu.com/s?wd=${encodeURIComponent(q + ' AI助手')}`;
 const tools = [
   { n:"豆包工作", c:"字节跳动", d:"豆包工作任务改版，面向办公场景的 AI 任务执行助手。", i:"assets/doubao-work.jpg", t:"大厂", l:"https://www.doubao.com/" },
-  { n:"WorkBuddy", c:"桌面智能体", d:"桌面智能体，办公新范式。", i:"assets/workbuddy.jpg", t:"办公", l:bd("WorkBuddy 桌面智能体") },
-  { n:"Loomy AI工作搭子", c:"工作搭子", d:"聚焦低门槛、高安全、强适配、主动协作，把复杂重复跨工具的工作流程落到执行层。", i:"assets/loomy.jpg", t:"办公", l:bd("Loomy AI工作搭子") },
+  { n:"WorkBuddy", c:"腾讯", d:"腾讯出品的全场景 AI 办公工作台，说出要求即开始执行。", i:"assets/workbuddy.jpg", t:"大厂", l:"https://www.workbuddy.cn/" },
+  { n:"Loomy AI工作搭子", c:"科大讯飞", d:"讯飞桌面级 AI 办公助理，低门槛、高安全、强适配、主动协作。", i:"assets/loomy.jpg", t:"办公", l:"https://loomy.xunfei.cn/" },
   { n:"ArkClaw", c:"火山引擎", d:"火山引擎推出的 7×24 在线专属智能伙伴。", i:"assets/arkclaw.jpg", t:"大厂", l:"https://www.volcengine.com/" },
-  { n:"DuMate", c:"OpenClaw 框架", d:"国产企业级满血版 OpenClaw（龙虾）AI 智能体框架。", i:"assets/dumate.jpg", t:"开源", l:bd("DuMate OpenClaw") },
+  { n:"DuMate", c:"OpenClaw 框架", d:"国产企业级满血版 OpenClaw（龙虾）AI 智能体框架。", i:"assets/dumate.jpg", t:"开源", l:"https://openclaw.ai/" },
   { n:"千问办公", c:"阿里巴巴", d:"专业级 AI 协同办公平台，理解、拆解并执行复杂任务的 AI Agent 系统。", i:"assets/qianwen.jpg", t:"大厂", l:"https://www.tongyi.com/" },
-  { n:"灵犀", c:"办公产出", d:"自主规划步骤、调用工具，直接产出可编辑的 Word、Excel、PPT 等办公成品。", i:"assets/lingxi.jpg", t:"办公", l:bd("灵犀 AI 办公 Word Excel PPT") },
-  { n:"MiniMax Hub", c:"AI 创作", d:"你的 AI 创作工作室，自动调度图像、视频、配音、剪辑等多种模型。", i:"assets/minimax-hub.jpg", t:"创作", l:"https://www.minimaxi.com/" },
-  { n:"妙手 CatPaw", c:"美团", d:"一句话，见成果！美团全场景 AI Agent 平台。", i:"assets/catpaw.jpg", t:"大厂", l:bd("妙手 CatPaw 美团 AI") },
-  { n:"纳米 Work", c:"数字员工", d:"让 AI 从回答问题的助手，转变为能完成工作并交付可用成果的数字员工团队。", i:"assets/nami-work.jpg", t:"办公", l:bd("纳米 Work AI 数字员工") },
-  { n:"QoderWork", c:"办公 Agent", d:"将 Qoder 的 Agent 能力从代码领域扩展到日常工作场景。", i:"assets/qoder-work.jpg", t:"办公", l:bd("QoderWork") },
-  { n:"Marvis", c:"个人助手", d:"马维斯，为你 24 小时随时在线。", i:"assets/marvis.jpg", t:"陪伴", l:bd("Marvis AI 助手 马维斯") },
+  { n:"灵犀", c:"金山办公", d:"WPS 推出的个人办公智能体，自主规划步骤、调用工具，直接产出 Word/Excel/PPT 成品。", i:"assets/lingxi.jpg", t:"办公", l:"https://lingxi.cn/" },
+  { n:"MiniMax Hub", c:"MiniMax", d:"你的 AI 创作工作室，自动调度图像、视频、配音、剪辑等多种模型。", i:"assets/minimax-hub.jpg", t:"创作", l:"https://www.minimaxi.com/" },
+  { n:"妙手 CatPaw", c:"美团", d:"美团全场景 AI Agent 平台，一句话见成果，搭载 LongCat 2.0。", i:"assets/catpaw.jpg", t:"大厂", l:"https://catpaw.meituan.com/" },
+  { n:"纳米 Work", c:"360", d:"360 推出的企业智能体工作平台，把 AI 从回答问题变为交付成果的数字员工团队。", i:"assets/nami-work.jpg", t:"办公", l:"https://work.n.cn/" },
+  { n:"QoderWork", c:"阿里巴巴", d:"将 Qoder 的 Agent 能力从代码领域扩展到日常工作场景，描述需求、自动执行、直接交付。", i:"assets/qoder-work.jpg", t:"办公", l:"https://qoder.com.cn/qoderwork" },
+  { n:"Marvis", c:"腾讯", d:"腾讯应用宝团队研发的操作系统级 AI 管家，24 小时在线，本地大模型文件零上传。", i:"assets/marvis.jpg", t:"陪伴", l:"https://marvis.qq.com/" },
   { n:"讯飞星辰 AstronClaw", c:"科大讯飞", d:"讯飞星辰 Agent 平台 AstronClaw。", i:"assets/astronclaw.jpg", t:"大厂", l:"https://xingchen.xfyun.cn/" },
-  { n:"LobsterAI 有道龙虾", c:"网易有道", d:"国内首款 MIT 开源本土化 OpenClaw 智能体产品。", i:"assets/lobster-ai.jpg", t:"开源", l:"https://www.youdao.com/" },
-  { n:"Kimi Work", c:"月之暗面", d:"不仅是对话，更是你的本地智能体。", i:"assets/kimi-work.jpg", t:"大厂", l:"https://www.kimi.com/" },
-  { n:"KroWork", c:"无代码", d:"从聊天到软件，自然语言对话将重复工作流程转化为桌面应用。", i:"assets/kro-work.jpg", t:"无代码", l:bd("KroWork 从聊天到软件") },
-  { n:"星辰超级智能体", c:"AI 办公搭子", d:"定位为 AI 办公搭子，本地化部署和深度系统集成，自动化处理办公任务。", i:"assets/star-super.jpg", t:"办公", l:"https://xingchen.xfyun.cn/" },
+  { n:"LobsterAI 有道龙虾", c:"网易有道", d:"网易有道推出的国内首款 MIT 开源本土化 OpenClaw 智能体产品。", i:"assets/lobster-ai.jpg", t:"开源", l:"https://www.youdao.com/" },
+  { n:"Kimi Work", c:"月之暗面", d:"Kimi 官方桌面客户端，面向知识工作者的本地智能体，支持浏览器自动化与全天候任务。", i:"assets/kimi-work.jpg", t:"大厂", l:"https://www.kimi.com/products/kimi-work" },
+  { n:"KroWork", c:"无代码", d:"从聊天到软件，自然语言对话即可将重复工作流程转化为桌面应用。", i:"assets/kro-work.jpg", t:"无代码", l:"https://www.kro.work/" },
+  { n:"星辰超级智能体", c:"科大讯飞", d:"定位为 AI 办公搭子，本地化部署和深度系统集成，自动化处理办公任务。", i:"assets/star-super.jpg", t:"办公", l:"https://xingchen.xfyun.cn/" },
   { n:"AutoClaw", c:"智谱 AI", d:"国内首个真一键安装本地版 OpenClaw，主打本地执行、飞书集成、全模型兼容。", i:"assets/autoclaw.jpg", t:"开源", l:"https://www.zhipuai.cn/" },
-  { n:"Agnes AI", c:"多智能体", d:"多智能体协同架构，涵盖研究、设计、演示与编程的一体化工作流。", i:"assets/agnes-ai.jpg", t:"办公", l:bd("Agnes AI 多智能体") },
-  { n:"QClaw", c:"腾讯", d:"腾讯电脑管家本地版 OpenClaw，将 AI 执行能力与微信/QQ 社交入口深度融合。", i:"assets/qclaw.jpg", t:"大厂", l:"https://guanjia.qq.com/" },
-  { n:"阿里悟空", c:"阿里巴巴", d:"悟空让 AI 从会回答进化到能交付，你说需求，它调工具、用技能推进到结果。", i:"assets/ali-wukong.jpg", t:"大厂", l:"https://www.aliyun.com/" },
-  { n:"JVS Claw", c:"阿里巴巴", d:"阿里巴巴推出的云原生 OpenClaw 类 AI 智能体平台。", i:"assets/jvs-claw.jpg", t:"大厂", l:"https://www.aliyun.com/" },
-  { n:"元气 AI Bot", c:"全场景", d:"满足生活陪伴、电脑修复、办公学习等多种场景需求。", i:"assets/placeholder.jpg", t:"陪伴", l:bd("元气 AI Bot 桌面") },
-  { n:"阶跃 AI 桌面伙伴", c:"全场景", d:"全场景自动化、本地化安全、免费开放，终端 Agent 领域标杆产品。", i:"assets/placeholder.jpg", t:"办公", l:"https://www.stepfun.com/" },
-  { n:"墨见", c:"墨刀", d:"墨刀推出的 AI 协作平台，专为一人公司、超级个体及中小企业打造。", i:"assets/placeholder.jpg", t:"办公", l:"https://modao.cc/" },
-  { n:"ToDesk AI", c:"远程桌面", d:"集成在 ToDesk 中的云端 AI 助手，自然语言指挥所有设备自动完成办公任务。", i:"assets/placeholder.jpg", t:"办公", l:"https://www.todesk.com/" },
+  { n:"Agnes AI", c:"多智能体", d:"多智能体协同架构，涵盖研究、设计、演示与编程的一体化工作流。", i:"assets/agnes-ai.jpg", t:"办公", l:"https://agnes-ai.com/" },
+  { n:"QClaw", c:"腾讯", d:"腾讯电脑管家本地版 OpenClaw，将 AI 执行能力与微信/QQ 社交入口深度融合。", i:"assets/qclaw.jpg", t:"大厂", l:"https://qclaw.qq.com/" },
+  { n:"阿里悟空", c:"阿里巴巴", d:"钉钉原生打造的企业级 AI Agent 平台，让 AI 从会回答进化到能交付。", i:"assets/ali-wukong.jpg", t:"大厂", l:"https://wukong.dingtalk.com/" },
+  { n:"JVS Claw", c:"阿里云", d:"阿里云无影推出的云原生 OpenClaw 智能体平台，零门槛接入、云上安全养虾。", i:"assets/jvs-claw.jpg", t:"大厂", l:"https://jvsclaw.aliyun.com/" },
+  { n:"元气 AI Bot", c:"国产 Clawd", d:"国产 Clawdbot，一键安装免费使用，一句话指令自动操作电脑。", i:"assets/yuanqi.jpg", t:"陪伴", l:"https://yuanqiai.net/" },
+  { n:"阶跃 AI 桌面伙伴", c:"阶跃星辰", d:"全场景自动化、本地化安全、免费开放，接入 5000+ 技能的终端 Agent。", i:"assets/stepfun.jpg", t:"办公", l:"https://www.stepfun.com/download" },
+  { n:"墨见", c:"墨刀", d:"墨刀推出的一人公司 AI 智能体，集结产品、架构、设计虚拟团队，从原型到代码落地。", i:"assets/mojian.jpg", t:"办公", l:"https://mojian.cn/" },
+  { n:"ToDesk AI", c:"ToDesk", d:"集成在 ToDesk 中的云端 AI 助手，自然语言指挥所有设备自动完成办公任务。", i:"assets/todesk.jpg", t:"办公", l:"https://www.todesk.com/" },
 ];
 
 const grid = document.getElementById('grid');
@@ -192,7 +191,7 @@ function render() {
         </div>
       </div>
       <p class="desc">${t.d}</p>
-      <div class="go">→ ${t.l.includes('baidu.com') ? '了解详情' : '前往官网'}</div>
+      <div class="go">→ 前往官网</div>
     </a>`).join('');
   empty.style.display = list.length ? 'none' : 'block';
   countEl.textContent = `共 ${tools.length} 款工具 · 当前显示 ${list.length} 款`;
