@@ -5,122 +5,127 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>桌面 AI 助手导航 · 精致版</title>
 <style>
-  :root {
-    --bg: #0f1115;
-    --bg-soft: #161922;
-    --card: #1a1e28;
-    --card-hover: #212634;
-    --border: #262b38;
-    --text: #e8eaef;
-    --text-dim: #9aa3b2;
-    --text-faint: #6b7280;
-    --accent: #38bdf8;
-    --accent-soft: rgba(56, 189, 248, 0.12);
-    --radius: 16px;
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Courier New', 'PingFang SC', monospace;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  ::placeholder { color: #a9a49a; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
+    background: #e8e4d8;
+    background-image:
+      linear-gradient(#d8d4c8 1px, transparent 1px),
+      linear-gradient(90deg, #d8d4c8 1px, transparent 1px);
+    background-size: 8px 8px;
     min-height: 100vh;
+    padding: 28px 16px 60px;
+    color: #2d2a26;
   }
-  /* 背景微光 */
-  body::before {
-    content: "";
-    position: fixed; inset: 0;
-    background:
-      radial-gradient(800px 400px at 15% -5%, rgba(56,189,248,0.08), transparent 60%),
-      radial-gradient(700px 380px at 90% 0%, rgba(16,185,129,0.06), transparent 60%);
-    pointer-events: none; z-index: 0;
-  }
-  .wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 48px 24px 80px; }
+  .wrap { max-width: 1080px; margin: 0 auto; }
 
   /* 头部 */
-  header { text-align: center; margin-bottom: 40px; }
+  .header {
+    background: #f8f6f0; border: 2px solid #2d2a26;
+    box-shadow: 6px 6px 0 #2d2a26;
+    padding: 26px 22px; text-align: center; margin-bottom: 22px;
+  }
   .badge {
     display: inline-block; font-size: 12px; letter-spacing: 1px;
-    color: var(--accent); background: var(--accent-soft);
-    padding: 5px 14px; border-radius: 999px; margin-bottom: 18px;
+    background: #58a950; color: #fff; padding: 4px 12px;
+    border: 2px solid #2d2a26; margin-bottom: 14px;
+    box-shadow: 3px 3px 0 #2d2a26;
   }
-  h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 12px; }
-  h1 span { background: linear-gradient(120deg, var(--accent), #34d399); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-  .sub { color: var(--text-dim); font-size: 15px; max-width: 560px; margin: 0 auto; }
-  .meta { margin-top: 14px; font-size: 13px; color: var(--text-faint); }
+  h1 { font-size: 26px; font-weight: bold; letter-spacing: 1px; margin-bottom: 8px; }
+  .sub { font-size: 13px; color: #6b6660; line-height: 1.6; }
+  .count { font-size: 12px; color: #6b6660; margin-top: 10px; }
 
-  /* 搜索栏 */
-  .search-bar {
-    max-width: 560px; margin: 28px auto 0; position: relative;
+  /* 搜索 */
+  .search-box {
+    position: relative; margin: 16px auto 0; max-width: 520px;
   }
-  .search-bar input {
-    width: 100%; padding: 14px 20px 14px 48px;
-    background: var(--bg-soft); border: 1px solid var(--border);
-    border-radius: 14px; color: var(--text); font-size: 15px; outline: none;
-    transition: border-color .2s, box-shadow .2s;
+  .search-box input {
+    width: 100%; padding: 11px 14px 11px 40px;
+    background: #fff; border: 2px solid #2d2a26; border-radius: 0;
+    font-size: 14px; color: #2d2a26; outline: none;
+    box-shadow: 3px 3px 0 #c9c4b8;
   }
-  .search-bar input::placeholder { color: var(--text-faint); }
-  .search-bar input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-  .search-bar svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); opacity: .5; }
+  .search-box input:focus {
+    background: #f8ffe8; box-shadow: 3px 3px 0 #58a950;
+  }
+  .search-box svg {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  }
 
-  /* 分类标签 */
-  .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 20px; }
+  /* 标签 */
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
   .tag {
-    font-size: 13px; padding: 6px 14px; border-radius: 999px; cursor: pointer;
-    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
-    transition: all .2s; user-select: none;
+    font-size: 12px; padding: 6px 12px; cursor: pointer;
+    background: #fff; border: 2px solid #2d2a26; color: #2d2a26;
+    box-shadow: 2px 2px 0 #c9c4b8; transition: all .1s; user-select: none;
   }
-  .tag:hover { border-color: var(--accent); color: var(--text); }
-  .tag.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .tag:active { transform: translate(2px,2px); box-shadow: 0 0 0 #c9c4b8; }
+  .tag.active { background: #58a950; color: #fff; box-shadow: 2px 2px 0 #2d2a26; }
 
   /* 网格 */
   .grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 18px; margin-top: 36px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px; margin-top: 22px;
   }
   .card {
-    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 22px; transition: transform .2s, border-color .2s, background .2s;
     display: flex; flex-direction: column; gap: 12px;
+    background: #f8f6f0; border: 2px solid #2d2a26;
+    box-shadow: 5px 5px 0 #2d2a26;
+    padding: 16px; text-decoration: none; color: #2d2a26;
+    transition: transform .1s, box-shadow .1s;
   }
-  .card:hover { transform: translateY(-3px); background: var(--card-hover); border-color: #354056; }
-  .card-head { display: flex; align-items: center; gap: 14px; }
+  .card:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #2d2a26; background: #fff; }
+  .card:active { transform: translate(3px,3px); box-shadow: 0 0 0 #2d2a26; }
+  .card-head { display: flex; align-items: center; gap: 12px; }
   .icon {
-    width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
-    background: #fff; display: flex; align-items: center; justify-content: center;
-    overflow: hidden; border: 1px solid var(--border);
+    width: 52px; height: 52px; flex-shrink: 0;
+    background: #fff; border: 2px solid #2d2a26;
+    box-shadow: 3px 3px 0 #c9c4b8; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
   }
   .icon img { width: 100%; height: 100%; object-fit: contain; }
-  .name { font-size: 16px; font-weight: 600; }
-  .cat { font-size: 11px; color: var(--accent); margin-top: 2px; }
-  .desc { font-size: 13.5px; color: var(--text-dim); line-height: 1.65; flex-grow: 1; }
+  .name { font-size: 15px; font-weight: bold; line-height: 1.3; }
+  .cat {
+    display: inline-block; font-size: 10px; margin-top: 3px;
+    background: #e8e4d8; border: 1px solid #2d2a26; padding: 1px 6px;
+  }
+  .desc { font-size: 12.5px; line-height: 1.6; color: #5a5650; flex-grow: 1; }
+  .go {
+    font-size: 11px; color: #58a950; font-weight: bold;
+    border-top: 1px dashed #2d2a26; padding-top: 8px;
+  }
 
-  .empty { text-align: center; color: var(--text-faint); padding: 60px 0; font-size: 15px; display: none; }
-
-  footer { text-align: center; margin-top: 60px; font-size: 12px; color: var(--text-faint); }
-  footer a { color: var(--text-dim); text-decoration: none; }
+  .empty {
+    text-align: center; color: #6b6660; padding: 50px 0;
+    font-size: 14px; display: none;
+  }
+  footer {
+    text-align: center; margin-top: 36px; font-size: 11px; color: #6b6660;
+  }
+  footer a { color: #2d2a26; }
 
   @media (max-width: 600px) {
-    h1 { font-size: 26px; }
-    .wrap { padding: 32px 16px 60px; }
+    h1 { font-size: 20px; }
     .grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
+  <div class="header">
     <div class="badge">AI 工具导航 · 去广告精致版</div>
-    <h1>桌面 <span>AI 助手</span> 导航</h1>
-    <p class="sub">收录主流桌面端 AI Agent / 智能办公助手，一键浏览、搜索过滤，无广告、无弹窗。</p>
-    <div class="meta" id="count"></div>
-    <div class="search-bar">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <h1>桌面 AI 助手导航</h1>
+    <p class="sub">收录主流桌面端 AI Agent / 智能办公助手，点击卡片直达。</p>
+    <div class="count" id="count"></div>
+    <div class="search-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d2a26" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       <input type="text" id="search" placeholder="搜索工具名称或描述…" autocomplete="off">
     </div>
     <div class="tags" id="tags"></div>
-  </header>
+  </div>
 
   <div class="grid" id="grid"></div>
   <div class="empty" id="empty">没有找到匹配的工具，换个关键词试试。</div>
@@ -131,33 +136,34 @@
 </div>
 
 <script>
+const bd = q => `https://www.baidu.com/s?wd=${encodeURIComponent(q + ' AI助手')}`;
 const tools = [
-  { n:"豆包工作", c:"字节跳动", d:"豆包工作任务改版，面向办公场景的 AI 任务执行助手。", i:"assets/doubao-work.jpg", t:"大厂" },
-  { n:"WorkBuddy", c:"桌面智能体", d:"桌面智能体，办公新范式。", i:"assets/workbuddy.jpg", t:"办公" },
-  { n:"Loomy AI工作搭子", c:"工作搭子", d:"聚焦低门槛、高安全、强适配、主动协作，把复杂、重复、跨工具的工作流程真正落到执行层。", i:"assets/loomy.jpg", t:"办公" },
-  { n:"ArkClaw", c:"火山引擎", d:"火山引擎推出的 7×24 在线专属智能伙伴。", i:"assets/arkclaw.jpg", t:"大厂" },
-  { n:"DuMate", c:"OpenClaw 框架", d:"国产企业级满血版 OpenClaw（龙虾）AI 智能体框架。", i:"assets/dumate.jpg", t:"开源" },
-  { n:"千问办公", c:"阿里巴巴", d:"专业级 AI 协同办公平台，能理解、拆解并执行复杂任务的 AI Agent 系统，实现从任务到交付的全流程自动化。", i:"assets/qianwen.jpg", t:"大厂" },
-  { n:"灵犀", c:"办公产出", d:"自主规划步骤、调用工具，直接产出可编辑的 Word、Excel、PPT 等办公成品。", i:"assets/lingxi.jpg", t:"办公" },
-  { n:"MiniMax Hub", c:"AI 创作", d:"一个属于你的 AI 创作工作室，自动调度图像、视频、配音、剪辑等多种模型，从想法到成片一气呵成。", i:"assets/minimax-hub.jpg", t:"创作" },
-  { n:"妙手 CatPaw", c:"美团", d:"一句话，见成果！美团全场景 AI Agent 平台。", i:"assets/catpaw.jpg", t:"大厂" },
-  { n:"纳米 Work", c:"数字员工", d:"让 AI 从回答问题的助手，转变为能完成工作并交付可用成果的数字员工团队，覆盖任务规划到成果交付全链条。", i:"assets/nami-work.jpg", t:"办公" },
-  { n:"QoderWork", c:"办公 Agent", d:"将 Qoder 的 Agent 能力从代码领域扩展到日常工作场景，描述需求、自动执行、直接交付结果。", i:"assets/qoder-work.jpg", t:"办公" },
-  { n:"Marvis", c:"个人助手", d:"马维斯，为你 24 小时随时在线。", i:"assets/marvis.jpg", t:"陪伴" },
-  { n:"讯飞星辰 AstronClaw", c:"科大讯飞", d:"讯飞星辰 Agent 平台 AstronClaw。", i:"assets/astronclaw.jpg", t:"大厂" },
-  { n:"LobsterAI 有道龙虾", c:"网易有道", d:"国内首款 MIT 开源本土化 OpenClaw 智能体产品。", i:"assets/lobster-ai.jpg", t:"开源" },
-  { n:"Kimi Work", c:"月之暗面", d:"不仅是对话，更是你的本地智能体。", i:"assets/kimi-work.jpg", t:"大厂" },
-  { n:"KroWork", c:"无代码", d:"从聊天到软件，无需编写代码，仅通过自然语言对话就能将重复性工作流程转化为专属桌面应用。", i:"assets/kro-work.jpg", t:"无代码" },
-  { n:"星辰超级智能体", c:"AI 办公搭子", d:"定位为 AI 办公搭子，通过本地化部署和深度系统集成，自动化处理各类办公任务。", i:"assets/star-super.jpg", t:"办公" },
-  { n:"AutoClaw", c:"智谱 AI", d:"国内首个真一键安装本地版 OpenClaw 智能体，主打本地执行、飞书无缝集成、1 分钟极速部署、全模型兼容。", i:"assets/autoclaw.jpg", t:"开源" },
-  { n:"Agnes AI", c:"多智能体", d:"多智能体协同架构，通过多个专精 AI 智能体分工协作，提供涵盖研究、设计、演示与编程的一体化工作流。", i:"assets/agnes-ai.jpg", t:"办公" },
-  { n:"QClaw", c:"腾讯", d:"腾讯电脑管家本地版 OpenClaw 智能体，将 AI 执行能力与微信/QQ 国民级社交入口深度融合。", i:"assets/qclaw.jpg", t:"大厂" },
-  { n:"阿里悟空", c:"阿里巴巴", d:"悟空让 AI 从会回答进化到能交付，你说需求，它调工具、用技能，把工作直接推进到结果。", i:"assets/ali-wukong.jpg", t:"大厂" },
-  { n:"JVS Claw", c:"阿里巴巴", d:"阿里巴巴推出的云原生 OpenClaw 类 AI 智能体平台。", i:"assets/jvs-claw.jpg", t:"大厂" },
-  { n:"元气 AI Bot", c:"全场景", d:"满足生活陪伴、电脑修复、办公学习等多种场景需求。", i:"assets/placeholder.jpg", t:"陪伴" },
-  { n:"阶跃 AI 桌面伙伴", c:"全场景", d:"全场景自动化、本地化安全、免费开放，终端 Agent 领域标杆产品。", i:"assets/placeholder.jpg", t:"办公" },
-  { n:"墨见", c:"墨刀", d:"墨刀推出的 AI 协作平台，专为一人公司、超级个体及中小企业打造。", i:"assets/placeholder.jpg", t:"办公" },
-  { n:"ToDesk AI", c:"远程桌面", d:"集成在 ToDesk 中的云端 AI 助手，通过自然语言指挥所有设备自动完成办公任务，无需代码基础。", i:"assets/placeholder.jpg", t:"办公" },
+  { n:"豆包工作", c:"字节跳动", d:"豆包工作任务改版，面向办公场景的 AI 任务执行助手。", i:"assets/doubao-work.jpg", t:"大厂", l:"https://www.doubao.com/" },
+  { n:"WorkBuddy", c:"桌面智能体", d:"桌面智能体，办公新范式。", i:"assets/workbuddy.jpg", t:"办公", l:bd("WorkBuddy 桌面智能体") },
+  { n:"Loomy AI工作搭子", c:"工作搭子", d:"聚焦低门槛、高安全、强适配、主动协作，把复杂重复跨工具的工作流程落到执行层。", i:"assets/loomy.jpg", t:"办公", l:bd("Loomy AI工作搭子") },
+  { n:"ArkClaw", c:"火山引擎", d:"火山引擎推出的 7×24 在线专属智能伙伴。", i:"assets/arkclaw.jpg", t:"大厂", l:"https://www.volcengine.com/" },
+  { n:"DuMate", c:"OpenClaw 框架", d:"国产企业级满血版 OpenClaw（龙虾）AI 智能体框架。", i:"assets/dumate.jpg", t:"开源", l:bd("DuMate OpenClaw") },
+  { n:"千问办公", c:"阿里巴巴", d:"专业级 AI 协同办公平台，理解、拆解并执行复杂任务的 AI Agent 系统。", i:"assets/qianwen.jpg", t:"大厂", l:"https://www.tongyi.com/" },
+  { n:"灵犀", c:"办公产出", d:"自主规划步骤、调用工具，直接产出可编辑的 Word、Excel、PPT 等办公成品。", i:"assets/lingxi.jpg", t:"办公", l:bd("灵犀 AI 办公 Word Excel PPT") },
+  { n:"MiniMax Hub", c:"AI 创作", d:"你的 AI 创作工作室，自动调度图像、视频、配音、剪辑等多种模型。", i:"assets/minimax-hub.jpg", t:"创作", l:"https://www.minimaxi.com/" },
+  { n:"妙手 CatPaw", c:"美团", d:"一句话，见成果！美团全场景 AI Agent 平台。", i:"assets/catpaw.jpg", t:"大厂", l:bd("妙手 CatPaw 美团 AI") },
+  { n:"纳米 Work", c:"数字员工", d:"让 AI 从回答问题的助手，转变为能完成工作并交付可用成果的数字员工团队。", i:"assets/nami-work.jpg", t:"办公", l:bd("纳米 Work AI 数字员工") },
+  { n:"QoderWork", c:"办公 Agent", d:"将 Qoder 的 Agent 能力从代码领域扩展到日常工作场景。", i:"assets/qoder-work.jpg", t:"办公", l:bd("QoderWork") },
+  { n:"Marvis", c:"个人助手", d:"马维斯，为你 24 小时随时在线。", i:"assets/marvis.jpg", t:"陪伴", l:bd("Marvis AI 助手 马维斯") },
+  { n:"讯飞星辰 AstronClaw", c:"科大讯飞", d:"讯飞星辰 Agent 平台 AstronClaw。", i:"assets/astronclaw.jpg", t:"大厂", l:"https://xingchen.xfyun.cn/" },
+  { n:"LobsterAI 有道龙虾", c:"网易有道", d:"国内首款 MIT 开源本土化 OpenClaw 智能体产品。", i:"assets/lobster-ai.jpg", t:"开源", l:"https://www.youdao.com/" },
+  { n:"Kimi Work", c:"月之暗面", d:"不仅是对话，更是你的本地智能体。", i:"assets/kimi-work.jpg", t:"大厂", l:"https://www.kimi.com/" },
+  { n:"KroWork", c:"无代码", d:"从聊天到软件，自然语言对话将重复工作流程转化为桌面应用。", i:"assets/kro-work.jpg", t:"无代码", l:bd("KroWork 从聊天到软件") },
+  { n:"星辰超级智能体", c:"AI 办公搭子", d:"定位为 AI 办公搭子，本地化部署和深度系统集成，自动化处理办公任务。", i:"assets/star-super.jpg", t:"办公", l:"https://xingchen.xfyun.cn/" },
+  { n:"AutoClaw", c:"智谱 AI", d:"国内首个真一键安装本地版 OpenClaw，主打本地执行、飞书集成、全模型兼容。", i:"assets/autoclaw.jpg", t:"开源", l:"https://www.zhipuai.cn/" },
+  { n:"Agnes AI", c:"多智能体", d:"多智能体协同架构，涵盖研究、设计、演示与编程的一体化工作流。", i:"assets/agnes-ai.jpg", t:"办公", l:bd("Agnes AI 多智能体") },
+  { n:"QClaw", c:"腾讯", d:"腾讯电脑管家本地版 OpenClaw，将 AI 执行能力与微信/QQ 社交入口深度融合。", i:"assets/qclaw.jpg", t:"大厂", l:"https://guanjia.qq.com/" },
+  { n:"阿里悟空", c:"阿里巴巴", d:"悟空让 AI 从会回答进化到能交付，你说需求，它调工具、用技能推进到结果。", i:"assets/ali-wukong.jpg", t:"大厂", l:"https://www.aliyun.com/" },
+  { n:"JVS Claw", c:"阿里巴巴", d:"阿里巴巴推出的云原生 OpenClaw 类 AI 智能体平台。", i:"assets/jvs-claw.jpg", t:"大厂", l:"https://www.aliyun.com/" },
+  { n:"元气 AI Bot", c:"全场景", d:"满足生活陪伴、电脑修复、办公学习等多种场景需求。", i:"assets/placeholder.jpg", t:"陪伴", l:bd("元气 AI Bot 桌面") },
+  { n:"阶跃 AI 桌面伙伴", c:"全场景", d:"全场景自动化、本地化安全、免费开放，终端 Agent 领域标杆产品。", i:"assets/placeholder.jpg", t:"办公", l:"https://www.stepfun.com/" },
+  { n:"墨见", c:"墨刀", d:"墨刀推出的 AI 协作平台，专为一人公司、超级个体及中小企业打造。", i:"assets/placeholder.jpg", t:"办公", l:"https://modao.cc/" },
+  { n:"ToDesk AI", c:"远程桌面", d:"集成在 ToDesk 中的云端 AI 助手，自然语言指挥所有设备自动完成办公任务。", i:"assets/placeholder.jpg", t:"办公", l:"https://www.todesk.com/" },
 ];
 
 const grid = document.getElementById('grid');
@@ -178,18 +184,19 @@ function render() {
     return okTag && okQ;
   });
   grid.innerHTML = list.map(t => `
-    <div class="card">
+    <a class="card" href="${t.l}" target="_blank" rel="noopener">
       <div class="card-head">
         <div class="icon"><img src="${t.i}" alt="${t.n}" loading="lazy"></div>
         <div>
           <div class="name">${t.n}</div>
-          <div class="cat">${t.c}</div>
+          <span class="cat">${t.c}</span>
         </div>
       </div>
       <p class="desc">${t.d}</p>
-    </div>`).join('');
+      <div class="go">→ 点击访问 ${t.l.includes('baidu.com') ? '搜索详情' : '官网'}</div>
+    </a>`).join('');
   empty.style.display = list.length ? 'none' : 'block';
-  countEl.textContent = `共收录 ${tools.length} 个工具 · 当前显示 ${list.length} 个`;
+  countEl.textContent = `共收录 ${tools.length} 个工具 · 当前显示 ${list.length} 个 · 点击卡片直达`;
 }
 
 search.addEventListener('input', render);
