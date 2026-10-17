@@ -16,6 +16,7 @@
 |---|---|---|
 | 01-web-apps | AIGC 导航 | https://fish1544.github.io/project/01-web-apps/aigc-nav/ |
 | 01-web-apps | 猫咪生活报（cat-workbench） | https://fish1544.github.io/project/01-web-apps/cat-workbench/ |
+| 01-web-apps | Goalday（Vite 构建） | https://fish1544.github.io/project/01-web-apps/goalday/ |
 | 01-web-apps | 个人 SOP | https://fish1544.github.io/project/01-web-apps/personal-sop/ |
 | 01-web-apps | 刷步工具 | https://fish1544.github.io/project/01-web-apps/step-sync-tool/ |
 | 01-web-apps | 刷步工具（友版） | https://fish1544.github.io/project/01-web-apps/step-sync-tool-friend/ |
@@ -28,7 +29,6 @@
 
 | 作品 | 状态 | 说明 |
 |---|---|---|
-| Goalday | 待构建 | React/Vite 源码，需 `npm run build` 生成静态产物后再上线 |
 | personal-user-manual | 不可静态部署 | 全栈工程（React + NestJS + PostgreSQL），需后端服务 |
 | liangli-energy-tracker | 不可静态部署 | 全栈工程（React + NestJS），需后端服务 |
 
