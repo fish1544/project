@@ -18,8 +18,6 @@
 | 01-web-apps | 猫咪生活报（cat-workbench） | https://fish1544.github.io/project/01-web-apps/cat-workbench/ |
 | 01-web-apps | Goalday（Vite 构建） | https://fish1544.github.io/project/01-web-apps/goalday/ |
 | 01-web-apps | 个人 SOP | https://fish1544.github.io/project/01-web-apps/personal-sop/ |
-| 01-web-apps | 刷步工具 | https://fish1544.github.io/project/01-web-apps/step-sync-tool/ |
-| 01-web-apps | 刷步工具（友版） | https://fish1544.github.io/project/01-web-apps/step-sync-tool-friend/ |
 | 01-web-apps | 刷步 Web | https://fish1544.github.io/project/01-web-apps/step-sync-web/ |
 | 02-mini-games | 凛冬轮回（frozen-reincarnation） | https://fish1544.github.io/project/02-mini-games/frozen-reincarnation/ |
 | 02-mini-games | 迷你超市（mini-mart） | https://fish1544.github.io/project/02-mini-games/mini-mart/ |
