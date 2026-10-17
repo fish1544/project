@@ -1,5 +1,0 @@
-{"uri":"https://aka.doubaocdn.com/s/n01yW0aw3e","path":"D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\app\\assets\\hero-cover.jpg"}
-{"uri":"https://aka.doubaocdn.com/s/iER3qykVoe","path":"D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\app\\assets\\voice-art.jpg"}
-{"uri":"https://aka.doubaocdn.com/s/IOKE2SMs83","path":"D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\app\\assets\\manual-art.jpg"}
-{"uri":"https://aka.doubaocdn.com/s/YspFTM8Zth","path":"D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\app\\assets\\rhythm-art.jpg"}
-{"uri":"https://aka.doubaocdn.com/s/bDCkPoUUIv","path":"D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\app\\assets\\paper-texture.jpg"}

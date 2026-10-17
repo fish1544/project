@@ -2,7 +2,7 @@
 """canvas-b 关键屏 6 条 figcaption 换成产品文案（按生成顺序 p01..p06）。"""
 import io, re
 
-BASE = r"D:\Project\ui-design-runs\全面重构对现有线上网页应-20260919-174101-8bf6"
+BASE = r"D:\Project\ui-design-runs\ui-redesign-run-20260919-174101-8bf6"
 path = BASE + r"\doc\canvas-b.html"
 with io.open(path, encoding="utf-8") as f:
     h = f.read()

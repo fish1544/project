@@ -1,6 +1,17 @@
+请根据以下**完整的 HTML 代码**创建一个网页应用：全面重构：对现有线上网页应用《个人使用说… · 设计方案（产品界面）。
+技术类型 arch_type=jspage。
+
+**请直接使用提供的 HTML 代码，不要做任何修改、不要重写、不要精简、不要按你自己的理解重新设计。**
+这份 HTML 是已经定稿的设计，你的职责是把它原样上屏。
+图片链接已经全部替换成公网 URL，直接用即可。
+禁止新增任何交互、动效、组件或页面；禁止替换或补充图片；禁止调整配色、字号与间距。
+如果你认为某处可以改进，**不要改**，在总结里说明即可。
+
+完整 HTML 代码如下：
+
 <!DOCTYPE html>
 <!-- ══ 写完这一份之后，唯一的下一步是执行这一条命令 ═══════════════
-     python3 C:\Users\zhy\AppData\Local\Doubao\User Data\Default\.doubao\agent_mode\workspace\.skills\doubao-ui-design\scripts\ui.py review --run D:\Project\ui-design-runs\全面重构对现有线上网页应-20260919-174101-8bf6\run.json
+     python3 C:\Users\zhy\AppData\Local\Doubao\User Data\Default\.doubao\agent_mode\workspace\.skills\doubao-ui-design\scripts\ui.py review --run D:\Project\ui-design-runs\ui-redesign-run-20260919-174101-8bf6\run.json
      ══════════════════════════════════════════════════════════════ -->
 <html lang="zh-CN">
 <head>
@@ -63,7 +74,7 @@
   --halo-1:var(--accent);
   --halo-2:var(--world-2);
   --halo-a:.20;
-  --stage-art:url(assets/paper-texture.jpg);
+  https://aka.doubaocdn.com/s/bDCkPoUUIv);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
@@ -231,7 +242,7 @@ img,svg{display:block;max-width:100%}
 
 /* ── 语音 ── */
 .voice-hero{position:relative;border-radius:var(--r-card);overflow:hidden;margin-bottom:14px;
-  height:150px;background:url(assets/voice-art.jpg) center/cover no-repeat;
+  https://aka.doubaocdn.com/s/iER3qykVoe) center/cover no-repeat;
   border:1px solid var(--line-soft);box-shadow:var(--shadow-card)}
 .voice-hero .ov{position:absolute;left:0;right:0;bottom:0;padding:30px 16px 12px;
   background:linear-gradient(180deg,transparent,rgba(30,59,52,.86) 66%)}
@@ -330,7 +341,7 @@ img,svg{display:block;max-width:100%}
 .rule-row .tx .s{font-size:11.5px;color:var(--ink-2);margin-top:1px}
 .rule-row .v{font-family:var(--num);font-size:14px;font-weight:700;color:var(--accent-deep);flex:none}
 .month-cover{position:relative;border-radius:var(--r-card);overflow:hidden;margin-bottom:14px;
-  height:128px;background:url(assets/manual-art.jpg) center/cover no-repeat;
+  https://aka.doubaocdn.com/s/IOKE2SMs83) center/cover no-repeat;
   border:1px solid var(--line-soft);box-shadow:var(--shadow-card)}
 .month-cover .ov{position:absolute;left:0;right:0;bottom:0;padding:34px 16px 12px;
   background:linear-gradient(180deg,transparent,rgba(30,59,52,.86) 66%)}
@@ -478,7 +489,7 @@ img,svg{display:block;max-width:100%}
       </div>
 
       <div class="hero-cover">
-        <img src="assets/hero-cover.jpg" alt="翻开的手册与精力曲线">
+        <img src="https://aka.doubaocdn.com/s/n01yW0aw3e" alt="翻开的手册与精力曲线">
         <div class="ov">
           <div class="k">YOUR MANUAL · 第 128 天</div>
           <div class="t">你的说明书，今天又准了一点</div>
@@ -554,19 +565,19 @@ img,svg{display:block;max-width:100%}
       <div class="card" style="padding:2px 16px">
         <div class="rows">
           <div class="row item">
-            <span class="rowthumb" style="background-image:url(assets/voice-art.jpg)"></span>
+            <span class="rowthumb" style="https://aka.doubaocdn.com/s/iER3qykVoe)"></span>
             <div class="tx"><div class="t">下午做完手工后，很快进入了工作状态</div>
               <div class="m"><span>15:03</span><span class="chip k">手工</span><span class="chip a">平静</span></div></div>
             <span class="end">0:24</span>
           </div>
           <div class="row item">
-            <span class="rowthumb" style="background-image:url(assets/manual-art.jpg)"></span>
+            <span class="rowthumb" style="https://aka.doubaocdn.com/s/IOKE2SMs83)"></span>
             <div class="tx"><div class="t">写文案前先整理了桌面，进入状态变快了</div>
               <div class="m"><span>11:40</span><span class="chip k">工作</span><span class="chip k">专注</span></div></div>
             <span class="end">0:18</span>
           </div>
           <div class="row item">
-            <span class="rowthumb" style="background-image:url(assets/rhythm-art.jpg)"></span>
+            <span class="rowthumb" style="https://aka.doubaocdn.com/s/YspFTM8Zth)"></span>
             <div class="tx"><div class="t">出门散步二十分钟，回来后思路很清晰</div>
               <div class="m"><span>09:12</span><span class="chip k">出门</span><span class="chip k">舒畅</span></div></div>
             <span class="end">0:31</span>
@@ -1071,3 +1082,6 @@ window.__UI_CAPTURE__={
 </script>
 </body>
 </html>
+
+
+请严格按照上面的 HTML 代码创建应用，不要做任何修改。

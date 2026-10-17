@@ -1,4 +1,4 @@
-with open(r"D:\Project\凛冬轮回\_check.js", "r", encoding="utf-8") as f:
+with open(r"D:\Project\02-mini-games\frozen-reincarnation\_check.js", "r", encoding="utf-8") as f:
     js = f.read()
 
 # Track brace depth, ignoring strings and comments

@@ -51,12 +51,8 @@ if ($config -and $config.password) {
 }
 
 # Random steps
-$default = Read-Host "Use safe random 7000-16000? (y/n, default y)"
-if ($default -ne "n") {
-    $steps = Get-Random -Minimum 7000 -Maximum 16000
-} else {
-    $steps = [int](Read-Host "Enter target steps")
-}
+$steps = Get-Random -Minimum 18000 -Maximum 21000
+Write-Host "Auto random target steps: $steps (18000-21000)"
 
 # Limit steps
 if ($steps -gt 30000) {
@@ -71,8 +67,8 @@ if ($save -ne "n") {
     $newConfig = @{
         account = $account
         password = $password
-        minSteps = 7000
-        maxSteps = 16000
+        minSteps = 18000
+        maxSteps = 21000
     }
     $newConfig | ConvertTo-Json | Out-File $configPath -Encoding utf8
 }

@@ -3,7 +3,7 @@
 from PIL import Image
 import os
 
-BASE = r"D:\Project\ui-design-runs\全面重构对现有线上网页应-20260919-174101-8bf6\shots"
+BASE = r"D:\Project\ui-design-runs\ui-redesign-run-20260919-174101-8bf6\shots"
 os.makedirs(BASE + r"\doc-bands", exist_ok=True)
 
 for name, bands in (("canvas-a-698.png", 4), ("canvas-b-698.png", 3)):

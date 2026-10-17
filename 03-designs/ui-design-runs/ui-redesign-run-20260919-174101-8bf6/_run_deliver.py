@@ -2,7 +2,7 @@
 """测试 upload map 解析；成功则把 map 写入 run.json 收据并继续 deliver。"""
 import io, re, subprocess, sys, json
 
-BASE = r"D:\Project\ui-design-runs\全面重构对现有线上网页应-20260919-174101-8bf6"
+BASE = r"D:\Project\ui-design-runs\ui-redesign-run-20260919-174101-8bf6"
 SCRIPTS = r"C:\Users\zhy\AppData\Local\Doubao\User Data\Default\.doubao\agent_mode\workspace\.skills\doubao-ui-design\scripts"
 
 UPLOAD = re.compile(r'\{[^{}]*"uri"\s*:\s*"([^"]+)"[^{}]*\}')

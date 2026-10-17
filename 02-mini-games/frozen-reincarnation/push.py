@@ -35,7 +35,7 @@ def gh(method, url, data=None):
 
 # 1. Push HTML
 print("1. Pushing index.html...")
-with open(r"D:\Project\02-小游戏与互动\凛冬轮回\凛冬轮回.html", "r", encoding="utf-8") as f:
+with open(r"D:\Project\02-mini-games\frozen-reincarnation\index.html", "r", encoding="utf-8") as f:
     html = f.read()
 html_b64 = base64.b64encode(html.encode("utf-8")).decode("utf-8")
 info = gh("GET", "https://api.github.com/repos/fish1544/frozen-reincarnation/contents/index.html")
@@ -47,7 +47,7 @@ if result: print(f"   HTML OK: {result['commit']['sha'][:12]}")
 
 # 2. Push images
 for img in ["city.jpg", "bunker.jpg", "blizzard.jpg", "beast_wolf.jpg", "beast_bear.jpg", "beast_scorpion.jpg", "pet_wolf.jpg", "pet_fox.jpg", "pet_bear.jpg", "scene_suburb.jpg", "scene_city.jpg", "scene_deep.jpg", "loc_supermarket.jpg", "loc_pharmacy.jpg", "loc_construction.jpg", "loc_gas.jpg"]:
-    img_path = rf"D:\Project\02-小游戏与互动\凛冬轮回\assets\{img}"
+    img_path = rf"D:\Project\02-mini-games\frozen-reincarnation\assets\{img}"
     print(f"2. Pushing assets/{img}...")
     with open(img_path, "rb") as f:
         img_b64 = base64.b64encode(f.read()).decode("utf-8")

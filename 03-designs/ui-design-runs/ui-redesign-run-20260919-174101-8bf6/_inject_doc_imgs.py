@@ -2,7 +2,7 @@
 """把 pack_img 产出的 b64 文本注入 cover.html / canvas-a.html 占位符。"""
 import io
 
-BASE = r"D:\Project\ui-design-runs\全面重构对现有线上网页应-20260919-174101-8bf6"
+BASE = r"D:\Project\ui-design-runs\ui-redesign-run-20260919-174101-8bf6"
 IMG = BASE + r"\doc\img"
 
 

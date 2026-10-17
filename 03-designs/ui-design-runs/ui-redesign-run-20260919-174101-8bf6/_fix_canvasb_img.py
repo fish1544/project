@@ -2,7 +2,7 @@
 """canvas-b KEY-SCREENS 占位 img 注入 p01 截图 URI，避免空 src 破碎图。"""
 import io
 
-BASE = r"D:\Project\ui-design-runs\全面重构对现有线上网页应-20260919-174101-8bf6"
+BASE = r"D:\Project\ui-design-runs\ui-redesign-run-20260919-174101-8bf6"
 path = BASE + r"\doc\canvas-b.html"
 with io.open(BASE + r"\doc\img\p01.b64.txt", "r", encoding="utf-8") as f:
     uri = f.read().strip()

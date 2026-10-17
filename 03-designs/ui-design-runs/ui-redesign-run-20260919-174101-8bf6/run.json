@@ -27,7 +27,7 @@
     "attachments": [],
     "skeleton": "app",
     "title": "全面重构：对现有线上网页应用《个人使用说… · 设计方案",
-    "workdir": "D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6",
+    "workdir": "D:\\Project\\ui-design-runs\\ui-redesign-run-20260919-174101-8bf6",
     "deliverables": {
       "doc": {
         "proposal": "doc/proposal.xml",
@@ -842,7 +842,7 @@
       {
         "ts": "2026-09-19T18:04:11",
         "url": "app/index.html",
-        "observed": "D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\observed-app.json",
+        "observed": "D:\\Project\\ui-design-runs\\ui-redesign-run-20260919-174101-8bf6\\observed-app.json",
         "count": 5,
         "resolved": false,
         "resolvedCount": 0
@@ -850,7 +850,7 @@
       {
         "ts": "2026-09-19T18:04:56",
         "url": "app/index.html",
-        "observed": "D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\observed-app.json",
+        "observed": "D:\\Project\\ui-design-runs\\ui-redesign-run-20260919-174101-8bf6\\observed-app.json",
         "count": 5,
         "resolved": true,
         "resolvedCount": 1
@@ -872,7 +872,7 @@
       {
         "ts": "2026-09-19T18:27:01",
         "url": "app/index.html",
-        "observed": "D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\observed-app.json",
+        "observed": "D:\\Project\\ui-design-runs\\ui-redesign-run-20260919-174101-8bf6\\observed-app.json",
         "count": 5,
         "resolved": true,
         "resolvedCount": 1
@@ -880,7 +880,7 @@
       {
         "ts": "2026-09-19T18:27:43",
         "url": "app/index.html",
-        "observed": "D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\observed-app.json",
+        "observed": "D:\\Project\\ui-design-runs\\ui-redesign-run-20260919-174101-8bf6\\observed-app.json",
         "count": 5,
         "resolved": true,
         "resolvedCount": 1
@@ -1133,7 +1133,7 @@
         "blocks": 2,
         "reconciled": true,
         "coverInserted": false,
-        "cover": "D:\\Project\\ui-design-runs\\全面重构对现有线上网页应-20260919-174101-8bf6\\shots\\cover.jpg",
+        "cover": "D:\\Project\\ui-design-runs\\ui-redesign-run-20260919-174101-8bf6\\shots\\cover.jpg",
         "coverUrl": null,
         "coverVia": "media-insert",
         "gaps": []
@@ -1285,11 +1285,11 @@
       {
         "ts": "2026-09-19T18:31:27",
         "map": {
-          "D:\\\\Project\\\\ui-design-runs\\\\全面重构对现有线上网页应-20260919-174101-8bf6\\\\app\\\\assets\\\\hero-cover.jpg": "https://aka.doubaocdn.com/s/n01yW0aw3e",
-          "D:\\\\Project\\\\ui-design-runs\\\\全面重构对现有线上网页应-20260919-174101-8bf6\\\\app\\\\assets\\\\voice-art.jpg": "https://aka.doubaocdn.com/s/iER3qykVoe",
-          "D:\\\\Project\\\\ui-design-runs\\\\全面重构对现有线上网页应-20260919-174101-8bf6\\\\app\\\\assets\\\\manual-art.jpg": "https://aka.doubaocdn.com/s/IOKE2SMs83",
-          "D:\\\\Project\\\\ui-design-runs\\\\全面重构对现有线上网页应-20260919-174101-8bf6\\\\app\\\\assets\\\\rhythm-art.jpg": "https://aka.doubaocdn.com/s/YspFTM8Zth",
-          "D:\\\\Project\\\\ui-design-runs\\\\全面重构对现有线上网页应-20260919-174101-8bf6\\\\app\\\\assets\\\\paper-texture.jpg": "https://aka.doubaocdn.com/s/bDCkPoUUIv"
+          "D:\\\\Project\\\\ui-design-runs\\\\ui-redesign-run-20260919-174101-8bf6\\\\app\\\\assets\\\\hero-cover.jpg": "https://aka.doubaocdn.com/s/n01yW0aw3e",
+          "D:\\\\Project\\\\ui-design-runs\\\\ui-redesign-run-20260919-174101-8bf6\\\\app\\\\assets\\\\voice-art.jpg": "https://aka.doubaocdn.com/s/iER3qykVoe",
+          "D:\\\\Project\\\\ui-design-runs\\\\ui-redesign-run-20260919-174101-8bf6\\\\app\\\\assets\\\\manual-art.jpg": "https://aka.doubaocdn.com/s/IOKE2SMs83",
+          "D:\\\\Project\\\\ui-design-runs\\\\ui-redesign-run-20260919-174101-8bf6\\\\app\\\\assets\\\\rhythm-art.jpg": "https://aka.doubaocdn.com/s/YspFTM8Zth",
+          "D:\\\\Project\\\\ui-design-runs\\\\ui-redesign-run-20260919-174101-8bf6\\\\app\\\\assets\\\\paper-texture.jpg": "https://aka.doubaocdn.com/s/bDCkPoUUIv"
         },
         "n": 5
       }
