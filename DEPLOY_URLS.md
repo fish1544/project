@@ -33,5 +33,6 @@
 ## 备注
 
 - 原独立短网址（`fish1544.github.io/frozen-reincarnation/`、`/mini-mart/`、`/personal-sop/`）对应的独立仓库已删除，URL 永久失效；内容已备份进本仓库，以子路径形式重新上线。
+- `personal-user-manual`、`liangli-energy-tracker` 无独立 GitHub 仓库，仅随本仓库（`fish1544/project`）托管，且为全栈工程、不可静态部署。
 - 全部仓库名与路径均为英文，网址无中文编码。
 - 若需给某个作品独立短网址：可复制该作品文件夹为独立仓库并启用 Pages（可选，非必需）。

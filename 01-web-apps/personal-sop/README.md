@@ -16,7 +16,7 @@
 
 ## 🚀 使用
 
-直接打开 [线上版本](https://fish1544.github.io/personal-sop/) 或下载 `index.html` 双击用浏览器打开。
+直接打开 [线上版本](https://fish1544.github.io/project/01-web-apps/personal-sop/) 或下载 `index.html` 双击用浏览器打开。
 
 > 所有数据存于浏览器本地，不同浏览器/设备数据互不相通；换设备用「数据中心 → 导出/导入」迁移。
 
