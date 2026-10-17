@@ -14,7 +14,7 @@ AI 助手在此创建 / 整理文件时会自动读取并遵守 [AGENTS.md](./AG
 | `personal-sop` | 个人工作台 · 学习生活 SOP（GitHub: fish1544/personal-sop，已发布 [线上版](https://fish1544.github.io/personal-sop/)） | 单文件离线个人 SOP：课表/专注/待办/习惯/购物/记账/阅读/考试/健康；隐私已清理，数据存本地 | 本地打开 `product.html`，线上打开链接 |
 | `personal-user-manual` | 个人使用说明书（全栈工程，GitHub: fish1544/personal-user-manual） | 语音记录 + AI 复盘 + 行为计时分析；React 19 + NestJS + PostgreSQL | `npm install` 后 `npm run dev` |
 | `liangli-energy-tracker` | 亮力能量管理 · 减脂健身追踪（GitHub: fish1544/liangli-energy-tracker） | 标准 NestJS + Vite 独立可部署项目：体重/体脂/热量/训练计划追踪 | `npm install` 后 `npm run dev` |
-| `step-sync-web` | 公开刷步网页 | 手机端适配的免费在线刷步网页，自动随机安全步数，朋友打开即用 | 直接打开 `index.html`，部署后可分享链接 |
+| `step-sync-tool` | 刷步工具（已发布 [线上版](https://fish1544.github.io/project/01-web-apps/step-sync-tool/)） | 手机端适配的免费在线刷步工具，自动随机安全步数，朋友打开即用 | 直接打开 `index.html`，或打开线上链接 |
 | `aigc-nav` | AIGC 工具导航（已发布 [线上版](https://fish1544.github.io/project/01-web-apps/aigc-nav/)） | 收录 367 款 AI 工具、16 个分类（写作/图像/视频/办公/设计/对话/音乐/智能体/开发等），复古像素风，Tab 切换、全局搜索、点击直达官网 | 直接打开 `index.html` |
 
 ## 🎮 02-mini-games
