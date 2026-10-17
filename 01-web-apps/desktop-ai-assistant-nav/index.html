@@ -1,210 +1,464 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>桌面 AI 助手导航</title>
+<title>AIGC 工具导航</title>
 <style>
-  * {
-    margin: 0; padding: 0; box-sizing: border-box;
-    font-family: 'Courier New', 'PingFang SC', monospace;
-  }
-  ::placeholder { color: #a9a49a; }
-  body {
-    background: #e8e4d8;
-    background-image:
-      linear-gradient(#d8d4c8 1px, transparent 1px),
-      linear-gradient(90deg, #d8d4c8 1px, transparent 1px);
-    background-size: 8px 8px;
-    min-height: 100vh;
-    padding: 28px 16px 60px;
-    color: #2d2a26;
-  }
-  .wrap { max-width: 1080px; margin: 0 auto; }
-
-  /* 头部 */
-  .header {
-    background: #f8f6f0; border: 2px solid #2d2a26;
-    box-shadow: 6px 6px 0 #2d2a26;
-    padding: 26px 22px; text-align: center; margin-bottom: 22px;
-  }
-  .badge {
-    display: inline-block; font-size: 12px; letter-spacing: 1px;
-    background: #58a950; color: #fff; padding: 4px 12px;
-    border: 2px solid #2d2a26; margin-bottom: 14px;
-    box-shadow: 3px 3px 0 #2d2a26;
-  }
-  h1 { font-size: 26px; font-weight: bold; letter-spacing: 1px; margin-bottom: 8px; }
-  .sub { font-size: 13px; color: #6b6660; line-height: 1.6; }
-  .count { font-size: 12px; color: #6b6660; margin-top: 10px; }
-
-  /* 搜索 */
-  .search-box {
-    position: relative; margin: 16px auto 0; max-width: 520px;
-  }
-  .search-box input {
-    width: 100%; padding: 11px 14px 11px 40px;
-    background: #fff; border: 2px solid #2d2a26; border-radius: 0;
-    font-size: 14px; color: #2d2a26; outline: none;
-    box-shadow: 3px 3px 0 #c9c4b8;
-  }
-  .search-box input:focus {
-    background: #f8ffe8; box-shadow: 3px 3px 0 #58a950;
-  }
-  .search-box svg {
-    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-  }
-
-  /* 标签 */
-  .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
-  .tag {
-    font-size: 12px; padding: 6px 12px; cursor: pointer;
-    background: #fff; border: 2px solid #2d2a26; color: #2d2a26;
-    box-shadow: 2px 2px 0 #c9c4b8; transition: all .1s; user-select: none;
-  }
-  .tag:active { transform: translate(2px,2px); box-shadow: 0 0 0 #c9c4b8; }
-  .tag.active { background: #58a950; color: #fff; box-shadow: 2px 2px 0 #2d2a26; }
-
-  /* 网格 */
-  .grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 18px; margin-top: 22px;
-  }
-  .card {
-    display: flex; flex-direction: column; gap: 12px;
-    background: #f8f6f0; border: 2px solid #2d2a26;
-    box-shadow: 5px 5px 0 #2d2a26;
-    padding: 16px; text-decoration: none; color: #2d2a26;
-    transition: transform .1s, box-shadow .1s;
-  }
-  .card:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #2d2a26; background: #fff; }
-  .card:active { transform: translate(3px,3px); box-shadow: 0 0 0 #2d2a26; }
-  .card-head { display: flex; align-items: center; gap: 12px; }
-  .icon {
-    width: 52px; height: 52px; flex-shrink: 0;
-    background: #fff; border: 2px solid #2d2a26;
-    box-shadow: 3px 3px 0 #c9c4b8; overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .icon img { width: 100%; height: 100%; object-fit: contain; }
-  .name { font-size: 15px; font-weight: bold; line-height: 1.3; }
-  .cat {
-    display: inline-block; font-size: 10px; margin-top: 3px;
-    background: #e8e4d8; border: 1px solid #2d2a26; padding: 1px 6px;
-  }
-  .desc { font-size: 12.5px; line-height: 1.6; color: #5a5650; flex-grow: 1; }
-  .go {
-    font-size: 11px; color: #58a950; font-weight: bold;
-    border-top: 1px dashed #2d2a26; padding-top: 8px;
-  }
-
-  .empty {
-    text-align: center; color: #6b6660; padding: 50px 0;
-    font-size: 14px; display: none;
-  }
-  footer {
-    text-align: center; margin-top: 36px; font-size: 11px; color: #6b6660;
-  }
-  footer a { color: #2d2a26; }
-
-  @media (max-width: 600px) {
-    h1 { font-size: 20px; }
-    .grid { grid-template-columns: 1fr; }
-  }
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Courier New','PingFang SC',monospace; }
+::placeholder { color:#a9a49a; }
+body { background:#e8e4d8; background-image:linear-gradient(#d8d4c8 1px,transparent 1px),linear-gradient(90deg,#d8d4c8 1px,transparent 1px); background-size:8px 8px; min-height:100vh; padding:24px 14px 60px; color:#2d2a26; }
+.wrap { max-width:1200px; margin:0 auto; }
+.header { background:#f8f6f0; border:2px solid #2d2a26; box-shadow:6px 6px 0 #2d2a26; padding:22px 20px; text-align:center; margin-bottom:18px; }
+h1 { font-size:26px; font-weight:bold; letter-spacing:1px; margin-bottom:6px; }
+.sub { font-size:13px; color:#6b6660; }
+.count { font-size:12px; color:#6b6660; margin-top:8px; }
+.search-box { position:relative; max-width:520px; margin:14px auto 0; }
+.search-box input { width:100%; padding:11px 14px 11px 40px; background:#fff; border:2px solid #2d2a26; border-radius:0; font-size:14px; color:#2d2a26; outline:none; box-shadow:3px 3px 0 #c9c4b8; }
+.search-box input:focus { background:#f8ffe8; box-shadow:3px 3px 0 #58a950; }
+.search-box svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); }
+.tabs { display:flex; gap:6px; overflow-x:auto; padding:4px 2px 10px; margin-top:14px; flex-wrap:nowrap; }
+.tabs::-webkit-scrollbar { height:6px; }
+.tabs::-webkit-scrollbar-thumb { background:#2d2a26; }
+.tab { flex-shrink:0; font-size:12px; padding:7px 14px; cursor:pointer; background:#fff; border:2px solid #2d2a26; color:#2d2a26; box-shadow:2px 2px 0 #c9c4b8; transition:all .1s; white-space:nowrap; }
+.tab:active { transform:translate(2px,2px); box-shadow:0 0 0 #c9c4b8; }
+.tab.active { background:#58a950; color:#fff; box-shadow:2px 2px 0 #2d2a26; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-top:18px; }
+.card { display:flex; flex-direction:column; gap:10px; background:#f8f6f0; border:2px solid #2d2a26; box-shadow:5px 5px 0 #2d2a26; padding:14px; text-decoration:none; color:#2d2a26; transition:transform .1s,box-shadow .1s; }
+.card:hover { transform:translate(-2px,-2px); box-shadow:7px 7px 0 #2d2a26; background:#fff; }
+.card:active { transform:translate(3px,3px); box-shadow:0 0 0 #2d2a26; }
+.card-head { display:flex; align-items:center; gap:10px; }
+.icon { width:46px; height:46px; flex-shrink:0; background:#fff; border:2px solid #2d2a26; box-shadow:3px 3px 0 #c9c4b8; overflow:hidden; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:18px; color:#58a950; }
+.icon img { width:100%; height:100%; object-fit:contain; }
+.name { font-size:14px; font-weight:bold; line-height:1.3; }
+.desc { font-size:12px; line-height:1.55; color:#5a5650; flex-grow:1; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.empty { text-align:center; color:#6b6660; padding:50px 0; font-size:14px; display:none; }
+footer { text-align:center; margin-top:40px; font-size:11px; color:#6b6660; }
+@media(max-width:600px) { h1{font-size:20px;} .grid{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="header">
-    <h1>桌面 AI 助手导航</h1>
-    <p class="sub">主流桌面端 AI Agent 与智能办公助手合集</p>
+    <h1>AIGC 工具导航</h1>
+    <p class="sub">写作 · 图像 · 视频 · 办公 · 设计 · 对话 · 音乐 · 智能体 · 开发</p>
     <div class="count" id="count"></div>
     <div class="search-box">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d2a26" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       <input type="text" id="search" placeholder="搜索工具名称或描述…" autocomplete="off">
     </div>
-    <div class="tags" id="tags"></div>
+    <div class="tabs" id="tabs"></div>
   </div>
-
   <div class="grid" id="grid"></div>
-  <div class="empty" id="empty">没有找到匹配的工具，换个关键词试试。</div>
-
-  <footer>
-    桌面 AI 助手导航 · 共 26 款工具 · 点击卡片前往官网
-  </footer>
+  <div class="empty" id="empty">没有找到匹配的工具。</div>
+  <footer>AIGC 工具导航 · 精选 367 款 AI 工具</footer>
 </div>
-
 <script>
-const tools = [
-  { n:"豆包工作", c:"字节跳动", d:"豆包工作任务改版，面向办公场景的 AI 任务执行助手。", i:"assets/doubao-work.jpg", t:"大厂", l:"https://www.doubao.com/" },
-  { n:"WorkBuddy", c:"腾讯", d:"腾讯出品的全场景 AI 办公工作台，说出要求即开始执行。", i:"assets/workbuddy.jpg", t:"大厂", l:"https://www.workbuddy.cn/" },
-  { n:"Loomy AI工作搭子", c:"科大讯飞", d:"讯飞桌面级 AI 办公助理，低门槛、高安全、强适配、主动协作。", i:"assets/loomy.jpg", t:"办公", l:"https://loomy.xunfei.cn/" },
-  { n:"ArkClaw", c:"火山引擎", d:"火山引擎推出的 7×24 在线专属智能伙伴。", i:"assets/arkclaw.jpg", t:"大厂", l:"https://www.volcengine.com/" },
-  { n:"DuMate", c:"OpenClaw 框架", d:"国产企业级满血版 OpenClaw（龙虾）AI 智能体框架。", i:"assets/dumate.jpg", t:"开源", l:"https://openclaw.ai/" },
-  { n:"千问办公", c:"阿里巴巴", d:"专业级 AI 协同办公平台，理解、拆解并执行复杂任务的 AI Agent 系统。", i:"assets/qianwen.jpg", t:"大厂", l:"https://www.tongyi.com/" },
-  { n:"灵犀", c:"金山办公", d:"WPS 推出的个人办公智能体，自主规划步骤、调用工具，直接产出 Word/Excel/PPT 成品。", i:"assets/lingxi.jpg", t:"办公", l:"https://lingxi.cn/" },
-  { n:"MiniMax Hub", c:"MiniMax", d:"你的 AI 创作工作室，自动调度图像、视频、配音、剪辑等多种模型。", i:"assets/minimax-hub.jpg", t:"创作", l:"https://www.minimaxi.com/" },
-  { n:"妙手 CatPaw", c:"美团", d:"美团全场景 AI Agent 平台，一句话见成果，搭载 LongCat 2.0。", i:"assets/catpaw.jpg", t:"大厂", l:"https://catpaw.meituan.com/" },
-  { n:"纳米 Work", c:"360", d:"360 推出的企业智能体工作平台，把 AI 从回答问题变为交付成果的数字员工团队。", i:"assets/nami-work.jpg", t:"办公", l:"https://work.n.cn/" },
-  { n:"QoderWork", c:"阿里巴巴", d:"将 Qoder 的 Agent 能力从代码领域扩展到日常工作场景，描述需求、自动执行、直接交付。", i:"assets/qoder-work.jpg", t:"办公", l:"https://qoder.com.cn/qoderwork" },
-  { n:"Marvis", c:"腾讯", d:"腾讯应用宝团队研发的操作系统级 AI 管家，24 小时在线，本地大模型文件零上传。", i:"assets/marvis.jpg", t:"陪伴", l:"https://marvis.qq.com/" },
-  { n:"讯飞星辰 AstronClaw", c:"科大讯飞", d:"讯飞星辰 Agent 平台 AstronClaw。", i:"assets/astronclaw.jpg", t:"大厂", l:"https://xingchen.xfyun.cn/" },
-  { n:"LobsterAI 有道龙虾", c:"网易有道", d:"网易有道推出的国内首款 MIT 开源本土化 OpenClaw 智能体产品。", i:"assets/lobster-ai.jpg", t:"开源", l:"https://www.youdao.com/" },
-  { n:"Kimi Work", c:"月之暗面", d:"Kimi 官方桌面客户端，面向知识工作者的本地智能体，支持浏览器自动化与全天候任务。", i:"assets/kimi-work.jpg", t:"大厂", l:"https://www.kimi.com/products/kimi-work" },
-  { n:"KroWork", c:"无代码", d:"从聊天到软件，自然语言对话即可将重复工作流程转化为桌面应用。", i:"assets/kro-work.jpg", t:"无代码", l:"https://www.kro.work/" },
-  { n:"星辰超级智能体", c:"科大讯飞", d:"定位为 AI 办公搭子，本地化部署和深度系统集成，自动化处理办公任务。", i:"assets/star-super.jpg", t:"办公", l:"https://xingchen.xfyun.cn/" },
-  { n:"AutoClaw", c:"智谱 AI", d:"国内首个真一键安装本地版 OpenClaw，主打本地执行、飞书集成、全模型兼容。", i:"assets/autoclaw.jpg", t:"开源", l:"https://www.zhipuai.cn/" },
-  { n:"Agnes AI", c:"多智能体", d:"多智能体协同架构，涵盖研究、设计、演示与编程的一体化工作流。", i:"assets/agnes-ai.jpg", t:"办公", l:"https://agnes-ai.com/" },
-  { n:"QClaw", c:"腾讯", d:"腾讯电脑管家本地版 OpenClaw，将 AI 执行能力与微信/QQ 社交入口深度融合。", i:"assets/qclaw.jpg", t:"大厂", l:"https://qclaw.qq.com/" },
-  { n:"阿里悟空", c:"阿里巴巴", d:"钉钉原生打造的企业级 AI Agent 平台，让 AI 从会回答进化到能交付。", i:"assets/ali-wukong.jpg", t:"大厂", l:"https://wukong.dingtalk.com/" },
-  { n:"JVS Claw", c:"阿里云", d:"阿里云无影推出的云原生 OpenClaw 智能体平台，零门槛接入、云上安全养虾。", i:"assets/jvs-claw.jpg", t:"大厂", l:"https://jvsclaw.aliyun.com/" },
-  { n:"元气 AI Bot", c:"国产 Clawd", d:"国产 Clawdbot，一键安装免费使用，一句话指令自动操作电脑。", i:"assets/yuanqi.jpg", t:"陪伴", l:"https://yuanqiai.net/" },
-  { n:"阶跃 AI 桌面伙伴", c:"阶跃星辰", d:"全场景自动化、本地化安全、免费开放，接入 5000+ 技能的终端 Agent。", i:"assets/stepfun.jpg", t:"办公", l:"https://www.stepfun.com/download" },
-  { n:"墨见", c:"墨刀", d:"墨刀推出的一人公司 AI 智能体，集结产品、架构、设计虚拟团队，从原型到代码落地。", i:"assets/mojian.jpg", t:"办公", l:"https://mojian.cn/" },
-  { n:"ToDesk AI", c:"ToDesk", d:"集成在 ToDesk 中的云端 AI 助手，自然语言指挥所有设备自动完成办公任务。", i:"assets/todesk.jpg", t:"办公", l:"https://www.todesk.com/" },
+var tools = [
+  {c:"AIGC工具推荐",n:"豆包AI",d:"豆包工作任务改版，新用户免费领30天会员",i:"assets/icon_001.jpg",l:"https://go.aigc.cn"},
+  {c:"AIGC工具推荐",n:"X·FUN",d:"AI 包装、字体、logo生成",i:"assets/icon_002.jpg",l:"https://xfun.design/?utm=aigc"},
+  {c:"AIGC工具推荐",n:"MonkeyCode智能开发平台",d:"无需安装，模型免费、云端开发环境免费。无论是实现业务需求、做个工具、数据分析，还是快速做个小游戏，都能一句话搞定。",i:"assets/icon_003.jpg",l:"https://monkeycode-ai.com/?ic=019be1ce-381a-757a-86f4-9623cc941538"},
+  {c:"AIGC工具推荐",n:"小云雀AI视频",d:"小云雀Seedance2.5 正式上线",i:"assets/icon_004.jpg",l:"https://dis.chatdesks.cn/chatdesk/xyqaigc.html"},
+  {c:"AIGC工具推荐",n:"AiPPT &#8211; 海量模板",d:"全智能Ai一键生成高质量PPT",i:"assets/icon_005.jpg",l:"https://www.aippt.cn/landingpage/newsem/?utm_type=Navweb&amp;utm_source=aigc&amp;utm_page=aippt&amp;utm_plan=aippt&amp;utm_unit=AIPPT&amp;utm_keyword=40518531"},
+  {c:"AIGC工具推荐",n:"豆包工作",d:"豆包工作任务改版，新用户免费领30天会员",i:"assets/icon_006.jpg",l:"https://dis.csqixiang.cn/dbwork?channel=aigc"},
+  {c:"AIGC工具推荐",n:"可灵AI视频",d:"最新可灵4.0模型，可灵AI通过先进的AI技术，为用户提供了一个能够将创意快速转化为视频内容的平台。",i:"assets/icon_007.jpg",l:"https://app.klingai.com/cn?utm_source=AIGC&amp;utm_medium=PCcpc&amp;utm_campaign=Wangzhan&amp;utm_content=Shipingongju&amp;utm_term=Shipingongju"},
+  {c:"AIGC工具推荐",n:"即梦AI-Seedance2.5",d:"SeeDance2.5 全球发布",i:"assets/icon_008.jpg",l:"https://jimeng.jianying.com/ai-tool/home/?utm_medium=aitools&amp;utm_source=aigc&amp;utm_campaign=null&amp;utm_content=hw_jm_aigc"},
+  {c:"AIGC工具推荐",n:"updream",d:"专业级一站式AI视频创作平台，面向专业内容创作者，主打长记忆agent、技能库、无界画布三大核心能力，定位为创作工作台而非单纯生成器，区别于轻量化「一键出片」工具，更适合高频创作、团队协作、风格统一的专业场景。",i:"assets/icon_009.jpg",l:"https://updream.cgref.cn/s/dqndm0wn2z"},
+  {c:"AIGC工具推荐",n:"TRAE-AI编程",d:"新用户赠4500积分，字节旗下Al 编程工具",i:"assets/icon_010.jpg",l:"https://www.trae.cn/sem/?utm_source=advertising&amp;utm_medium=aigc.cn_ug_cpa&amp;utm_term=hw_trae_aigc"},
+  {c:"AIGC工具推荐",n:"Seko AI视频",d:"首个“创编一体”的AI视频创作智能体",i:"assets/icon_011.jpg",l:"https://seko.cgref.cn/s/59ngw7jer2"},
+  {c:"AIGC工具推荐",n:"妙呀",d:"一站式生成潮玩IP世界观、角色三视图及商品效果图",i:"assets/icon_012.jpg",l:"https://www.miaoyaai.cn/create?sqm=miaoya.cpa.aigc.pc"},
+  {c:"AIGC工具推荐",n:"DuMate百度搭子",d:"国产桌面 AI 智能体功能架构与场景",i:"assets/icon_013.jpg",l:"https://dumate.cn/download?track=1063479t&amp;sub_track=02cE&amp;dutoken=3.s%3A%2F%C2%A5%5EYrSKf2Qacn%5E%25"},
+  {c:"AIGC工具推荐",n:"UP求职 &#8211; 发现职位",d:"专业的求职顾问 AI，帮你搞定写简历、找职位、面试全流程，一路陪你拿 Offer",i:"assets/icon_014.jpg",l:"https://upcv.tech/invite/INV1CHOLBT6"},
+  {c:"AIGC工具推荐",n:"SkildArt AI视觉创作",d:"一站式 AI 视觉创作平台，为商业营销而生",i:"assets/icon_015.jpg",l:"https://skildart.cn?channel=v7BiKiJHv1x3"},
+  {c:"AIGC写作平台",n:"蛙蛙写作",d:"AI写小说，一键成文，AI漫剧",i:"assets/icon_016.jpg",l:"https://wawawriter.com/app/?utm_source=aigc1"},
+  {c:"AIGC写作平台",n:"豆包AI写作助手",d:"一键提取精华，秒懂全文大意",i:"assets/icon_017.jpg",l:"https://go.aigc.cn"},
+  {c:"AIGC写作平台",n:"千问-阿里AI助手",d:"Qwen最新模型推荐-通义千问",i:"assets/icon_018.jpg",l:"https://dis.chatdesks.cn/chatdesk/qwaigc.html"},
+  {c:"AIGC写作平台",n:"稿定AI文案",d:"满血版DeepSeek驱动，将「设计」从「专业技能」转化为「语言表达」—— 无需掌握 PS、AI，只需告诉 AI「我想要什么」，就能获得「可用、可改、可商用」的视觉内容。",i:"assets/icon_019.jpg",l:"https://www.gaoding.com/utms/5d3a5454b07a4fe6baba040a748d398d"},
+  {c:"AIGC写作平台",n:"讯飞星火",d:"深度推理能力全新升级，全面对标OpenAI o1",i:"assets/icon_020.jpg",l:"https://xinghuo.xfyun.cn/desk/?ch=xfxh-aigjtf02"},
+  {c:"AIGC写作平台",n:"笔灵AI写作",d:"全能型AI写作工具！3分钟生成论文初稿，一键降重降AI，自动生成答辩PPT和自述稿；写小说可拆解爆款、生成大纲、扩写剧情，减少卡文。另有600+专业写作模板，覆盖多行业写作需求，从论文到网文，起稿、扩写、修改都能用。",i:"assets/icon_021.jpg",l:"https://ibiling.cn/?from=aigc.cn"},
+  {c:"AIGC写作平台",n:"FeelFish写小说",d:"专为小说创作者打造的 AI 写作 PC 客户端软件",i:"assets/icon_022.jpg",l:"https://www.feelfish.com/?fr=aigccn"},
+  {c:"AIGC写作平台",n:"AI论文 &#8211; 高质量",d:"10秒大纲，3分钟万字论文，66论文网是面向720+学科专业的论文写作平台，支持毕业论文、期刊论文等。提供开题报告、任务书，10秒生成千字大纲，3分钟极速生成万字论文，知网论文查重率稳定在10%左右。",i:"assets/icon_023.jpg",l:"https://www.66paper.cn/AI_A13D921"},
+  {c:"AIGC写作平台",n:"千笔AI论文",d:"免费送万字写论文，降重降AI兑换码",i:"assets/icon_024.jpg",l:"https://www.qianbixiezuo.com/?pic=mnpN"},
+  {c:"AIGC写作平台",n:"Aibiye &#8211; Ai论文生成",d:"利用先进的Multimodal+Global Thought Chain语言模型来帮助用户生成连贯、一致和逻辑性强的长文本技术文档",i:"assets/icon_025.jpg",l:"https://www.aibiye.com/?code=nKMqXm"},
+  {c:"AIGC写作平台",n:"PaperFake AI写论文",d:"一键AI生成3万字论文，查重率、aigc率双重担保",i:"assets/icon_026.jpg",l:"https://paperfake.cn/?q=aigc"},
+  {c:"AIGC写作平台",n:"切问学术 &#8211; 学术Codex",d:"复旦自研AI Agent，0幻觉3.6亿真实文献",i:"assets/icon_027.jpg",l:"https://qiewenpaper.com/zh?utm_source=aigc.cn"},
+  {c:"AIGC写作平台",n:"讯飞绘文",d:"选题、配图、成文，一站式创作，让内容运营更高效",i:"assets/icon_028.jpg",l:"https://turbodesk.cgref.cn/s/20ep6ldnw1"},
+  {c:"AIGC写作平台",n:"万能小in一键论文",d:"3分钟4万字130+应用，只需标题，快速生成文献综述、开题报告、PPT、工作总结等 ",i:"assets/icon_029.jpg",l:"https://xiaoin.com.cn/home/creation/submission-list?sharerUserId=1749323819392270338"},
+  {c:"AIGC写作平台",n:"小橡皮-AI内容一键变人味",d:"一键去AI味，将机器味重的内容改得更有活人感，防止因为 AI 内容被平台打上 AI 标签，以及限流。发布前检测敏感表达与违禁词，减少内容违规和限流风险发布。",i:"assets/icon_030.jpg",l:"https://xiangpiai.cn/workspace?from=aigcxiangpi"},
+  {c:"AIGC写作平台",n:"Paperpal",d:"英文论文写作助手免费写作及润色AI工具，兼备翻译及投稿检查等强大功能，大幅节省写作时长",i:"assets/icon_031.jpg",l:"https://paperpal.cn/?utm_source=aigc&amp;utm_medium=Banner&amp;utm_campaign=Banner"},
+  {c:"AIGC写作平台",n:"Medpeer 自然科学基金",d:"75万 +获批项目数据，智能析热点，一键生成高质量申请书。",i:"assets/icon_032.jpg",l:"https://product.medpeer.cn/product/index/productDetails?page=fund&amp;P_S_C=aigc"},
+  {c:"AIGC写作平台",n:"万彩AI",d:"提供AI智能写作支持，还集成了AI换脸、照片数字人制作和AI短视频制作等AI生成内容功能，极大地扩展了AI的创作领域。",i:"assets/icon_033.jpg",l:"https://ai.kezhan365.com/inviteCode/n6AW84"},
+  {c:"AIGC写作平台",n:"小鱼AI写作",d:"满足自媒体人和办公人写作创作的在线智能AI写作平台，可以用AI自动生成高质量原创内容，内容创作覆盖多种类型，满足不同场景、人群的AI创作需求以及提供个性化的自定",i:"assets/icon_034.jpg",l:"https://www.xiaoyuxiezuo.com/AI_A13d921"},
+  {c:"AIGC写作平台",n:"慧言AI",d:"一站式AI解决方案，全能聚合平台",i:"assets/icon_035.jpg",l:"https://l.huiyan-ai.cn/s/AM5JOF"},
+  {c:"AIGC写作平台",n:"摄图AI写作",d:"超会言AI提供免费的AI文章写作、论文生成、学术报告撰写，只需输入主题，即可获得高质量的文章，自动化内容创作，为您带来超多的创作灵感。",i:"assets/icon_036.jpg",l:"https://ai.699pic.com/superai/template?from=326"},
+  {c:"AIGC写作平台",n:"AI内容管家",d:"AI驱动的SEO挖词、写作、发布工具",i:"assets/icon_037.jpg",l:"https://guanjia.seowhy.com/?o3lzkd"},
+  {c:"AIGC写作平台",n:"橙篇",d:"写长文不用愁，我帮你一键成篇",i:"assets/icon_038.jpg",l:"https://cp.baidu.com/#"},
+  {c:"AIGC写作平台",n:"Postme",d:"快速生成高质量外贸营销文案",i:"assets/icon_039.jpg",l:"https://www.postme.cn"},
+  {c:"AIGC图像生成",n:"小云雀AI生图",d:"依托于豆包大模型及自研的Seedream 5.0图像生成模型，旨在通过零门槛的对话式交互，帮助用户轻松、高效地完成各类图片创作与编辑。",i:"assets/icon_040.jpg",l:"https://dis.chatdesks.cn/chatdesk/xyqaigc.html"},
+  {c:"AIGC图像生成",n:"即梦AI图片生成",d:"SeeDance2.5最新模型，强化一致性、风格与图文响应",i:"assets/icon_041.jpg",l:"https://jimeng.jianying.com/ai-tool/home/?utm_medium=aitools&amp;utm_source=aigc&amp;utm_campaign=null&amp;utm_content=hw_jm_aigc"},
+  {c:"AIGC图像生成",n:"妙呀AI",d:"专注于潮玩IP设计的AI创作平台。它旨在通过AI技术，帮助用户快速生成具有潮玩风格的IP形象和相关视觉内容。",i:"assets/icon_042.jpg",l:"https://www.miaoyaai.cn/create?sqm=miaoya.cpa.aigc.pc"},
+  {c:"AIGC图像生成",n:"LiblibAI·哩布哩布AI",d:"一键使用顶尖图片生成模型",i:"assets/icon_043.jpg",l:"https://liblib.cgref.cn/s/omklvdzn4d"},
+  {c:"AIGC图像生成",n:"稿定AI-文生图",d:"AI绘图、AI设计、AI素材、AI图片处理等一站式免费AI创作平台！’",i:"assets/icon_044.jpg",l:"https://www.gaoding.art/utms/c2dfc8dabc1b4189a1d354e2c4e6486d"},
+  {c:"AIGC图像生成",n:"可图AI绘画",d:"可灵AI旗下专业图片生成工具，面向专业创作者与普通用户的多模态图像创作引擎，支持从文本生成图像、图像编辑、风格转绘等全链路创作需求。",i:"assets/icon_045.jpg",l:"https://app.klingai.com/cn/text-to-image/new?utm_source=AIGC&amp;utm_medium=PCcpc&amp;utm_campaign=Wangzhan&amp;utm_content=Huihuashengcheng&amp;utm_term=Huihuashengcheng"},
+  {c:"AIGC图像生成",n:"艾绘AI",d:"一站式AI绘本创作平台",i:"assets/icon_046.jpg",l:"https://www.aiyou.art/dashboard/#/?code=CH203809"},
+  {c:"AIGC图像生成",n:"LinkFox AI",d:"LinkFox AI 支持AI绘图、以图生图、商品图换背景、一键抠图等操作，让卖家制作商品主图、A+图等图片先人一步。同时，还提供AI模特、相似图裂变等功能，帮助卖家避免侵权，有效刺激消费者下单。",i:"assets/icon_047.jpg",l:"https://ai.linkfox.com/?channel=Becca_AIGC"},
+  {c:"AIGC图像生成",n:"MX绘画中文站",d:"最新Nano Banana模型，MX绘画中文站，覆盖文字生图、视频生图、数字人三大核心创作场景，凭借多元艺术风格与高精度渲染能力，构建高效 AI 协作工作流，重塑数字艺术生产范式。",i:"assets/icon_048.jpg",l:"https://www.mxai.cn/home/#?from=invite&amp;invite_id=9580359"},
+  {c:"AIGC图像生成",n:"图星人AI生图",d:"领先的“AI生成+免费专业图库”混视觉平台",i:"assets/icon_049.jpg",l:"https://www.tuxingren.com/?utm_source=360c&amp;utm_term=26835"},
+  {c:"AIGC图像生成",n:"阿贝AI绘画",d:"用AI创作绘本，让孩子的创意有更多表现形式，让天马行空的想法更快实现；家长也可以把想讲的话在10分钟之内创作出一个绘本故事，讲给孩子听，让亲子间的互动更加紧密，更为和谐。",i:"assets/icon_050.jpg",l:"https://abeiai.com/?r=251"},
+  {c:"AIGC图像生成",n:"堆友Agent-AI生图",d:"阿里专家设计师skill助力AI设计，让你拥有24小时待命的AI设计部，覆盖品牌IP、平面海报、电商营销、文旅融媒体、运营汇报、社交娱乐等多个需求场景。",i:"assets/icon_051.jpg",l:"https://d.design"},
+  {c:"AIGC图像生成",n:"摄图AI画图",d:"全方位AI图像工具服务，涵盖 AI 海报设计、文生图创作、局部重绘优化、AI 图像消除、支持智能抠图一键去除背景、图像变清晰修复模糊画质、无损放大提升图片分辨率，更能实现黑白照片转彩色等高效处理。用摄图网AI工具，轻松搞定图像创作。",i:"assets/icon_052.jpg",l:"https://ai.699pic.com/front/ai/assistant?from=326"},
+  {c:"AIGC图像生成",n:"Openflow",d:"OpenFlow是一个多功能的AI平台，它通过提供行业特定的工作流优化、内容创作支持、社区管理和变现途径，为个体用户提供了一个全面的解决方案。",i:"assets/icon_053.jpg",l:"https://www.openflowai.net/midjourney?puid=6442"},
+  {c:"AIGC图像生成",n:"绘蛙AI-创意文生图",d:"帮助用户快速生成商业摄影图片和吸引人的文案。它专为满足小红书、电商和跨境电商等不同平台的内容创作需求而设计。",i:"assets/icon_054.jpg",l:"https://www.ihuiwa.com/workspace/ai-image/creative-scene"},
+  {c:"AIGC图像生成",n:"千问创作平台",d:"深度融合了阿里云基础设施，旨在为个人创作者、开发者及企业提供安全、高效、低门槛的智能化服务，推动数字内容创作行业的智能化升级。",i:"assets/icon_055.jpg",l:"https://create.qianwen.com"},
+  {c:"AIGC图像生成",n:"包图 · AI生图",d:"包图AI文生图是一个高效的AI图像生成工具，它通过理解用户的文字描述来创造出相应的视觉内容，极大地提高了设计和创意工作的效率。",i:"assets/icon_056.jpg",l:"https://ibaotu.com/?m=AigcTi&amp;spm=aigcai"},
+  {c:"AIGC图像生成",n:"Holopix AI",d:"为个人开发者、游戏美术工作者等用户群体提供了高效、便捷的素材创作解决方案。",i:"assets/icon_057.jpg",l:"https://holopix.cn?source=47ed9cb940a3d267c4a4c9ac55a283d4"},
+  {c:"AIGC图像生成",n:"吐司AI绘画",d:"吐司AI，免费在线生图的 AI 模型分享社区",i:"assets/icon_058.jpg",l:"https://tusi.cn/?utm_source=aigccn&amp;source_id=aigccn"},
+  {c:"AIGC图像生成",n:"触手AI绘画",d:"触手AI绘画通过提供多样化的AI辅助创作功能，为插画、漫画、设计等领域的专业人士提供了一个强大的数字创作平台。",i:"assets/icon_059.jpg",l:"https://acgnai.art/login?inviteCode=221141&amp;channel=channel_invite"},
+  {c:"AIGC图像生成",n:"RunningHub",d:"预装 “最新最全” 的 ComfyUI 节点，每日更新，无需担心 “报红”（节点缺失或错误），用户评价 “节点齐全，工作流运行顺畅”",i:"assets/icon_060.jpg",l:"https://www.runninghub.cn"},
+  {c:"AIGC图像生成",n:"莓图AI",d:"一款在线AI修图工具，中文指令一键修图。支持电商设计、虚拟试衣、照片修复、背景处理、无痕改字、高清放大。",i:"assets/icon_061.jpg",l:"https://ai.iiit.cn"},
+  {c:"AIGC图像生成",n:"海艺AI-SeaArt AI",d:"海艺SeaArt-AI免费易用的海艺AI绘画工具，一个高效易用的AIGC绘图工具：SeaArt让你无需专业技能，短时间内成为艺术家。借助强大的渲染引擎和个性化混合推荐系统，高质量创作触手可得。",i:"assets/icon_062.jpg",l:"https://www.haiyi.art"},
+  {c:"AIGC图像生成",n:"Canva可画AI生图",d:"输入包含主题、主体、颜色等内容的详细描述，AI 就能依据文字提示生成对应的图片或插画，如输入 “一个穿着汉服在樱花树下跳舞的少女”，就能得到相关画面。",i:"assets/icon_063.jpg",l:"https://www.canva.cn/image-generator"},
+  {c:"AIGC视频创作",n:"小云雀AI视频",d:"小云雀Seedance2.5 正式上线",i:"assets/icon_064.jpg",l:"https://dis.chatdesks.cn/chatdesk/xyqaigc.html"},
+  {c:"AIGC视频创作",n:"可灵AI电影级视频创作",d:"166灵感值和体验会员专属权益，快手推出的一款最新的视频生成工具，可灵AI通过先进的AI技术，为用户提供了一个能够将创意快速转化为视频内容的平台。",i:"assets/icon_065.jpg",l:"https://app.klingai.com/cn?utm_source=AIGC&amp;utm_medium=PCcpc&amp;utm_campaign=Wangzhan&amp;utm_content=Shipingongju&amp;utm_term=Shipingongju"},
+  {c:"AIGC视频创作",n:"即梦AI视频生成",d:"SeeDance2.5全球发布，支持多镜头和运镜",i:"assets/icon_066.jpg",l:"https://jimeng.jianying.com/ai-tool/home/?utm_medium=aitools&amp;utm_source=aigc&amp;utm_campaign=null&amp;utm_content=hw_jm_aigc"},
+  {c:"AIGC视频创作",n:"updream",d:"专业级一站式AI视频创作平台，面向专业内容创作者，主打长记忆agent、技能库、无界画布三大核心能力，定位为创作工作台而非单纯生成器，区别于轻量化「一键出片」工具，更适合高频创作、团队协作、风格统一的专业场景。",i:"assets/icon_067.jpg",l:"https://updream.cgref.cn/s/dqndm0wn2z"},
+  {c:"AIGC视频创作",n:"Liblib AI &#8211; 视频",d:"一键使用顶尖视频生成模型",i:"assets/icon_068.jpg",l:"https://liblib.cgref.cn/s/omklvdzn4d"},
+  {c:"AIGC视频创作",n:"LibTV &#8211; SeeDance2.0",d:"从脚本到成片全闭环，LLM、音视频 SOTA 模型全驱动，AI 拉片、剧情推演、多帧生成一气呵成！ 专业镜头控制，视频创作更高效!",i:"assets/icon_069.jpg",l:"https://libtv.cgref.cn/s/54onyomkjx"},
+  {c:"AIGC视频创作",n:"商汤Seko",d:"帮助创作者和小型工作室实现“一人剧组”的工业化生产模式。",i:"assets/icon_070.jpg",l:"https://seko.cgref.cn/s/59ngw7jer2"},
+  {c:"AIGC视频创作",n:"PixTV",d:"一站式AI短剧、漫剧、创意视频、TVC创作平台，汇聚全球顶尖模型，官方原生接口，拒绝掺水，让创作更安心。",i:"assets/icon_071.jpg",l:"https://pixtv.cgref.cn/aigc"},
+  {c:"AIGC视频创作",n:"JoyAI 网页版",d:"AIGC视频创作工具，支持图片生成、视频生成、数字人生成等",i:"assets/icon_072.jpg",l:"https://joyai.com/?c=uiuk7marvk"},
+  {c:"AIGC视频创作",n:"白日梦AI",d:"领先AI创作平台，可生成最长50分钟的视频。人物一致性强，支持最新的Nano Banana。",i:"assets/icon_073.jpg",l:"https://aibrm.cgref.cn/s/7xpn892ezw"},
+  {c:"AIGC视频创作",n:"堆友AI视频",d:"阿里官方HappyHorse、wan系列、Seedance2.0等最新顶流模型集结，满足电商、漫剧、短剧、广告TVC、文旅需求",i:"assets/icon_074.jpg",l:"https://d.design"},
+  {c:"AIGC视频创作",n:"AniShort-AI影视剧",d:"为AI影视剧协作而生，重构AI影视剧生产流程",i:"assets/icon_075.jpg",l:"https://app.anishort.cn"},
+  {c:"AIGC视频创作",n:"造剧",d:"一站式AI短剧制作、AI漫剧创作与AI视频制作平台",i:"assets/icon_076.jpg",l:"https://zaoju.art"},
+  {c:"AIGC视频创作",n:"有言-一键生成视频",d:"一站式AI视频创作，1200+免费3D数字人。",i:"assets/icon_077.jpg",l:"https://www.youyan3d.com/login/?utm_source=zhanwaidaoliu&amp;utm_campaign=zwj&amp;utm_content=zmthome&amp;from=aigc"},
+  {c:"AIGC视频创作",n:"讯飞智作-创意视频",d:"语音合成、人脸建模、唇形预测、图形处理等，为用户提供的一个音视频生产平台。它旨在通过AI技术解决用户在音视频制作中遇到的主播难找、成本高、生产效率低等问题，使内容创作更加灵活、高效和便捷。",i:"assets/icon_078.jpg",l:"https://xfzhizuo.cgref.cn/s/1le06vweoq"},
+  {c:"AIGC视频创作",n:"绘蛙AI视频",d:"阿里推出的AI视频生成工具，支持图转视频，多图成片等功能，一键打造高转化的口播和商品营销视频，服务于电商与内容创作者。",i:"assets/icon_079.jpg",l:"https://www.ihuiwa.com/workspace/ai-video/multi-img"},
+  {c:"AIGC视频创作",n:"闪剪_AI视频剪辑",d:"闪剪是一款AI智能视频剪辑工具，自2021年起专注于数字人领域，并在2022年推出了数字人短视频创作平台。该平台提供SAAS级企业应用的数字产品，并打造了APP和网页两种产品形态。",i:"assets/icon_080.jpg",l:"https://shanjian.tv/?inviteId=64b78e68072504003a4143c0"},
+  {c:"AIGC视频创作",n:"WorkRally",d:"为漫剧、影视及动画制作提供从剧本解析、分镜生成、内容生产到资产管理与团队协作的全链路一体化生产系统。",i:"assets/icon_081.jpg",l:"https://workrally.qq.com"},
+  {c:"AIGC视频创作",n:"WonderClip 万镜一刻",d:"以“万镜生辉·一刻成片”为核心理念，旨在通过智能技术重构影视创作流程，帮助创作者和企业实现从创意到成片的高效量产。",i:"assets/icon_082.jpg",l:"https://www.yikeai.com/#/home"},
+  {c:"AIGC视频创作",n:"OiiOii",d:"专注于动画与视频创作的专业 AI Agent 工具",i:"assets/icon_083.jpg",l:"https://www.oiioii.tv/login"},
+  {c:"AIGC视频创作",n:"海螺AI视频",d:"多功能的AI助手，通过提供视频创作、音乐创作、图像识别和文本写作等功能，帮助用户提升工作和学习的效率。它的智能化和高效率的特点，使其成为提升生产力的有力工具。",i:"assets/icon_084.jpg",l:"https://hailuoai.com/video"},
+  {c:"AIGC视频创作",n:"Pavo",d:"Agnes AI 推出的一款多模态视觉创作引擎，专注于为创作者提供高质量的图像与视频生成服务。",i:"assets/icon_085.jpg",l:"https://app.pavo-ai.work"},
+  {c:"AIGC视频创作",n:"Runway",d:"Runway 拥有 30 多种 AI Magic Tools、实时视频编辑、协作等功能，是您的下一代内容创作套件。就在您的浏览器中。",i:"assets/icon_086.jpg",l:"https://runwayml.com"},
+  {c:"AIGC视频创作",n:"剪映CapCut",d:"接入DeepSeek,AI文案创作,AI音乐创作,AI切片,短视频创作，就用剪映！",i:"assets/icon_087.jpg",l:"https://lf3-package.vlabstatic.com/obj/faceu-packages/Jianying_8_6_0_13206_jianyingpro_aigc_creatortool.exe"},
+  {c:"AIGC智慧办公",n:"博思AIPPT",d:"AI一键生成PPT，就用博思AIPPT！新一代的在线AI生成PPT软件，提供多种快速制作PPT的方式，包括主题生成PPT、文本生成PPT、导入Word/PDF/TXT/Markdown文件生成PPT等，内置海量精美PPT模板，涵盖商务、教育、科技等不同风格，随心使用不重样，同时针对每个页面提供多种版式，一键自适应切换，完美适配各种办公场景。",i:"assets/icon_088.jpg",l:"https://pptgo.cn?utm_source=referrals&amp;utm_content=aigccn&amp;_channel_track_key=sqxy7Hhz"},
+  {c:"AIGC智慧办公",n:"千问AI PPT",d:"阿里巴巴旗下千问应用推出的一项AI演示文稿生成功能",i:"assets/icon_089.jpg",l:"https://dis.chatdesks.cn/chatdesk/qwpptaigc.html"},
+  {c:"AIGC智慧办公",n:"全智能Ai一键生成PPT",d:"AiPPT是一款创新的AI辅助PPT制作工具，通过智能化的一键生成和模板更换功能，极大地提升了用户制作PPT的效率和质量。",i:"assets/icon_090.jpg",l:"https://www.aippt.cn/landingpage/newsem/?utm_type=Navweb&amp;utm_source=aigc&amp;utm_page=aippt&amp;utm_plan=aippt&amp;utm_unit=AIPPT&amp;utm_keyword=40518531"},
+  {c:"AIGC智慧办公",n:"稿定PPT",d:"稿定推出的PPT模版资源库",i:"assets/icon_091.jpg",l:"https://www.gaoding.com/utms/05e57fb6067547d5bc8e1381e94f87a2"},
+  {c:"AIGC智慧办公",n:"iSlide PPT",d:"iSlide是一款由AI赋能的PPT制作工具，支持AI一键生成、导入文档生成以及上传模板生成PPT，内置8大资源库，超过1400w+PPT素材资源，包含模板、图示、图表、图片等。支持PPT一键美化、智能编辑、AI润色等，支持多格式文件导出，助力快速产出高质量PPT！",i:"assets/icon_092.jpg",l:"https://www.islide.cc?mtm_campaign=AIGC"},
+  {c:"AIGC智慧办公",n:"ChatPPT",d:"ChatPPT是一个创新的AI驱动的PPT生成工具，它通过对话式交互和全流程AI创作，大幅简化了PPT的制作过程。",i:"assets/icon_093.jpg",l:"https://chatppt.cn/?channel=aigc.cn"},
+  {c:"AIGC智慧办公",n:"咔片PPT",d:"AI助力，做PPT更简单！",i:"assets/icon_094.jpg",l:"https://www.cappt.cc/?mtm_campaign=CZQD-AIGC-ppt-10009"},
+  {c:"AIGC智慧办公",n:"办公小浣熊",d:"数据分析、生成 PPT、知识库问答、文案生成、任务规划",i:"assets/icon_095.jpg",l:"https://www.xiaohuanxiong.com/login?utm_source=blmay2"},
+  {c:"AIGC智慧办公",n:"笔格AIPPT &#8211; Agent模式",d:"全新Agent功能上线！智能引导理清思路，精准把控生成细节，PPT内容更贴近需求。让你选择更自由，内容更丰富，制作更高效！",i:"assets/icon_096.jpg",l:"https://bigppt.cn/?hmmd=aigc"},
+  {c:"AIGC智慧办公",n:"Pi-智能演示文档",d:"AI-native的互动内容创作与分享平台",i:"assets/icon_097.jpg",l:"https://pi.deepvinci.tech/idea?share_token=CRYHPLJIMFGCE"},
+  {c:"AIGC智慧办公",n:"觅知网AI+PPT模板",d:"AIPPT与优质模板相融合的智能办公平台",i:"assets/icon_098.jpg",l:"https://www.51miz.com/ppt/?utm_term=56599175&amp;utm_source=webad"},
+  {c:"AIGC智慧办公",n:"笔灵AI生成答辩PPT",d:"答辩PPT、千字自述稿一键生成，预测导师提问，答辩一次过！",i:"assets/icon_099.jpg",l:"https://ibiling.cn/ppt?from=aigcpptdb"},
+  {c:"AIGC智慧办公",n:"PPTFake答辩PPT生成器",d:"毕业答辩PPT+演讲稿一键生成，助你答辩一次通过",i:"assets/icon_100.jpg",l:"https://paperfake.cn/ppt/?q=aigc"},
+  {c:"AIGC智慧办公",n:"爱设计PPT",d:"爱设计PPT是一款AI驱动的PPT制作神器",i:"assets/icon_101.jpg",l:"https://ppt.isheji.com/?utm_type=AIGC&amp;utm_source=aigc&amp;utm_page=aippt&amp;utm_plan=ppt&amp;utm_unit=aigc&amp;utm_keyword=129548"},
+  {c:"AIGC智慧办公",n:"歌者PPT",d:"一键智能生成，内置海量模板，支持在线编辑美化，轻松做出令人惊艳的 PPT",i:"assets/icon_102.jpg",l:"https://pro.gezhe.com/invite?referrerUserId=UJ94k6K"},
+  {c:"AIGC智慧办公",n:"二狗 AI PPT",d:"为中式职场场景打造的 AI PPT 生成工具",i:"assets/icon_103.jpg",l:"https://2dogppt.cgref.cn/s/59ngp3jnr2"},
+  {c:"AIGC智慧办公",n:"迅捷AIPPT",d:"AI演示文稿制作工具",i:"assets/icon_104.jpg",l:"https://www.xunjieppt.com"},
+  {c:"AIGC智慧办公",n:"讯飞智文",d:"一键生成PPT和Word，让学习生活更轻松",i:"assets/icon_105.jpg",l:"https://zhiwen.xfyun.cn/home?from=aitool6"},
+  {c:"AIGC智慧办公",n:"扣子 Coze",d:"职场 AI，就用扣子！",i:"assets/icon_106.jpg",l:"https://dis.csqixiang.cn/dbwork?channel=aigc"},
+  {c:"AIGC智慧办公",n:"PPT百科",d:"基于人工智能技术的在线PPT生成工具，免费优质PPT模板、PPT课件免费下载网站",i:"assets/icon_107.jpg",l:"https://www.pptwiki.com/?ref=dvxuBsrll"},
+  {c:"AIGC智慧办公",n:"美图LivePPT",d:"免费在线AI生成PPT设计工具",i:"assets/icon_108.jpg",l:"https://www.designkit.com/ppt/?channel=aigcdhzppt"},
+  {c:"AIGC智慧办公",n:"塔猫ChatPPT",d:"仅需一句话，智能生成整套PPT文件",i:"assets/icon_109.jpg",l:"http://ppt.tamao.fun/?promotion_code=aigc"},
+  {c:"AIGC智慧办公",n:"MotionGo官网",d:"让PPT动效、动画表达更专业",i:"assets/icon_110.jpg",l:"https://motion.yoo-ai.com"},
+  {c:"AIGC智慧办公",n:"Canva可画",d:"免费PPT制作工具，轻松搞定PPT设计",i:"assets/icon_111.jpg",l:"https://www.canva.cn/create/ppt-slides"},
+  {c:"AIGC商业设计",n:"妙呀",d:"全球首个潮玩创作者AI平台",i:"assets/icon_112.jpg",l:"https://www.miaoyaai.cn/create?sqm=miaoya.cpa.aigc.pc"},
+  {c:"AIGC商业设计",n:"Lovart",d:"全球首个专注于设计领域的 AI 智能体（Agent）",i:"assets/icon_113.jpg",l:"https://lovart.cgref.cn/s/5ln1lqmkrw"},
+  {c:"AIGC商业设计",n:"稿定AI设计",d:"国内知名在线AI设计作图工具&amp;amp;新媒体人必备素材库，它通过AI设计，AI绘画，AI抠图，在线PS，图片编辑/延展等功能，将AI能力逐步渗透到灵感获取，创作，作品优化等环节，降低设计门槛，累计使用用户1亿+！",i:"assets/icon_114.jpg",l:"https://www.gaoding.com/utms/656bcb8b01104751993ced9f343f418e"},
+  {c:"AIGC商业设计",n:"PagePop",d:"一站式AI创作和设计平台",i:"assets/icon_115.jpg",l:"https://www.pagepop.cn/?utm_source=web_collab&amp;utm_medium=partner_share&amp;utm_term=invite_link&amp;utm_content=partner_08&amp;utm_campaign=partner_invite&amp;_channel_track_key=CfYbSJwl"},
+  {c:"AIGC商业设计",n:"XFUN",d:"AIGC 智能包装设计平台",i:"assets/icon_116.jpg",l:"https://xfun.design/?utm=aigc"},
+  {c:"AIGC商业设计",n:"墨刀AI",d:"AI秒生原型稿",i:"assets/icon_117.jpg",l:"https://modao.cc/feature/ai?utm_channel=wl&amp;utm_source=referrals&amp;utm_keyword=aigccn"},
+  {c:"AIGC商业设计",n:"Paico生成设计稿",d:"AI 赋能 + 专业工具 + 协作生态的一体化解决方案",i:"assets/icon_118.jpg",l:"https://paico.cn/?utm_source=referrals&amp;utm_content=aigccn&amp;_channel_track_key=k1dqxhqQ"},
+  {c:"AIGC商业设计",n:"堆友Agent",d:"阿里巴巴集团旗下的人工智能技术在线设计服务平台",i:"assets/icon_119.jpg",l:"https://d.design"},
+  {c:"AIGC商业设计",n:"星流AI",d:"星流AI是LiblibAI打造的一站式多模态AI设计Agent，深度优化中文语境，支持图/视频/3D/音频全链路创作与精细化编辑，低门槛实现专业级创意产出。",i:"assets/icon_120.jpg",l:"https://www.xingliu.art"},
+  {c:"AIGC商业设计",n:"Miora",d:"成为理解用户意图、具备长期记忆且能自主规划工作流的创意伙伴，覆盖从概念到成品的全链路创作。",i:"assets/icon_121.jpg",l:"https://miora.design"},
+  {c:"AIGC商业设计",n:"创好物",d:"一站式创意设计+物料印刷制作平台",i:"assets/icon_122.jpg",l:"https://www.chuanghaowu.com"},
+  {c:"AIGC商业设计",n:"盒朗朗 包装设计",d:"从智能设计、AI辅助到自动派单生产的全链路一体化平台",i:"assets/icon_123.jpg",l:"https://www.boxnova.net"},
+  {c:"AIGC商业设计",n:"腾讯设计 Ardot",d:"AI驱动的智能设计工具",i:"assets/icon_124.jpg",l:"https://ardot.tencent.com"},
+  {c:"AIGC商业设计",n:"千图AI",d:"集成了多种AI图像生成与编辑功能的在线创意平台，旨在通过人工智能技术帮助用户高效地创作和修改图片，满足电商、营销、设计等多种场景的需求。",i:"assets/icon_125.jpg",l:"https://ai.58pic.com"},
+  {c:"AIGC商业设计",n:"易企秀-小易AI",d:"小易AI智能设计创作神器",i:"assets/icon_126.jpg",l:"https://ai.eqxiu.com﻿"},
+  {c:"AIGC商业设计",n:"志设AI",d:"一站式AI设计平台，集“AI生图 + 在线设计 + 素材交易 + 收益分成”于一体。",i:"assets/icon_127.jpg",l:"https://www.zs9.com"},
+  {c:"AIGC商业设计",n:"呜哩",d:"阿里巴巴旗下创意设计生产力平台",i:"assets/icon_128.jpg",l:"https://wuli.art/generate?openRegisterModal=true&amp;inviteCode=WL-WULIGVKDMVGG"},
+  {c:"AIGC商业设计",n:"MoPNG设计助手",d:"以 “无损抠图去背景” 为核心功能的在线设计工具",i:"assets/icon_129.jpg",l:"https://mopng.cn"},
+  {c:"AIGC商业设计",n:"包图-AIGC设计素材",d:"1.5亿高清素材,AIGC素材,免费下载！",i:"assets/icon_130.jpg",l:"https://ibaotu.com/tupian/shuziyishu.html?spm=aigc"},
+  {c:"AIGC商业设计",n:"UXbot",d:"人工智能为核心引擎的视觉设计与交互式原型生成工具，“零成本设计转换”—— 无论用户是否具备专业设计能力，只需提供产品想法或参考素材，即可通过 AI 自动生成多端适配（Web/APP/ 桌面 / 平板）的高保真界面与可交互流程，同时支持精细化编辑、风格切换与开发级导出。",i:"assets/icon_131.jpg",l:"https://www.uxbot.cn"},
+  {c:"AIGC商业设计",n:"Refore 网页转设计",d:"加速产品 UI 设计迭代的工具，可一键导入UI设计软件",i:"assets/icon_132.jpg",l:"https://reforeai.cn/html-to-design"},
+  {c:"AIGC商业设计",n:"稿定AI",d:"从灵感到成品的全链路创意解决方案",i:"assets/icon_133.jpg",l:"https://www.gaoding.com/utms/5d3a5454b07a4fe6baba040a748d398d"},
+  {c:"AIGC商业设计",n:"美图设计室",d:"美图设计室是美图秀秀旗下的智能平面设计在线协作平台，提供丰富的设计资源和便捷的在线设计工具。它主要面向需要平面设计服务的用户，包括但不限于海报制作、电商设计、PPT制作等领域。",i:"assets/icon_134.jpg",l:"https://www.designkit.com/?channel=aigcdhz"},
+  {c:"AIGC商业设计",n:"创客贴",d:"创客贴是由北京艺源酷科技有限公司推出的一个多平台图形编辑和平面设计工具，支持Web、Mobile、Mac、Windows等平台。它提供一站式在线设计平台服务，覆盖创意全场景和全流程，用户可以通过简单的拖、拉、拽方式，利用创客贴提供的大量图片、字体、模板等设计元素来制作所需的设计作品。",i:"assets/icon_135.jpg",l:"https://www.chuangkit.com/?utm_source=aigccn"},
+  {c:"AIGC智能对话",n:"豆包AI助手 &#8211; 网页版",d:"豆包工作任务改版，新用户免费领30天会员，学生再送3个月会员",i:"assets/icon_136.jpg",l:"https://go.aigc.cn"},
+  {c:"AIGC智能对话",n:"千问AI助手",d:"最新Qwen模型体验 - 通义千问",i:"assets/icon_137.jpg",l:"https://dis.chatdesks.cn/chatdesk/qwkhdcs.html"},
+  {c:"AIGC智能对话",n:"豆包桌面版 &#8211; 下载",d:"豆包工作任务改版，新用户免费领30天会员，学生再送3个月会员",i:"assets/icon_138.jpg",l:"https://ugapk.com/YJQSg"},
+  {c:"AIGC智能对话",n:"讯飞星火",d:"讯飞星火是科大讯飞推出的高性能AI语言模型，具备多模态理解和生成能力，服务于企业服务、智能硬件、智慧政务、智慧金融、智慧生活和智慧医疗等多个领域。",i:"assets/icon_139.jpg",l:"https://xinghuo.xfyun.cn/desk/?ch=xfxh-aigjtf02"},
+  {c:"AIGC智能对话",n:"腾讯元宝",d:"DeepSeek+智能新体验，R1最新版！",i:"assets/icon_140.jpg",l:"https://yuanbao.tencent.com/chat"},
+  {c:"AIGC智能对话",n:"智谱",d:"智谱清言是一款基于人工智能技术的千亿参数对话模型，遵循中国政府的立场和社会主义价值观，提供多领域知识问答、信息检索、文本生成等服务。",i:"assets/icon_141.jpg",l:"https://www.zhipuai.cn/zh"},
+  {c:"AIGC智能对话",n:"DeepSeek官方入口",d:"DeepSeek官方登录入口",i:"assets/icon_142.jpg",l:"https://chat.deepseek.com/sign_in"},
+  {c:"AIGC智能对话",n:"LongCat",d:"打造面向未来的全能AI助手。LongCat不仅提供面向普通用户的App应用，还构建了包含语言模型、视频模型、多模态模型在内的丰富技术矩阵",i:"assets/icon_143.jpg",l:"https://longcat.chat"},
+  {c:"AIGC智能对话",n:"Kimi",d:"Kimi 是一款AI智能助手，由 Moonshot 自研的大语言模型驱动，支持在线搜索、深度思考、多模态推理和超长文本对话。",i:"assets/icon_144.jpg",l:"https://kimi.moonshot.cn"},
+  {c:"AIGC智能对话",n:"文心一言",d:"文心一言既是你的智能伙伴，可以陪你聊天、回答问题、画图识图；也是你的AI助手，可以提供灵感、撰写文案、阅读文档、智能翻译，帮你高效完成工作和学习任务。",i:"assets/icon_145.jpg",l:"https://chat.baidu.com"},
+  {c:"AIGC智能对话",n:"灵光AI",d:"全模态通用 AI 助手，定位为 “AGI（通用人工智能）战略级产品”，核心价值主张 “让复杂变简单”。",i:"assets/icon_146.jpg",l:"https://www.lingguang.com/chat"},
+  {c:"AIGC智能对话",n:"问小白",d:"简化用户日常生活的智能助手，它通过对话的形式提供陪伴、信息搜索、资料整理、情绪支持和生活规划等服务。",i:"assets/icon_147.jpg",l:"https://www.wenxiaobai.com/?forceLogin=true&amp;source=aishenqi&amp;ad_source=aishenqi"},
+  {c:"AIGC智能对话",n:"纳米AI助手",d:"一站体验国内领先大模型",i:"assets/icon_148.jpg",l:"https://bot.n.cn"},
+  {c:"AIGC智能对话",n:"商汤商量SenseChat",d:"商汤商量SenseChat是由商汤科技推出的语言大模型，提供对话和文档理解服务，能够处理百科问答、图片理解、数学解答、代码编写等多种任务。",i:"assets/icon_149.jpg",l:"https://chat.sensetime.com"},
+  {c:"AIGC智能对话",n:"知乎直答",d:"知乎直答是知乎推出的一项基于人工智能技术的搜索问答服务。它利用AI大模型技术，为用户提供智能搜索和可靠的回答，使得用户能够快速找到最相关的答案和专业的知乎答主。",i:"assets/icon_150.jpg",l:"https://zhida.zhihu.com"},
+  {c:"AIGC智能对话",n:"墨镜熊-AI隐私平台",d:"一款能让你安心使用的AI隐私助手，底层技术来自荆华密算",i:"assets/icon_151.jpg",l:"https://www.mojingxiong.com/?utm_source=baizhu_1"},
+  {c:"AIGC智能对话",n:"TWTchat智能客服",d:"TWT旗下一款面向全球化业务场景打造的智能客户沟通与团队协作平台",i:"assets/icon_152.jpg",l:"https://www.twt.com/?rc=aigc"},
+  {c:"AIGC智能对话",n:"天工AI助手",d:"天工AI是一个多功能的智能助手，它通过整合搜索、数据分析和智能预测等技术，为用户提供了一个全面、便捷和个性化的服务体验。",i:"assets/icon_153.jpg",l:"https://www.tiangong.cn"},
+  {c:"AIGC智能对话",n:"当贝AI",d:"集合了满血版DeepSeek R1、豆包和通义千问，实际性能是普通版DeepSeek的四百倍。",i:"assets/icon_154.jpg",l:"https://ai.dangbei.com/chat"},
+  {c:"AIGC智能对话",n:"360智脑",d:"360智脑是360公司自研的认知型通用大模型，依托于360多年积累的大算力、大数据、工程化等关键优势，集成了360GPT大模型、360CV大模型、360多模态大模型技术能力。它具备生成创作、多轮对话、逻辑推理等十大核心能力和数百项细分功能，旨在重塑人机协作的新范式。",i:"assets/icon_155.jpg",l:"https://chat.360.com"},
+  {c:"AIGC智能对话",n:"万联摩尔",d:"全产业 AI 大模型，产业智能助手！",i:"assets/icon_156.jpg",l:"https://www.wanmol.com/?utm_0=emU7Fb"},
+  {c:"AIGC智能对话",n:"亿福AI助手",d:"功能全面、应用广泛的智能助手平台",i:"assets/icon_157.jpg",l:"http://ifaihelp.com"},
+  {c:"AIGC智能对话",n:"小鸽子助手",d:"小鸽子助手是一款免费继承于WPS/WORD的智能写作插件",i:"assets/icon_158.jpg",l:"https://xgz.hingecloud.com"},
+  {c:"AIGC智能对话",n:"AI小聚",d:"AI小聚是一个提供智能对话、文本创作和艺术绘画服务的在线平台",i:"assets/icon_159.jpg",l:"https://ii.cn"},
+  {c:"AIGC音乐语音",n:"谱乐AI",d:"一款功能强大且极具创新性的AI音乐创作平台",i:"assets/icon_160.jpg",l:"https://app.yourmusic.fun?inviteCode=QKVBXMXBUZ"},
+  {c:"AIGC音乐语音",n:"Suno苏诺之音",d:"当AI成为你的音乐合伙人",i:"assets/icon_161.jpg",l:"https://www.suno.cn/home/#/?from=invite&amp;invite_id=9580359"},
+  {c:"AIGC音乐语音",n:"SenseAudio",d:"提供“自然、好听、有情绪”的 AI 语音服务",i:"assets/icon_162.jpg",l:"https://datayi.cn/w/WoM5A0eo"},
+  {c:"AIGC音乐语音",n:"音述AI",d:"以“用声音述说故事”为核心的 AI 音乐创作与声音分享社区。",i:"assets/icon_163.jpg",l:"https://yinshu.cgref.cn/s/3rpe38jn05"},
+  {c:"AIGC音乐语音",n:"即梦AI音乐生成",d:"创作灵感探索社区，抖音推出的一款图文生成工具，可图生视频等，即梦Dreamina通过集成多种创作工具，为用户提供了一站式的创意解决方案。无论是图片创作还是视频制作，即梦AI都能帮助用户轻松实现创意，满足不同场景的创作需求。",i:"assets/icon_164.jpg",l:"https://jimeng.jianying.com/ai-tool/home/?utm_medium=aitools&amp;utm_source=aigc&amp;utm_campaign=null&amp;utm_content=hw_jm_aigc"},
+  {c:"AIGC音乐语音",n:"Vemus未音",d:"让音乐创作、演唱与分享的门槛变得极低。",i:"assets/icon_165.jpg",l:"https://vemus.tencentmusic.com"},
+  {c:"AIGC音乐语音",n:"歌歌AI",d:"降低音乐创作的门槛，让没有专业乐理知识的普通用户也能通过AI技术，快速将文字灵感转化为高质量的原创歌曲。",i:"assets/icon_166.jpg",l:"https://gegemusic.cn"},
+  {c:"AIGC音乐语音",n:"海绵音乐Agent",d:"海绵音乐，一个精选音乐的聚集地，致力于为用户提供各种风格的治愈系音乐。",i:"assets/icon_167.jpg",l:"https://www.haimianyinyue.com"},
+  {c:"AIGC音乐语音",n:"妙响 &#8211; 抖音音乐",d:"抖音一站式 AI 音乐生产力工具",i:"assets/icon_168.jpg",l:"https://music.douyin.com/studio"},
+  {c:"AIGC音乐语音",n:"网易·天音",d:"一站式 AI 音乐创作平台，以 “让人人都能成为音乐人” 为核心目标，通过深度学习与语音合成技术重构音乐创作流程。",i:"assets/icon_169.jpg",l:"https://tianyin.music.163.com/#"},
+  {c:"AIGC音乐语音",n:"SUNO",d:"苏诺是一个歌曲创作平台，它鼓励用户围绕任何主题创作歌曲。",i:"assets/icon_170.jpg",l:"https://suno.com"},
+  {c:"AIGC音乐语音",n:"音潮",d:"全栈自研AI音乐平台，让人人都能用AI创作、聆听并分享属于自己的音乐。每日登录免费赠送积分，直接生成完整歌曲。",i:"assets/icon_171.jpg",l:"https://web.yinchaoyongxian.com/studio/wicexpo-create"},
+  {c:"AIGC音乐语音",n:"Mureka AI",d:"昆仑万维AI音乐创作平台，集成了AI音乐生成、编辑和版权交易功能",i:"assets/icon_172.jpg",l:"https://www.mureka.cn?invite_code=BrIfM3"},
+  {c:"AIGC音乐语音",n:"天谱乐",d:"凭借其音乐生成、智能推荐、音乐编辑等多种功能，极大地简化了音乐创作的过程，降低了创作难度",i:"assets/icon_173.jpg",l:"https://tianpuyue.cn"},
+  {c:"AIGC音乐语音",n:"LickMV",d:"AI音乐MV一站式智能生成创作平台",i:"assets/icon_174.jpg",l:"https://lickmv.dubmic.com"},
+  {c:"AIGC音乐语音",n:"Yoohe &#8211; 一站式AI音乐工具",d:"AI 驱动的音轨分离与 MIDI 编辑工具",i:"assets/icon_175.jpg",l:"https://www.yoohe.net"},
+  {c:"AIGC音乐语音",n:"反谱",d:"一站式音乐工具，支持扒谱、音轨分离、歌曲生成、语音克隆，适合音乐爱好者、乐器学习者、视频创作者、编曲人等",i:"assets/icon_176.jpg",l:"https://miaogaichong.com"},
+  {c:"AIGC音乐语音",n:"OhYesAI 音乐MV生成",d:"AI MV创作智能体平台",i:"assets/icon_177.jpg",l:"https://ohyesai.com"},
+  {c:"AIGC音乐语音",n:"CAVN AI",d:"将“从创意到成品”的完整流程整合在一个工作流中，用户只需输入文字、图片或视频灵感，即可在数秒内获得歌曲变体，并进一步进行专业级精修。",i:"assets/icon_178.jpg",l:"https://cavn.ai"},
+  {c:"AIGC音乐语音",n:"AiWave",d:"AI音效生成平台，用中文描述即可生成专业级音效",i:"assets/icon_179.jpg",l:"https://www.aiwave.art"},
+  {c:"AIGC音乐语音",n:"OpenMusic AI 音乐生成器",d:"实现 60 秒快速生成录音室品质的原创音乐，且所有生成曲目均 100% 免版税并支持全场景商业使用。",i:"assets/icon_180.jpg",l:"https://www.openmusic.ai/zh"},
+  {c:"AIGC音乐语音",n:"Noema Lab创作实验室",d:"AI 音乐创作实验室，专注于可控生成、深度理解与创作过程本身。",i:"assets/icon_181.jpg",l:"https://www.aimusic-tools.com"},
+  {c:"AIGC音乐语音",n:"音剪",d:"专业音频制作，激发创新灵感，释放创意潜力，让你的音频创作更自由、便捷和精彩",i:"assets/icon_182.jpg",l:"https://audioeditor.ximalaya.com"},
+  {c:"AIGC音乐语音",n:"音虫",d:"音虫SoundBug是一款由国内团队研发的数字音频工作站（DAW）软件，以其简洁直观的用户界面和易于上手的操作特点，为音乐爱好者和音乐学习者提供了一套完整的音乐制作工具。",i:"assets/icon_183.jpg",l:"https://www.soundbug.com"},
+  {c:"AIGC技能认证",n:"生成式AI工程师",d:"驾驭大模型 × 构建智能体 × 赋能全场景《生成式AI工程师》职业技术培训考试",i:"assets/icon_184.jpg",l:"https://www.aigc.cn/aigc-prompt-engineer"},
+  {c:"AIGC技能认证",n:"AIGC应用工程师",d:"AIGC应用工程师 职业技术培训考试",i:"assets/icon_185.jpg",l:"https://www.aigc.cn/sites/90472.html"},
+  {c:"AIGC技能认证",n:"AI智能体应用工程师",d:"AI智能体应用工程师 职业技术培训考试",i:"assets/icon_186.jpg",l:"https://www.aigc.cn/sites/101519.html"},
+  {c:"AIGC技能认证",n:"人工智能应用工程师",d:"人工智能应用工程师 职业技术培训考试",i:"assets/icon_187.jpg",l:"https://www.aigc.cn/sites/90468.html"},
+  {c:"AIGC技能认证",n:"提示工程师",d:"提示工程师 职业技术培训考试",i:"assets/icon_188.jpg",l:"https://www.aigc.cn/sites/90482.html"},
+  {c:"AIGC技能认证",n:"人工智能标注工程师",d:"人工智能标注工程师 职业技术培训考试",i:"assets/icon_189.jpg",l:"https://www.aigc.cn/sites/102899.html"},
+  {c:"AIGC技能认证",n:"AI产品经理",d:"AI产品经理 职业技术培训考试",i:"assets/icon_190.jpg",l:"https://www.aigc.cn/sites/101044.html"},
+  {c:"AIGC技能认证",n:"AIGC智能办公应用师",d:"AIGC智能办公应用师 职业技术培训考试",i:"assets/icon_191.jpg",l:"https://www.aigc.cn/sites/103936.html"},
+  {c:"AIGC技能认证",n:"机器学习工程师",d:"机器学习工程师 职业技术培训考试",i:"assets/icon_192.jpg",l:"https://www.aigc.cn/sites/90466.html"},
+  {c:"AIGC技能认证",n:"大模型开发工程师",d:"大模型开发工程师 职业技术培训考试",i:"assets/icon_193.jpg",l:"https://www.aigc.cn/sites/90484.html"},
+  {c:"AIGC技能认证",n:"大模型应用工程师",d:"大模型应用工程师 职业技术培训考试",i:"assets/icon_194.jpg",l:"https://www.aigc.cn/sites/90474.html"},
+  {c:"AIGC技能认证",n:"Python技术应用工程师",d:"Python技术应用工程师 职业技术培训考试",i:"assets/icon_195.jpg",l:"https://www.aigc.cn/sites/90460.html"},
+  {c:"AIGC技能认证",n:"AI剪辑师",d:"AI剪辑师 岗位能力证书培训及课程学习",i:"assets/icon_196.jpg",l:"https://www.aigc.cn/sites/81135.html"},
+  {c:"AIGC技能认证",n:"AIGC艺术设计师",d:"AIGC艺术设计师 岗位能力证书培训及课程学习",i:"assets/icon_197.jpg",l:"https://www.aigc.cn/sites/81133.html"},
+  {c:"AIGC技能认证",n:"人工智能算法工程师",d:"人工智能算法工程师 职业技术培训考试",i:"assets/icon_198.jpg",l:"https://www.aigc.cn/sites/102897.html"},
+  {c:"AIGC技能认证",n:"人工智能训练工程师",d:"人工智能训练工程师 职业技术培训考试",i:"assets/icon_199.jpg",l:"https://www.aigc.cn/sites/102894.html"},
+  {c:"AIGC学习资源",n:"免费AI短剧课",d:"一套分层式免费学习体系，覆盖从零基础小白到资深创作者的全阶段需求。",i:"assets/icon_200.jpg",l:"https://dis.chatdesks.cn/chatdesk/xyqaigc.html"},
+  {c:"AIGC学习资源",n:"AI漫剧课",d:"聚焦 2026 年 AI 漫剧、动漫短剧的商业创作机会，实现从基础操作到爆款内容打造、从个人创作到商业大片落地的全能力培养。",i:"assets/icon_201.jpg",l:"https://huke88.com/threeddigital/34-4657-0-0-0-2-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"每天一节免费AIGC视频课",d:"AIGC教程涵盖了GPT进阶教程、AI绘画教程(例如Midjourney、Stable Diffusion)、电商设计等多种AI设计培训课。",i:"assets/icon_202.jpg",l:"https://huke88.com/threeddigital/34-4610-0-0-0-2-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"免费AI认证证书",d:"【限时免费】讯飞AI大学堂的Prompt工程师认证是科大讯飞基于其在大模型领域的技术积累与产业实践，打造的一套体系化、实战化的专业认证体系。",i:"assets/icon_203.jpg",l:"https://www.aidaxue.com/certification?ch=daxue_collection_3"},
+  {c:"AIGC学习资源",n:"Codex课程",d:"小白也能看懂的Codex入门课程：这是一门面向新手的入门课程，主要教授如何下载和安装 Codex 桌面版。",i:"assets/icon_204.jpg",l:"https://huke88.com/course/176308.html?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"ChatGPT使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_205.jpg",l:"https://huke88.com/threeddigital/34-0-4582-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"DeepSeek使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_206.jpg",l:"https://huke88.com/threeddigital/34-4610-4633-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"ComfyUI使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_207.jpg",l:"https://huke88.com/threeddigital/34-0-4609-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"Stable Diffusion使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_208.jpg",l:"https://huke88.com/threeddigital/34-0-4584-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"Midjourney使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_209.jpg",l:"https://huke88.com/threeddigital/34-0-4583-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"WHEE使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_210.jpg",l:"https://huke88.com/threeddigital/34-0-4628-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"即梦AI使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_211.jpg",l:"https://huke88.com/threeddigital/34-4610-4629-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"可灵AI使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_212.jpg",l:"https://huke88.com/threeddigital/34-4610-4624-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"Liblib AI使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_213.jpg",l:"https://huke88.com/threeddigital/34-4610-4623-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"堆友AI使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_214.jpg",l:"https://huke88.com/threeddigital/34-0-4631-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"Nano banana使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_215.jpg",l:"https://huke88.com/threeddigital/34-0-4654-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"StartAI使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_216.jpg",l:"https://huke88.com/threeddigital/34-0-4632-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"豆包AI使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_217.jpg",l:"https://huke88.com/threeddigital/34-0-4622-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"Kimi AI使用教程",d:"每天一节免费AIGC视频课！",i:"assets/icon_218.jpg",l:"https://huke88.com/threeddigital/34-0-4627-0-0-1-1-16-1/?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"AI副业训练营",d:"打造睡后收入-0基础可学",i:"assets/icon_219.jpg",l:"https://huke88.com/aigc/home?identity=da9e988089a4"},
+  {c:"AIGC学习资源",n:"国家智慧教育-AI通识课",d:"AI精品通识课-国家智慧教育公共服务平台",i:"assets/icon_220.jpg",l:"https://www.smartedu.cn/AIEducation"},
+  {c:"AIGC学习资源",n:"国家终身教育平台",d:"可免费学习AI绘画设计、AI大模型训练、AI商业设计训练，国家终身教育平台覆盖广泛的在线教育资源整合平台，它通过提供便捷的搜索功能和丰富的学习资源，满足了不同用户群体的终身学习需求",i:"assets/icon_221.jpg",l:"https://le.ouchn.cn/searchCourseList?Keyword=ai"},
+  {c:"AIGC学习资源",n:"Day of AI",d:"麻省理工大学（MIT）致力于将 AI 教育普及到学校的项目，与学校和学区合作，为学生、教师、管理人员和家庭等所有学校利益相关者创建 AI 素养项目，提供免费和开源的 AI 工具、课程、评估以及教师专业发展材料，由 MIT RAISE 提供支持，帮助学生和教育工作者在校园内外成为负责任和高效的 AI 用户",i:"assets/icon_222.jpg",l:"https://dayofai.org"},
+  {c:"AIGC学习资源",n:"ChatGPT-Prompt深度学习",d:"免费|吴恩达×OPENAI联合推出ChatGPT prompt深度学习课程提供了许多机会，可以在几分钟或几小时内构建强大的应用程序，而以前需要几天或几周的时间。我很高兴能够分享这些最佳实践，使更多的人能够利用这些革命性的新功能。",i:"assets/icon_223.jpg",l:"https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers"},
+  {c:"AI 智能体平台",n:"豆包工作",d:"豆包工作任务改版，新用户免费领30天会员",i:"assets/icon_224.jpg",l:"https://dis.csqixiang.cn/dbwork?channel=aigc"},
+  {c:"AI 智能体平台",n:"WorkBuddy",d:"桌面智能体 办公新范式",i:"assets/icon_225.jpg",l:"https://dis.chatdesks.cn/workbuddy/?channel=aigc"},
+  {c:"AI 智能体平台",n:"Loomy AI工作搭子",d:"聚焦“低门槛、高安全、强适配、主动协作”四个核心方向，帮助用户把复杂、重复、跨工具的工作流程真正落到执行层。",i:"assets/icon_226.jpg",l:"https://loomy.cgref.cn/s/jgem0jgnmy"},
+  {c:"AI 智能体平台",n:"ArkClaw",d:"火山引擎推出的7×24在线专属智能伙伴",i:"assets/icon_227.jpg",l:"http://dis.chatdesks.cn/chatdesk/hsyqaigc.html"},
+  {c:"AI 智能体平台",n:"DuMate",d:"国产企业级满血版 OpenClaw（龙虾）AI 智能体框架",i:"assets/icon_228.jpg",l:"https://dumate.cn/download?track=1063479t&amp;sub_track=02cE&amp;dutoken=3.s%3A%2F%C2%A5%5EYrSKf2Qacn%5E%25"},
+  {c:"AI 智能体平台",n:"千问办公",d:"阿里巴巴推出的一款专业级 AI 协同办公平台，由钉钉业务线主导研发。它并非一个简单的对话式 AI 助手，而是一个能够理解、拆解并执行复杂任务的 AI Agent（智能体）系统，旨在实现从“任务”到“交付”的全流程自动化。",i:"assets/icon_229.jpg",l:"https://qwenwork.cn"},
+  {c:"AI 智能体平台",n:"灵犀",d:"自主规划步骤、调用工具，直接产出可编辑的Word、Excel、PPT等办公成品。",i:"assets/icon_230.jpg",l:"https://www.lingxi.cn/?utm_source=cakegrowth2"},
+  {c:"AI 智能体平台",n:"MiniMax Hub",d:"一个属于你的 AI 创作工作室。它旨在帮助用户将创意从想法到成片一气呵成，通过自动调度图像、视频、配音、剪辑等多种模型，实现高效、专业的内容创作。",i:"assets/icon_231.jpg",l:"https://hub.minimaxi.com"},
+  {c:"AI 智能体平台",n:"妙手CatPaw",d:"一句话，见成果！美团全场景 AI Agent 平台",i:"assets/icon_232.jpg",l:"https://catpaw.meituan.com"},
+  {c:"AI 智能体平台",n:"纳米Work",d:"让AI从“回答问题”的助手，转变为能够“完成工作”并交付可用成果的数字员工团队。它旨在帮助企业老板、创业者、一人公司及员工，将AI能力深度融入真实业务流程，实现从任务规划到成果交付的全链条自动化。",i:"assets/icon_233.jpg",l:"https://work.n.cn"},
+  {c:"AI 智能体平台",n:"QoderWork",d:"将 Qoder 的 Agent 能力从代码领域扩展到日常工作场景，描述需求，自动执行，直接交付结果。",i:"assets/icon_234.jpg",l:"https://qoder.com.cn"},
+  {c:"AI 智能体平台",n:"Marvis",d:"马维斯 为你24小时随时在线",i:"assets/icon_235.jpg",l:"https://marvis.qq.com"},
+  {c:"AI 智能体平台",n:"讯飞星辰AstronClaw",d:"讯飞星辰Agent平台AstronClaw",i:"assets/icon_236.jpg",l:"https://agent.xfyun.cn"},
+  {c:"AI 智能体平台",n:"LobsterAI 有道龙虾",d:"网易有道推出的国内首款 MIT 开源本土化 OpenClaw 智能体产品",i:"assets/icon_237.jpg",l:"https://lobsterai.youdao.com/#/index"},
+  {c:"AI 智能体平台",n:"Kimi Work",d:"不仅是对话，更是你的本地智能体",i:"assets/icon_238.jpg",l:"https://www.kimi.com/zh-cn/products/kimi-work"},
+  {c:"AI 智能体平台",n:"KroWork",d:"“从聊天到软件”，旨在让用户无需编写代码，仅通过自然语言对话，就能将重复性的工作流程转化为自己专属的桌面应用程序（Kro）。",i:"assets/icon_239.jpg",l:"https://krowork.com/zh/index"},
+  {c:"AI 智能体平台",n:"星辰超级智能体",d:"定位为“AI办公搭子”，旨在通过本地化部署和深度系统集成，帮助用户自动化处理各类办公任务，提升工作效率。",i:"assets/icon_240.jpg",l:"https://www.teleai.com.cn/product/teleagent"},
+  {c:"AI 智能体平台",n:"AutoClaw",d:"智谱AI 发布的国内首个真一键安装本地版 OpenClaw 智能体，主打本地执行、飞书无缝集成、1 分钟极速部署、全模型兼容，核心将 AI Agent 的执行力封装在飞书 IM 入口中，让用户在聊天对话框即可下达复杂任务，实现任务拆解、本地工具调用、执行状态实时回传的全流程自动化。",i:"assets/icon_241.jpg",l:"https://autoglm.zhipuai.cn/autoclaw"},
+  {c:"AI 智能体平台",n:"Agnes AI",d:"“多智能体协同架构”，旨在通过多个专精AI智能体的分工协作，为用户提供涵盖研究、设计、演示与编程的一体化工作流。",i:"assets/icon_242.jpg",l:"https://agnes-ai.cn"},
+  {c:"AI 智能体平台",n:"QClaw",d:"腾讯电脑管家本地版 OpenClaw 智能体，是 OpenClaw 全民普及的里程碑式产品，其核心创新在于将 OpenClaw 的 AI 执行能力与微信 / QQ 的国民级社交入口深度融合",i:"assets/icon_243.jpg",l:"https://qclaw.qq.com"},
+  {c:"AI 智能体平台",n:"阿里悟空",d:"悟空让 AI 从“会回答”进化到“能交付”。你说需求，它调工具、用技能，把工作直接推进到结果。",i:"assets/icon_244.jpg",l:"https://wukong.dingtalk.com"},
+  {c:"AI 智能体平台",n:"JVS Claw",d:"阿里巴巴推出的云原生 OpenClaw 类 AI 智能体平台",i:"assets/icon_245.jpg",l:"https://jvs.wuying.aliyun.com"},
+  {c:"AI 智能体平台",n:"元气AI Bot",d:"满足用户在生活陪伴、电脑修复、办公学习等多种场景下的需求。",i:"assets/icon_246.jpg",l:"https://yuanqiai.net"},
+  {c:"AI 智能体平台",n:"阶跃AI桌面伙伴",d:"“全场景自动化、本地化安全、免费开放” 的核心优势，成为当前终端 Agent 领域的标杆产品。",i:"assets/icon_247.jpg",l:"https://www.stepfun.com/download"},
+  {c:"AIGC开发平台",n:"TRAE-AI编程",d:"新用户赠4500积分，字节旗下Al 编程工具。",i:"assets/icon_248.jpg",l:"https://www.trae.cn/sem/?utm_source=advertising&amp;utm_medium=aigc.cn_ug_cpa&amp;utm_term=hw_trae_aigc"},
+  {c:"AIGC开发平台",n:"小浣熊AI助手",d:"代码小浣熊Raccoon是商汤科技最新推出的一个智能AI编程助手和工具，由商汤自研的大模型驱动，支持多种编程语言和多项任务能力，可为开发人员带来全新的编程体验。",i:"assets/icon_249.jpg",l:"https://www.xiaohuanxiong.com/login?utm_source=blmay2"},
+  {c:"AIGC开发平台",n:"码上飞-AI生成小程序",d:"免费生成小程序/app/网站等各类应用",i:"assets/icon_250.jpg",l:"https://codeflying.cgref.cn/s/q50k9y7ng6"},
+  {c:"AIGC开发平台",n:"Meoo 秒悟",d:"阿里巴巴推出的零门槛 AI 开发平台",i:"assets/icon_251.jpg",l:"https://meoo.com"},
+  {c:"AIGC开发平台",n:"CodeBuddy",d:"“从产品构思到上线部署的一站式交付平台”，支持 IDE、插件和 CLI 三种形态，覆盖专业开发者、产品经理、设计师乃至零基础用户。",i:"assets/icon_252.jpg",l:"https://www.codebuddy.cn"},
+  {c:"AIGC开发平台",n:"网易智企-Codewave",d:"可控的企业应用AI Coding平台",i:"assets/icon_253.jpg",l:"https://codewave.163.com/?fromlcap=AIGC"},
+  {c:"AIGC开发平台",n:"秒哒",d:"支持OpenClaw调用，通过自然语言对话，完成应用的创建、查看、修改、发布上线等操作，实现智能化、批量化的应用自动开发。",i:"assets/icon_254.jpg",l:"https://www.miaoda.cn/?invitecode=user-8f9e2q6l3ytc"},
+  {c:"AIGC开发平台",n:"NoCode",d:"通过简单操作（如拖放、AI 对话等）无需编写代码，即可快速创建应用、工具、网站及管理系统，覆盖个人生活、商业经营、企业管理等多场景，显著降低了软件开发的技术门槛。",i:"assets/icon_255.jpg",l:"https://nocode.cn"},
+  {c:"AIGC开发平台",n:"文心快码 Comate",d:"百度研发的智能编码助手。基于文心大模型，结合百度积累多年的编程现场大数据和外部优秀开源数据，为你生成更符合实际研发场景的优质代码。提升你的编码效率，释放“十倍”软件生产力。",i:"assets/icon_256.jpg",l:"https://comate.baidu.com/?inviteCode=6qjnzdhg"},
+  {c:"AIGC开发平台",n:"CodeGeeX",d:"自动代码生成、代码翻译、自动编写注释等功能，支持20多种编程语言",i:"assets/icon_257.jpg",l:"https://codegeex.cn/zh-CN"},
+  {c:"AIGC开发平台",n:"Cursor",d:"主打“多文件协同编辑”与“AI 自主执行”能力。它不仅支持自然语言生成代码、智能补全、调试建议，更能理解整个项目上下文，实现跨文件的联动修改与重构，是独立开发者和初创团队快速构建原型Cursor的利器。",i:"assets/icon_258.jpg",l:"https://cursor.com"},
+  {c:"AIGC开发平台",n:"Tabby",d:"自托管的人工智能编程助手，为开发人员提供了一个开源和本地部署的替代方案，支持通过利用第三方开源代码大模型（如StarCoder、CodeLlama、DeepseekCoder）以实现类似于 GitHub Copilot 的功能",i:"assets/icon_259.jpg",l:"https://www.tabbyml.com"},
+  {c:"AIGC开发平台",n:"极狐CodeRider",d:"极狐GitLab推出的AI编程与软件智能研发助手，专为提升程序员的编码效率和研发效能而设计。",i:"assets/icon_260.jpg",l:"https://coderider.gitlab.cn"},
+  {c:"AIGC开发平台",n:"HowOne AI",d:"构建并商业化AI应用的一站式平台",i:"assets/icon_261.jpg",l:"https://www.howone.ai"},
+  {c:"AIGC开发平台",n:"泰山AI &#8211; 智能开发平台",d:"“AI 全流程赋能” 为核心的无代码 / 低代码应用搭建平台，聚焦企业及个人的数字化应用开发需求，通过先进的 AI 技术重构应用开发流程，实现 “无需编程、快速上手、灵活定制” 的开发体验",i:"assets/icon_262.jpg",l:"https://ai.tidenet.cn"},
+  {c:"AIGC开发平台",n:"Devin Desktop",d:"全面升级为“Agent 指挥中心”，旨在统一管理本地与云端的各类 AI 代理，为开发者提供从桌面到云端、从 CLI 到代码审查的全栈式统一体验。",i:"assets/icon_263.jpg",l:"https://devin.ai/desktop"},
+  {c:"AIGC开发平台",n:"通义灵码",d:"基于通义大模型的智能编码辅助工具",i:"assets/icon_264.jpg",l:"https://tongyi.aliyun.com/lingma"},
+  {c:"AIGC开发平台",n:"天壤小白",d:"天壤小白大模型应用开发平台，提供一站式的大模型开发服务和全面的赋能，为开发者和零编程基础人员轻松创建个性化的AI应用。",i:"assets/icon_265.jpg",l:"https://www.tianrang.com"},
+  {c:"AIGC开发平台",n:"栅格兽",d:"AI 驱动前端代码生成工具",i:"assets/icon_266.jpg",l:"https://shangeshou.lingzhutech.com"},
+  {c:"AIGC开发平台",n:"图像大厨Imgcook",d:"图像大厨Imgcook阿里巴巴出品...",i:"assets/icon_267.jpg",l:"https://www.imgcook.com"},
+  {c:"AIGC开发平台",n:"Joker",d:"通过 “可视化操作 + 低代码逻辑编排 + AI 辅助” 的融合模式，降低开发门槛、提升开发效率，同时兼顾开发灵活性与系统稳定性，为开发人员及企业提供从 “快速原型搭建” 到 “全功能系统落地” 的全流程开发支持。",i:"assets/icon_268.jpg",l:"https://www.jokers.pub"},
+  {c:"AIGC开发平台",n:"GitHub Copilot",d:"GitHub 和 OpenAI 联合开发的一款人工智能编程助手",i:"assets/icon_269.jpg",l:"https://github.com/features/copilot"},
+  {c:"AIGC开发平台",n:"CodeWhisperer",d:"Amazon Q 开发者版，亚马逊推出的一款人工智能代码生成工具，旨在帮助开发者更高效地编写代码。",i:"assets/icon_270.jpg",l:"https://aws.amazon.com/cn/q/developer"},
+  {c:"AIGC开发平台",n:"CodingSee-AI伴学",d:"专为中国少儿编程设计的软件，它集成了多种实用功能，为孩子们提供了一个全面的编程学习平台。",i:"assets/icon_271.jpg",l:"https://www.codingsee.com"},
+  {c:"AIGC词元算力",n:"火山方舟 Coding Plan",d:"支持在最新版 Doubao-Seed-2.0-pro/lite/Code、Doubao-Seed-Code、MiniMax-M2.5、Kimi-K2.5、GLM-4.7、Deepseek-V3.2 多种模型中自由切换，或使用Auto模式调度。",i:"assets/icon_272.jpg",l:"http://dis.chatdesks.cn/chatdesk/hsyqaigc.html"},
+  {c:"AIGC词元算力",n:"千问AI平台",d:"为企业和开发者提供稳定、高效且高性价比的AI基础设施与API接入服务。该平台以“为Agent而生”为核心理念，提供从模型发现、在线试用到API接入、开发工具及成本管理的一站式解决方案。",i:"assets/icon_273.jpg",l:"https://www.qianwenai.com"},
+  {c:"AIGC词元算力",n:"千帆大模型平台",d:"以Agent为核心的一站式企业级大模型服务平台",i:"assets/icon_274.jpg",l:"https://qianfan.cloud.baidu.com"},
+  {c:"AIGC词元算力",n:"TokenHub大模型服务平台",d:"覆盖通用对话、深度推理、代码生成、视觉理解、图像生成、视频生成等多类场景。",i:"assets/icon_275.jpg",l:"https://cloud.tencent.com/product/tokenhub?Is=aigc"},
+  {c:"AIGC词元算力",n:"DeepSeek API",d:"创建 API key 之后，你可以使用以下样例脚本的来访问 DeepSeek API。",i:"assets/icon_276.jpg",l:"https://platform.deepseek.com"},
+  {c:"AIGC词元算力",n:"KIMI（Moonshot api）",d:"多模态模型现已发布！支持多模态理解与处理。",i:"assets/icon_277.jpg",l:"https://platform.moonshot.cn/docs/api/chat"},
+  {c:"AIGC词元算力",n:"MiniMax API",d:"全栈模型矩阵，涵盖文本、语音、视频、图像与音乐五大方向。助力开发者高效构建智能应用",i:"assets/icon_278.jpg",l:"https://www.minimaxi.com"},
+  {c:"AIGC词元算力",n:"智谱BigModel",d:"不止模型，构建可信智能",i:"assets/icon_279.jpg",l:"https://bigmodel.cn"},
+  {c:"AIGC词元算力",n:"星火大模型API",d:"一站式大模型精调定制及推理服务平台",i:"assets/icon_280.jpg",l:"https://xinghuo.xfyun.cn/sparkapi?ch=xh_srx_nQ1o"},
+  {c:"AIGC词元算力",n:"腾讯混元大模型 api",d:"实现对话沟通、内容生成、分析理解，可以广泛应用在智能客服、智能营销、角色扮演、广告文案创作、商品描述、剧本创作、简历生成、文章写作、代码生成、数据分析、内容分析等各类场景。",i:"assets/icon_281.jpg",l:"https://cloud.tencent.com/document/product/1729/101848"},
+  {c:"AIGC词元算力",n:"Xiaomi MiMo",d:"诚邀全球用户释放 Xiaomi MiMo 大模型的强大生产力",i:"assets/icon_282.jpg",l:"https://platform.xiaomimimo.com"},
+  {c:"AIGC词元算力",n:"商汤-日日新大模型API",d:"原生多模态通用大模型系列，其核心能力覆盖文本、图像、视频、语音的融合处理与端到端交互",i:"assets/icon_283.jpg",l:"https://www.sensenova.cn/models"},
+  {c:"AIGC词元算力",n:"StepFun 阶跃星辰",d:"构建你的下一个 AI 应用，Step API 稳定 · 高性能 · 易集成",i:"assets/icon_284.jpg",l:"https://www.stepfun.com"},
+  {c:"AIGC词元算力",n:"百川智能 api",d:"百川智能的 API 开放平台文档页面，提供开发者接入百川大模型的服务。在使用 API 前，需要完成实名认证、充值和创建 API Key。",i:"assets/icon_285.jpg",l:"https://platform.baichuan-ai.com/docs/api"},
+  {c:"AIGC词元算力",n:"华为盘古NLP大模型",d:"华为盘古大模型api",i:"assets/icon_286.jpg",l:"https://www.huaweicloud.com/product/pangu/nlp.html"},
+  {c:"AIGC词元算力",n:"BlueLm蓝心大模型",d:"BlueLm蓝心大模型 api",i:"assets/icon_287.jpg",l:"https://developers.vivo.com/product/ai/bluelm"},
+  {c:"AIGC词元算力",n:"超算互联网",d:"以算力为核心、以协同为纽带、以生态为支撑的新型基础设施。",i:"assets/icon_288.jpg",l:"https://www.scnet.cn/ui/mall/service/llm"},
+  {c:"AIGC词元算力",n:"硅基流动",d:"SiliconCloud 是硅基流动推出的一站式大模型云服务平台。",i:"assets/icon_289.jpg",l:"https://siliconflow.cn/zh-cn/siliconcloud"},
+  {c:"AIGC词元算力",n:"移动云MoMA",d:"一站式模型服务平台",i:"assets/icon_290.jpg",l:"https://ecloud.10086.cn/portal/product/MaaS"},
+  {c:"AIGC词元算力",n:"阿里云百炼",d:"企业级模型服务和应用开发",i:"assets/icon_291.jpg",l:"https://bailian.console.aliyun.com/cn-beijing"},
+  {c:"AIGC词元算力",n:"Claude API",d:"Anthropic 提供的应用程序编程接口（API）",i:"assets/icon_292.jpg",l:"https://claude.com/platform/api"},
+  {c:"AIGC词元算力",n:"OpenAI api",d:"它为开发者和研究人员提供了访问 OpenAI 人工智能技术的接口。通过这些 API，用户可以集成和利用 OpenAI 的先进算法和模型，如自然语言处理、图像识别和机器学习等，来增强自己的应用程序和服务。",i:"assets/icon_293.jpg",l:"https://openai.com/api"},
+  {c:"AIGC词元算力",n:"Gemini api",d:"让你在 Go 项目中直接调用 Google 最新的多模态大模型，实现对话、代码生成、图像识别等功能。以下是快速集成步骤。",i:"assets/icon_294.jpg",l:"https://docs.gemini.com/rest-api"},
+  {c:"AIGC词元算力",n:"X.AI api",d:"具备高级推理、语音、图像生成和实时搜索功能的前沿人工智能模型的 Grok API。利用文本、视觉和工具使用等能力进行构建。",i:"assets/icon_295.jpg",l:"https://x.ai/api"},
+  {c:"AIGC营销增长",n:"稿定AI营销玩法",d:"免费玩转爆款人像、创意商品、萌宠互动等AI趣味玩法，轻松引爆社媒流量。",i:"assets/icon_296.jpg",l:"https://www.gaoding.com/utms/d2b2b5a6fab94087a818407f078ad266"},
+  {c:"AIGC营销增长",n:"闪剪-直播切片一键生成",d:"一款AI智能直播切片一键生成工具，数字人短视频创作平台。提供SAAS级企业应用的数字产品，并打造了APP和网页两种产品形态。",i:"assets/icon_297.jpg",l:"https://shanjian.tv/?inviteId=64b78e68072504003a4143c0"},
+  {c:"AIGC营销增长",n:"CakeGrowth",d:"专注 AI 应用的一站式联盟营销平台",i:"assets/icon_298.jpg",l:"https://cakegrowth.cn/?partner=8AFC3F4D53E6"},
+  {c:"AIGC营销增长",n:"七色米AI",d:"一站式AI商业创作与经营决策平台",i:"assets/icon_299.jpg",l:"https://ai.qisemiyun.com/?s=aibaizhu3"},
+  {c:"AIGC营销增长",n:"疯火轮AI",d:"营销人的 AI 工作台",i:"assets/icon_300.jpg",l:"https://madfireai.com"},
+  {c:"AIGC营销增长",n:"SheepGeo",d:"AI 驱动 GEO 优化，提升网站 AI 可见性与推荐率",i:"assets/icon_301.jpg",l:"https://www.sheepgeo.com"},
+  {c:"AIGC营销增长",n:"DoLabAI",d:"面向自媒体、电商卖家、内容创作者AI短视频与图片生成平台",i:"assets/icon_302.jpg",l:"https://www.dolabai.com"},
+  {c:"AIGC营销增长",n:"蝉妈妈AI",d:"电商人专属的营销助手，通过蝉妈妈庞大的电商数据库和AI大语言模型深度分析，帮助电商人从战略决策到执行落地，从数据解读到内容创作，一站式高效解决电商营销难题。",i:"assets/icon_303.jpg",l:"https://ai.chanmama.com/chat"},
+  {c:"AIGC营销增长",n:"易销AI-专为跨境",d:"最懂跨境电商的AI营销工具",i:"assets/icon_304.jpg",l:"https://yixiaoai.com/ "},
+  {c:"AIGC营销增长",n:"SocialEcho",d:"一站式海外社媒多账号管理平台",i:"assets/icon_305.jpg",l:"https://www.socialecho.cn"},
+  {c:"AIGC营销增长",n:"自媒AI",d:"自媒AI，更懂自媒体的AI工具，将致力打造一个包含AI工具、经验分享、有趣故事的网站，探索自媒体与AI之间，更多的可能性。这里提供AI续写、AI改写、标题优化、小红书文案生成等功能，有助于解决自媒体创作效率低，内容不够吸引人等问题，轻轻松松使用AI进行创作。",i:"assets/icon_306.jpg",l:"https://zimeiai.com"},
+  {c:"AIGC营销增长",n:"易撰自媒体工具",d:"易撰提供文章检测、爆文分析、数据监测、视频库、热点追踪等功能，如果需要，我们还将为您提供数据定制服务及其它相关联的API接口服务。",i:"assets/icon_307.jpg",l:"https://zmt.yizhuan5.com"},
+  {c:"AIGC营销增长",n:"活动汪",d:"10W+方案/设计可下载",i:"assets/icon_308.jpg",l:"https://www.eventwang.cn"},
+  {c:"AIGC营销增长",n:"图司机AI创作写作助手",d:"为你提供快速、高效、多元化的创意设计解决方案，让你在短时间内实现最佳的推广效果",i:"assets/icon_309.jpg",l:"https://www.tusij.com"},
+  {c:"AIGC营销增长",n:"灵感岛",d:"灵感岛一方面会对社交平台的热门内容进行全面分析，圈定流量密码，为自媒体创作者提供爆文创作灵感，同时依托海量的中文语料库训练数据和智能化的自然语言处理技术，预设30余种国内创作者常用的写作应用场景，实现在不同需求场景下，自动调优生成高效、准确、优质的文本内容，大幅提升内容质量及生产效率。",i:"assets/icon_310.jpg",l:"https://web.linggandaquan.com"},
+  {c:"AIGC营销增长",n:"LinkFoxAI",d:"跨境电商企业级AI营销工具",i:"assets/icon_311.jpg",l:"https://ai.linkfox.com/?channel=Becca_AIGC"},
+  {c:"AIGC营销增长",n:"Kua.ai",d:"帮助您创建优于竞争对手的优化内容",i:"assets/icon_312.jpg",l:"https://www.kua.ai"},
+  {c:"AIGC营销增长",n:"轻舸",d:"AI更懂你 | 让营销更省力、更省心",i:"assets/icon_313.jpg",l:"https://qingge.baidu.com/login"},
+  {c:"AIGC营销增长",n:"亚马逊Listing AI助手",d:"基于gpt模型 AI智能生成亚马逊产品listing",i:"assets/icon_314.jpg",l:"https://www.assistanttool.site"},
+  {c:"AIGC营销增长",n:"星耀裂变",d:"专注微信生态用户增长，企业微信、公众号、视频号裂变增长工具",i:"assets/icon_315.jpg",l:"https://www.xyookj.com"},
+  {c:"AIGC营销增长",n:"5118营销大数据",d:"5118站长工具，关键词挖掘，流量词",i:"assets/icon_316.jpg",l:"https://www.5118.com/?promote=aigccn"},
+  {c:"AIGC营销增长",n:"Jounce",d:"营销领域已经开始逐渐转向人...",i:"assets/icon_317.jpg",l:"https://www.jounce.ai"},
+  {c:"AIGC营销增长",n:"Klap",d:"生成tiktok，短片和卷轴从你的YouTube视频在点击使用人工智能。",i:"assets/icon_318.jpg",l:"https://klap.app"},
+  {c:"AIGC营销增长",n:"CLOSERSCOPY",d:"利用世界上最强大的文案的秘密……让您的文案机器人将它们变为现实！",i:"assets/icon_319.jpg",l:"https://www.closerscopy.com"},
+  {c:"AIGC企业服务",n:"OfferGo AI模拟面试",d:"智能识别面试问题，实时生成个性化回答建议",i:"assets/icon_320.jpg",l:"https://offergo.site"},
+  {c:"AIGC企业服务",n:"牛牛面试",d:"AI面试助手，帮你更从容应对面试",i:"assets/icon_321.jpg",l:"https://www.offernn.com"},
+  {c:"AIGC企业服务",n:"求职精灵Genielink",d:"AI求职，就用求职精灵！你的 24 小时在线求职教练！",i:"assets/icon_322.jpg",l:"https://finsight.work"},
+  {c:"AIGC企业服务",n:"面灵AI",d:"从简历准备、模拟面试、实时面试辅助到深度复盘的求职面试全链路解决方案。平台依托先进的音频采集、语音识别与自然语言处理技术，深度适配中文面试场景与国内主流招聘平台",i:"assets/icon_323.jpg",l:"https://mianlingai.com"},
+  {c:"AIGC企业服务",n:"笔面通AI面试笔试助手",d:"以求职场景的核心痛点为切入点，通过 “AI 实时赋能 + 全场景适配 + 安全隐蔽” 的核心优势，构建了 “笔试 + 面试” 一体化的智能辅助解决方案。",i:"assets/icon_324.jpg",l:"https://bimiantong.com"},
+  {c:"AIGC企业服务",n:"面试猴",d:"覆盖‘简历优化 - 笔试辅助 - 实时面试 - 面试复盘’全链路，解决求职者‘面试冷场、笔试卡壳、简历无亮点、复盘无方向’四大核心痛点”。",i:"assets/icon_325.jpg",l:"https://offer.autohanding.com"},
+  {c:"AIGC企业服务",n:"OfferStar AI",d:"解决求职者在在线面试、笔试中 “应答不及时、算法题攻克难、紧张导致发挥失常、复盘无依据” 等痛点。通过 “实时语音识别 + AI 智能应答 + 多平台兼容” 的技术架构，平台为互联网及泛 IT 行业求职者（如程序员、产品经理、设计师）提供 “隐蔽化、高效化、精准化” 的求职辅助服务",i:"assets/icon_326.jpg",l:"https://www.offerstar.cn"},
+  {c:"AIGC企业服务",n:"聘才猫AI",d:"深度融合 AI 技术与人力资源场景，为企业和求职者提供全方位、高效能的服务。",i:"assets/icon_327.jpg",l:"https://www.pincaimao.com"},
+  {c:"AIGC企业服务",n:"面试猫",d:"实时辅导、模拟练习、智能分析等功能，帮助求职者提升面试表现、高效应对各类面试挑战，其核心定位为 “助你轻松拿 OFFER”",i:"assets/icon_328.jpg",l:"https://www.offermore.cc"},
+  {c:"AIGC企业服务",n:"OfferGoose 多面鹅",d:"OfferGoose 多面鹅是一个专业的AI面试模拟平台，通过AI技术提供实时反馈、模拟面试、面试押题和深度复盘，帮助求职者提升面试技巧，显著提高面试通过率和薪资涨幅。适用于多种职位和行业，是求职者的得力助手。",i:"assets/icon_329.jpg",l:"https://www.offergoose.cn"},
+  {c:"AIGC企业服务",n:"Offer鸡",d:"Offer鸡是一款面相广大年轻求职者的AI求职助手。",i:"assets/icon_330.jpg",l:"https://offerchick.cn"},
+  {c:"AIGC企业服务",n:"面试教练",d:"面试教练（Job Interview Coach）是一个专门设计的在线平台，旨在帮助个人通过提供高级面试辅导来准备面试并在面试中取得成功。",i:"assets/icon_331.jpg",l:"https://jobinterview.coach"},
+  {c:"AIGC企业服务",n:"方便面AI面试",d:"方便面AI面试是一个基于“AI+视频”的招聘工具，旨在通过AI技术赋能招聘流程管理的各个环节。该系统不仅提供标准化的AI面试评估和打分，还具有个性化推荐功能。随着面试数据的增加，系统能自动更新算法模型和参数权重，以提高推荐模型的准确性。",i:"assets/icon_332.jpg",l:"https://fbmms.cn"},
+  {c:"AIGC企业服务",n:"海纳AI",d:"海纳AI是一个提供大规模AI+视频面试解决方案的平台，旨在帮助大型集团实现招聘的数字化和智能化。该平台通过省时省力、降本增效的方式，助力企业在招聘过程中提高效率。海纳AI提供的服务包括AI面试、在线笔试、视频面试等，专为招聘场景设计，稳定流畅，满足各种面试场景的需求。",i:"assets/icon_333.jpg",l:"https://www.hina.com"},
+  {c:"AIGC企业服务",n:"讯飞智聘",d:"企业招聘全流程的智能化解决方案",i:"assets/icon_334.jpg",l:"https://zp.xfsaas.cn"},
+  {c:"AIGC企业服务",n:"倍塔塞司",d:"按“HR+AI”模式，提供职业规划、职业测评、定制测评、AI测评、AI工具等多样化创意类AI服务。",i:"assets/icon_335.jpg",l:"https://www.betasess.com"},
+  {c:"AIGC企业服务",n:"HR智能助手",d:"为HR打造的免费工作智能应用，帮助解决Hr处理日常工作中的问题，提升工作效率和效果产出。",i:"assets/icon_336.jpg",l:"https://shuqihui.com/zhushou"},
+  {c:"AIGC企业服务",n:"AI得贤招聘官",d:"替代人类面试官对候选人的核心价值观，通用素质，潜在领导力和专业素质进行基于视频面试的判断。",i:"assets/icon_337.jpg",l:"https://www.airecruitas.com"},
+  {c:"AIGC企业服务",n:"Final Round AI",d:"Final Round A是一个全面的AI工具，专为招聘季节设计，提供从第一天到最终面试的一系列AI超能力。它通过个性化和实时的面试准备支持，帮助求职者提高面试技能和自信心，从而在竞争激烈的就业市场中脱颖而出。",i:"assets/icon_338.jpg",l:"https://www.finalroundai.com"},
+  {c:"AIGC企业服务",n:"Huru.ai",d:"Huru.ai 是一个领先的人工智能驱动的视频面试准备平台，旨在帮助用户提高自信心、通过面试并最终获得梦想中的工作。",i:"assets/icon_339.jpg",l:"https://huru.ai"},
+  {c:"AIGC企业服务",n:"interviewsby.ai",d:"Interviewsby.ai 是一个提供定制模拟面试和实时反馈的在线平台，由人工智能技术，特别是ChatGPT提供支持。",i:"assets/icon_340.jpg",l:"https://interviewsby.ai"},
+  {c:"AIGC企业服务",n:"Moka Eva",d:"Moka Eva是Moka公司发布的首个AI原生HR SaaS整体解决方案，也是面向AGI时代的AI HR伙伴。这是Moka全面拥抱AI战略布局的里程碑，也将重新定义HR数字化未来新趋势。Moka因此成为行业首家真正交付AI原生HR SaaS产品的公司。Moka Eva的名字来自“Moka Evolution With AI”的缩写，寓意Moka全面拥抱AI的战略，同时也寓意Moka Eva将会像人一样提供更人性化的服务。",i:"assets/icon_341.jpg",l:"https://www.moka.com"},
+  {c:"AIGC企业服务",n:"HRMind",d:"HRMind 是拉勾招聘推出的 AI 智能招聘助手产品。它是基于预训练大模型实现广泛应用的招聘场景产品。该产品是根据数十万精英 HR 的招聘经验而打造的，采用了最先进的预训练大模型。",i:"assets/icon_342.jpg",l:"https://www.lagou.com"},
+  {c:"AIGC企业服务",n:"Moonhub AI",d:"Moonhub AI 是一个以 AI 为驱动的招聘平台，专为初创公司和正在增长的企业提供人才招聘服务。该平台使用会话式 AI 来分析市场数据并设计最佳的招聘策略，以最大化招聘质量和速度。",i:"assets/icon_343.jpg",l:"https://www.moonhub.ai"},
+  {c:"AIGC医疗健康",n:"蚂蚁阿福",d:"聚焦健康医疗领域的 AI 医生助手",i:"assets/icon_344.jpg",l:"https://chat.antafu.com"},
+  {c:"AIGC医疗健康",n:"百小医",d:"基于百川自研的 Baichuan-M4 医疗大模型驱动，旨在为用户提供从看病前到看病后的全流程健康管理服务，核心理念是“明明白白看医生，安安心心管家人”。",i:"assets/icon_345.jpg",l:"https://ying.baichuan-ai.com/chat"},
+  {c:"AIGC医疗健康",n:"小荷AI医生",d:"AI医疗助手App，主要面向普通大众，提供7×24小时的健康服务",i:"assets/icon_346.jpg",l:"https://www.xiaohe.cn/home/doctor"},
+  {c:"AIGC医疗健康",n:"灵医智惠",d:"百度大脑技术驱动的AI医疗品牌，致力于通过人工智能技术赋能大健康产业。",i:"assets/icon_347.jpg",l:"https://01.baidu.com"},
+  {c:"AIGC医疗健康",n:"京医星脉",d:"核心定位是“全方位的医疗资源和服务集成开放平台”，旨在通过开放API接口、标准化服务模块和AI能力，帮助各类机构快速构建或升级自身的数字化医疗服务体系。",i:"assets/icon_348.jpg",l:"https://jdhcloud.jd.com/jdh-qs-cloud/home"},
+  {c:"AIGC医疗健康",n:"脉络洞察AIGC",d:"解决行业内 “知识管理碎片化、内容创作低效、合规审核复杂、专业问答无据可依” 的痛点。",i:"assets/icon_349.jpg",l:"https://www.medomino.com/product/aigc"},
+  {c:"AIGC医疗健康",n:"达医智影",d:"阿里巴巴达摩院医疗AI医学影像早筛平台达医智影，结合阿里云算力，赋能医学影像癌症AI筛检，致力癌症早筛、肿瘤筛查等各类急症和慢病的早期检查，为实现筛查精准性提升，以及平扫CT+AI多癌筛查能力成为可能。",i:"assets/icon_350.jpg",l:"https://damomed.com"},
+  {c:"AIGC医疗健康",n:"紫荆智康",d:"紫荆智康致力于医疗领域人工智能应用，推出 Agent Hospital 首批 AI 医生，辅助医生进行诊断、治疗和患者管理，提高医疗服务效率和质量，为患者提供更好的就医体验，推动医疗行业智能化发展",i:"assets/icon_351.jpg",l:"https://www.tairex.cn"},
+  {c:"AIGC医疗健康",n:"AI神农大脑",d:"AI神农大脑可能具备智能交互功能，能够根据用户的问题和需求提供相应的回答和解决方案，帮助用户更高效地获取信息和解决问题.",i:"assets/icon_352.jpg",l:"https://shennongalpha.westlake.edu.cn"},
+  {c:"AIGC医疗健康",n:"MedGPT",d:"中国领先的互联网医院医联于 2023 年 4 月 28 日宣布成功研制的国内首款大模型驱动的 AI 医生",i:"assets/icon_353.jpg",l:"https://www.medlinker.com/index"},
+  {c:"AIGC医疗健康",n:"全诊通Aioclinic",d:"通过语音识别、图片识别、大语言模型等技术，帮助医生自动生成病历，提升病历书写效率和质量，同时保护患者隐私",i:"assets/icon_354.jpg",l:"https://www.aioclinic.com/ai_assistant/introduction#"},
+  {c:"AIGC医疗健康",n:"讯飞晓医-你的个人健康助手",d:"具备症状自查、药物查询、中医辨证、报告解读、医院推荐、科室推荐、饮食建议七大功能，是服务每个人的AI健康助手。",i:"assets/icon_355.jpg",l:"https://www.iflyhealth.com/product/244.html"},
+  {c:"AIGC医疗健康",n:"医真AI+",d:"医真AI+自成立以来，专注于医疗影像、超声、内镜、核医学、病理等全医技医疗大数据底层核心技术的自主研发及应用，在医技业务、医技大数据应用、协同、科研、运营、百姓感知及人工智能方面具备高度先进与成熟的应用，截止目前已服务2500+医疗机构。",i:"assets/icon_356.jpg",l:"http://aistore.yizhen.cn/yizhen-aistore/index.jsp"},
+  {c:"AIGC医疗健康",n:"唤醒食物",d:"基于人工智能与数据可视化技术为您提供全面直观的食物营养成分与科学食疗方案。",i:"assets/icon_357.jpg",l:"https://www.foodwake.cn"},
+  {c:"AIGC医疗健康",n:"超能文献",d:"超能文献是由深圳数野科技推出的基于人工智能 (AI) 技术打造的医学文献搜索引擎，它融合了先进的大语言模型算法、再结合传统的 NLP 技术，能够像真人一样理解你的搜索意图，并从海量文献中精准定位你需要的文章。",i:"assets/icon_358.jpg",l:"https://suppr.wilddata.cn"},
+  {c:"AIGC医疗健康",n:"AI医学 &#8211; PubMed中文版",d:"PubMed中文版提供对PubMed的全中文实时访问。",i:"assets/icon_359.jpg",l:"https://www.aipubmed.com"},
+  {c:"AIGC医疗健康",n:"Gleamer",d:"Gleamer 是一家专注于放射学领域的人工智能公司，其首款临床 AI 应用程序 BoneView 成为全球骨创伤 X 射线解读的标准，高效识别骨折、关节积液、脱位和骨病变等病变",i:"assets/icon_360.jpg",l:"https://www.gleamer.ai"},
+  {c:"AIGC医疗健康",n:"BioticsAI",d:"BioticsAI 是一款人工智能驱动的软件，专注于妇产科领域，提供胎儿异常筛查验证、胎儿脆弱部位定位和自动化报告生成等功能。",i:"assets/icon_361.jpg",l:"https://www.biotics.ai"},
+  {c:"AIGC医疗健康",n:"Freed",d:"专为临床医生设计的 AI 医疗记录工具，通过自动化记录医疗笔记，帮助医生节省时间，提高工作效率，让他们能够更专注于与患者的互动和提供优质的医疗服务。",i:"assets/icon_362.jpg",l:"https://www.getfreed.ai"},
+  {c:"AIGC医疗健康",n:"Docus AI",d:"技术与医疗专业人工智能健康平台",i:"assets/icon_363.jpg",l:"https://docus.ai"},
+  {c:"AIGC医疗健康",n:"Lunit",d:"Lunit是一家上市公司，开发有助于征服癌症的医疗AI软件。对于癌症，生存通常取决于它被发现的早期程度，而Lunit的癌症筛查AI帮助医生更早地发现它。",i:"assets/icon_364.jpg",l:"https://www.lunit.io"},
+  {c:"AIGC医疗健康",n:"GLASS",d:"GLASS有效的问题表述，也称为诊断性单行词，包括相关的人口统计学、相关病史或流行病学危险因素、疾病的持续时间和速度，以及关键体征和症状以及关键数据（实验室、影像学、体格检查数据）。",i:"assets/icon_365.jpg",l:"https://glass.health"},
+  {c:"AIGC医疗健康",n:"woebot",d:"woebot是您的个人心理健康盟友，可帮助您恢复自己的感觉。以临床研究为后盾，由 AI 提供支持。",i:"assets/icon_366.jpg",l:"https://woebothealth.com"},
+  {c:"AIGC医疗健康",n:"Facial Assessment Tool-QOVES",d:"QOVES实验室的面部评估工具，它使用机器学习像临床医生一样分析您的面部，并建议改善您的日常工作。",i:"assets/icon_367.jpg",l:"https://qoves.com/facial-assessment-tool"}
 ];
+var grid = document.getElementById('grid');
+var search = document.getElementById('search');
+var empty = document.getElementById('empty');
+var tabsEl = document.getElementById('tabs');
+var countEl = document.getElementById('count');
+var cats = ['全部'];
+tools.forEach(function(t){ if(cats.indexOf(t.c)<0) cats.push(t.c); });
+var activeCat = '全部';
 
-const grid = document.getElementById('grid');
-const search = document.getElementById('search');
-const empty = document.getElementById('empty');
-const tagsEl = document.getElementById('tags');
-const countEl = document.getElementById('count');
-let activeTag = '全部';
-
-const cats = ['全部', ...new Set(tools.map(t => t.t))];
-tagsEl.innerHTML = cats.map(c => `<div class="tag ${c===activeTag?'active':''}" data-c="${c}">${c}</div>`).join('');
+tabsEl.innerHTML = cats.map(function(c){ return '<div class="tab'+(c===activeCat?' active':'')+'" data-c="'+c+'">'+c+'</div>'; }).join('');
 
 function render() {
-  const q = search.value.trim().toLowerCase();
-  const list = tools.filter(t => {
-    const okTag = activeTag === '全部' || t.t === activeTag;
-    const okQ = !q || t.n.toLowerCase().includes(q) || t.d.toLowerCase().includes(q) || t.c.toLowerCase().includes(q);
-    return okTag && okQ;
+  var q = search.value.trim().toLowerCase();
+  var list = tools.filter(function(t){
+    var okCat = (activeCat==='全部' || t.c===activeCat);
+    var okQ = (!q || t.n.toLowerCase().indexOf(q)>=0 || t.d.toLowerCase().indexOf(q)>=0);
+    return okCat && okQ;
   });
-  grid.innerHTML = list.map(t => `
-    <a class="card" href="${t.l}" target="_blank" rel="noopener">
-      <div class="card-head">
-        <div class="icon"><img src="${t.i}" alt="${t.n}" loading="lazy"></div>
-        <div>
-          <div class="name">${t.n}</div>
-          <span class="cat">${t.c}</span>
-        </div>
-      </div>
-      <p class="desc">${t.d}</p>
-      <div class="go">→ 前往官网</div>
-    </a>`).join('');
+  grid.innerHTML = list.map(function(t){
+    var letter = t.n.charAt(0);
+    return '<a class="card" href="'+t.l+'" target="_blank" rel="noopener">'+
+      '<div class="card-head"><div class="icon">'+
+      '<img src="'+t.i+'" alt="'+t.n+'" loading="lazy" onerror="this.style.display=\'none\';this.parentNode.textContent=\''+letter+'\'">'+
+      '</div><div class="name">'+t.n+'</div></div>'+
+      '<p class="desc">'+t.d+'</p></a>';
+  }).join('');
   empty.style.display = list.length ? 'none' : 'block';
-  countEl.textContent = `共 ${tools.length} 款工具 · 当前显示 ${list.length} 款`;
+  countEl.textContent = '共 ' + tools.length + ' 款工具 · ' + (activeCat==='全部'?'全部分类':activeCat) + ' · 显示 ' + list.length + ' 款';
 }
-
 search.addEventListener('input', render);
-tagsEl.addEventListener('click', e => {
-  const t = e.target.closest('.tag'); if (!t) return;
-  activeTag = t.dataset.c;
-  document.querySelectorAll('.tag').forEach(x => x.classList.toggle('active', x === t));
+tabsEl.addEventListener('click', function(e){
+  var t = e.target.closest('.tab'); if(!t) return;
+  activeCat = t.dataset.c;
+  document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('active', x===t); });
   render();
 });
-
 render();
 </script>
 </body>
