@@ -15,9 +15,10 @@ if (Test-Path $configPath) {
 }
 
 # Load history
-$history = @()
+[array]$history = @()
 if (Test-Path $historyPath) {
-    $history = Get-Content $historyPath -Raw | ConvertFrom-Json
+    $loaded = Get-Content $historyPath -Raw | ConvertFrom-Json
+    if ($loaded) { $history = @($loaded) }
 }
 
 # Check today submission
@@ -38,7 +39,7 @@ if ($config -and $config.account) {
     $account = Read-Host "Account (default: $($config.account))"
     if (-not $account) { $account = $config.account }
 } else {
-    $account = Read-Host "Enter Zepp account"
+    $account = Read-Host "Enter Zepp account (email)"
 }
 
 # Password input
@@ -50,20 +51,11 @@ if ($config -and $config.password) {
 }
 
 # Random steps
-if ($config -and $config.minSteps) {
-    $custom = Read-Host "Custom steps? (Enter for random $($config.minSteps)-$($config.maxSteps))"
-    if (-not $custom) {
-        $steps = Get-Random -Minimum $config.minSteps -Maximum $config.maxSteps
-    } else {
-        $steps = [int]$custom
-    }
+$default = Read-Host "Use safe random 7000-16000? (y/n, default y)"
+if ($default -ne "n") {
+    $steps = Get-Random -Minimum 7000 -Maximum 16000
 } else {
-    $default = Read-Host "Use safe random 7000-16000? (y/n, default y)"
-    if ($default -ne "n") {
-        $steps = Get-Random -Minimum 7000 -Maximum 16000
-    } else {
-        $steps = [int](Read-Host "Enter target steps")
-    }
+    $steps = [int](Read-Host "Enter target steps")
 }
 
 # Limit steps
@@ -88,7 +80,7 @@ if ($save -ne "n") {
 # Confirm
 Write-Host ""
 Write-Host "Pre-check: 1.Bind success 2.No real band bound" -ForegroundColor Cyan
-Write-Host "Target steps: $steps (random)"
+Write-Host "Target steps: $steps"
 $confirm = Read-Host "Confirm submit? (y/n, default y)"
 if ($confirm -eq "n") {
     Write-Host "Cancelled"
@@ -117,7 +109,7 @@ Write-Host ""
 if ($result.code -eq 200) {
     Write-Host "SUCCESS! Submitted $steps steps" -ForegroundColor Green
     Write-Host $result.msg -ForegroundColor Green
-    Write-Host "Wait 10-60 minutes for sync, no re-submit today" -ForegroundColor Cyan
+    Write-Host "Wait 3-10 minutes for sync, no re-submit today" -ForegroundColor Cyan
 
     $newRecord = @{
         date = $today

@@ -22,10 +22,20 @@ export default {
     }
 
     try {
-      const params = await request.formData();
-      const account = params.get('user')?.trim();
-      const password = params.get('password')?.trim();
-      let step = parseInt(params.get('step')?.trim());
+      let account, password, stepStr;
+      const contentType = request.headers.get('content-type') || '';
+      if (contentType.includes('application/x-www-form-urlencoded')) {
+        const urlParams = await request.formData();
+        account = urlParams.get('user')?.trim();
+        password = urlParams.get('password')?.trim();
+        stepStr = urlParams.get('step')?.trim();
+      } else {
+        const params = await request.formData();
+        account = params.get('user')?.trim();
+        password = params.get('password')?.trim();
+        stepStr = params.get('step')?.trim();
+      }
+      let step = parseInt(stepStr);
 
       if (!account || !password) {
         return new Response(JSON.stringify({code:400, msg:'请填写账号和密码'}), {
