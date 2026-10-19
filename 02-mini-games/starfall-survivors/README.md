@@ -39,6 +39,8 @@ python tools/art/gen_adaptive_icons.py assets/icons   # Android 自适应图标
 
 流程：Python 程序化生成（`tools/art/generate.py`）→ Aseprite CLI 转 `.aseprite` 源文件（`assets/sprites/src/`，可在 Aseprite 中继续手绘编辑）→ Aseprite CLI 导出最终 PNG（`assets/sprites/`）。
 
+**中文字体子集化**（同一管线自动完成）：`tools/art/collect_chars.py` 扫描工程全部文案收集实际用到的字符（约 470 个）→ fonttools 将 Noto Sans SC 可变字体实例化为 Regular 并子集化为 `assets/fonts/noto_sc_cn.ttf`（约 110KB，已通过项目 `gui/theme/custom_font` 全局启用）。后续新增文案只需重跑 `build.sh` 即可自动扩充字体子集，无需手动干预。
+
 ## 双端导出
 
 ```bash
