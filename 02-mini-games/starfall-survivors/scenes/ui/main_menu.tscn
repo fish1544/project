@@ -1,0 +1,126 @@
+[gd_scene load_steps=7 format=3 uid="uid://starfallmenu"]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_scr"]
+
+[sub_resource type="LabelSettings" id="LS_title"]
+font_size = 52
+font_color = Color(1, 0.85, 0.35, 1)
+outline_color = Color(0, 0, 0, 0.85)
+outline_size = 10
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="LabelSettings" id="LS_sub"]
+font_size = 16
+font_color = Color(0.55, 0.8, 1, 1)
+outline_color = Color(0, 0, 0, 0.7)
+outline_size = 4
+
+[sub_resource type="LabelSettings" id="LS_desc"]
+font_size = 14
+font_color = Color(0.82, 0.85, 0.92, 1)
+outline_color = Color(0, 0, 0, 0.6)
+outline_size = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_btn"]
+bg_color = Color(0.2, 0.25, 0.42, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+border_color = Color(1, 0.85, 0.35, 0.7)
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_hover"]
+bg_color = Color(0.28, 0.34, 0.55, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+border_color = Color(1, 0.85, 0.35, 1)
+
+[node name="MainMenu" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_scr")
+
+[node name="Bg" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.054, 0.07, 0.141, 1)
+
+[node name="Stars" type="Node2D" parent="."]
+
+[node name="CenterBox" type="VBoxContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -190.0
+offset_right = 300.0
+offset_bottom = 190.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 52
+label_settings = SubResource("LS_title")
+text = "星陨幸存者"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="CenterBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+label_settings = SubResource("LS_sub")
+text = "STARFALL SURVIVORS · 肉鸽割草"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="CenterBox"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+
+[node name="Desc" type="Label" parent="CenterBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+label_settings = SubResource("LS_desc")
+text = "星陨之夜，怪物成群而至。
+自动射击、拾取宝石、每次升级三选一强化，活得越久，变得越强。"
+horizontal_alignment = 1
+
+[node name="Spacer2" type="Control" parent="CenterBox"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="CenterBox"]
+custom_minimum_size = Vector2(240, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("SB_btn")
+theme_override_styles/hover = SubResource("SB_btn_hover")
+theme_override_styles/pressed = SubResource("SB_btn_hover")
+text = "开始游戏"
+
+[node name="Hint" type="Label" parent="CenterBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+label_settings = SubResource("LS_desc")
+text = "WASD / 方向键移动 · 自动攻击最近敌人 · 升级时按 1/2/3 选择强化"
+horizontal_alignment = 1
+
+[node name="Version" type="Label" parent="CenterBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+label_settings = SubResource("LS_sub")
+text = "v0.2 · Web / Android 双端"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="CenterBox/StartButton" to="." method="_on_start_pressed"]

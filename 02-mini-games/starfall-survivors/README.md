@@ -2,19 +2,22 @@
 
 Godot 4.7 + Aseprite 全栈开发的 **Survivors-like 肉鸽割草**游戏。目标平台：TapTap（Android / H5）。
 
-## 玩法（当前版本 v0.1 核心循环）
+## 玩法（当前版本 v0.2）
 
-- WASD / 方向键移动
-- 角色自动攻击范围内最近的敌人（间隔 1.2s）
+- **主菜单 / 结算**：开始界面 + 战绩结算（存活时间/击杀/等级/波次），Enter 快速重开
+- **WASD / 方向键移动**，角色自动攻击范围内最近的敌人
+- **三种敌种**（随波次解锁）：追击者（直线）、冲刺者（蓄力白闪后高速冲撞）、弹幕手（保持距离发射能量弹）
+- **波次系统**：每 30 秒一波，敌人血量/速度递增、生成加速、敌种混合升级，波次推进有仪式感震屏
+- **升级三选一**：每次升级暂停并弹出 3 张强化卡（攻速/伤害/移速/多弹丸/生命上限/磁吸/索敌，共 7 种 Buff）
+- **打击反馈**：屏幕震动、受击白闪+击退、命中火花、伤害飘字、死亡爆裂粒子、受击红屏
 - 敌人死亡掉落经验宝石，磁吸拾取，经验满升级
-- 敌人接触造成伤害（受击后 0.6s 无敌帧），HP 归零游戏结束
-- UI 实时显示 HP / 等级 / 经验 / 击杀数
+- UI：HP/XP 进度条、计时、波次、击杀数实时显示
 
 ## 运行
 
 ```bash
 # 需要 Godot 4.7.x（已用 4.7.2.stable 验证）
-godot --path .            # 运行游戏
+godot --path .            # 运行游戏（从主菜单开始）
 godot --path . --editor   # 打开编辑器
 ```
 
@@ -25,12 +28,13 @@ godot --headless --path . --import   # 首次运行先导入资源
 godot --headless --path . res://scenes/test/test_runner.tscn
 ```
 
-覆盖：场景实例化、输入移动、接触伤害、自动攻击击杀、宝石掉落与拾取、升级曲线、无敌帧、游戏结束。
+26 项断言全过：核心循环 10 项 + Buff 池/三选一面板流程/冲刺者状态机/远程弹幕/难度缩放/特效自毁/震屏复位/主菜单加载。
 
 ## 像素美术管线（一条命令全自动重建）
 
 ```bash
-bash tools/art/build.sh
+bash tools/art/build.sh                       # 全部精灵（含三种敌种/敌弹/图标）
+python tools/art/gen_adaptive_icons.py assets/icons   # Android 自适应图标
 ```
 
 流程：Python 程序化生成（`tools/art/generate.py`）→ Aseprite CLI 转 `.aseprite` 源文件（`assets/sprites/src/`，可在 Aseprite 中继续手绘编辑）→ Aseprite CLI 导出最终 PNG（`assets/sprites/`）。
@@ -55,8 +59,8 @@ godot --headless --path . --export-release "Web"
 
 ```
 starfall-survivors/
-├── project.godot          # Godot 4.7 工程配置
-├── scenes/                # 场景（玩家/敌人/宝石/弹丸/HUD）
+├── project.godot          # Godot 4.7 工程配置（主场景=主菜单）
+├── scenes/                # 场景（玩家/三种敌人/宝石/弹丸/HUD/菜单/面板）
 ├── scripts/               # GDScript（游戏逻辑 + autoload + 测试）
 ├── assets/sprites/        # 最终 PNG（Godot 导入）
 │   └── src/               # Aseprite 源文件（生成器中间产物，可手绘编辑）
@@ -68,7 +72,7 @@ starfall-survivors/
 ## 开发路线图
 
 - v0.1 核心循环（移动/射击/掉落/升级）✅
-- v0.1.5 应用图标 + 双端导出（Web / Android APK）✅ 当前
-- v0.2 武器与掉落三选一、敌种多样化
-- v0.3 精英/BOSS、BGM 与音效、主菜单
-- v1.0 TapTap 上架（release 签名、开发者资料、隐私合规、应用商店截图）
+- v0.1.5 应用图标 + 双端导出（Web / Android APK）✅
+- v0.2 表现层（震屏/白闪/粒子/飘字）+ 三敌种 + 波次系统 + 升级三选一 + 主菜单/结算 ✅ 当前
+- v0.3 BGM 与音效（程序化合成）、精英/BOSS、暂停与设置
+- v1.0 release 签名、TapTap 上架（开发者资料、隐私合规、商店截图）

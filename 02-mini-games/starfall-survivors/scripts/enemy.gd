@@ -1,15 +1,7 @@
-extends CharacterBody2D
-
-const XPGemScene := preload("res://scenes/pickups/xp_gem.tscn")
+extends EnemyBase
+## 追击者：直线追向玩家的基础敌种。
 
 @export var chase_speed := 60.0
-@export var hp := 20
-
-var target: Node2D
-
-
-func _ready() -> void:
-	add_to_group("enemies")
 
 
 func _physics_process(delta: float) -> void:
@@ -19,19 +11,10 @@ func _physics_process(delta: float) -> void:
 			velocity = to_target.normalized() * chase_speed
 		else:
 			velocity = Vector2.ZERO
-	move_and_slide()
+	else:
+		velocity = Vector2.ZERO
+	_integrate_common(delta)
 
 
-func take_damage(amount: int) -> void:
-	hp -= amount
-	if hp <= 0:
-		GameState.add_kill()
-		call_deferred("_drop_loot")
-
-
-func _drop_loot() -> void:
-	var gem := XPGemScene.instantiate()
-	gem.position = global_position
-	gem.target = target
-	get_parent().add_child(gem)
-	queue_free()
+func _apply_difficulty(wave: int, mult: float) -> void:
+	chase_speed = 60.0 * mult

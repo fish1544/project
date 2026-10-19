@@ -83,6 +83,59 @@ def draw_enemy() -> Canvas:
     return c
 
 
+def draw_dasher() -> Canvas:
+    """冲刺者：紫红色箭头形，蓄势待发的尖锐轮廓。"""
+    c = Canvas(16, 16)
+    dark = (40, 12, 48, 255)
+    purple = (178, 102, 255, 255)
+    light = (226, 190, 255, 255)
+    c.rect(7, 0, 2, 16, dark)      # 中轴
+    c.rect(2, 2, 12, 12, dark)     # 头部外框
+    c.rect(4, 4, 8, 8, dark)
+    c.rect(3, 3, 10, 10, purple)
+    c.rect(5, 5, 6, 6, purple)
+    c.rect(6, 2, 4, 12, purple)    # 箭头
+    c.rect(7, 1, 2, 14, light)
+    c.rect(6, 6, 2, 2, (248, 249, 250, 255))  # 眼
+    c.rect(6, 10, 2, 2, (248, 249, 250, 255))
+    return c
+
+
+def draw_shooter() -> Canvas:
+    """远程弹幕手：青绿色圆环 + 炮口，谨慎的射手轮廓。"""
+    c = Canvas(16, 16)
+    dark = (12, 48, 56, 255)
+    teal = (56, 200, 190, 255)
+    light = (170, 240, 235, 255)
+    c.rect(3, 3, 10, 10, dark)
+    c.rect(4, 4, 8, 8, teal)
+    c.rect(6, 6, 4, 4, dark)
+    c.rect(7, 7, 2, 2, light)
+    c.rect(0, 5, 3, 6, dark)       # 左炮
+    c.rect(0, 6, 2, 4, teal)
+    c.rect(13, 5, 3, 6, dark)      # 右炮
+    c.rect(14, 6, 2, 4, teal)
+    return c
+
+
+def draw_enemy_bullet() -> Canvas:
+    """远程敌弹：8x8 青绿能量球，边缘暗描边。"""
+    c = Canvas(8, 8)
+    dark = (8, 40, 48, 255)
+    teal = (80, 220, 200, 255)
+    light = (200, 250, 245, 255)
+    c.rect(2, 0, 4, 1, dark)
+    c.rect(1, 1, 6, 1, dark)
+    c.rect(0, 2, 8, 4, dark)
+    c.rect(1, 6, 6, 1, dark)
+    c.rect(2, 7, 4, 1, dark)
+    c.rect(2, 1, 4, 1, teal)
+    c.rect(1, 2, 6, 4, teal)
+    c.rect(2, 6, 4, 1, teal)
+    c.rect(2, 2, 3, 3, light)
+    return c
+
+
 def draw_gem() -> Canvas:
     c = Canvas(8, 8)
     dark = (20, 60, 30, 255)
@@ -190,8 +243,11 @@ def main() -> None:
     painters = {
         "player": draw_player,
         "enemy": draw_enemy,
+        "dasher": draw_dasher,
+        "shooter": draw_shooter,
         "gem": draw_gem,
         "projectile": draw_projectile,
+        "enemy_bullet": draw_enemy_bullet,
         "icon": draw_icon,
     }
     for name, fn in painters.items():
