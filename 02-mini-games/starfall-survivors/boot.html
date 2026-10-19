@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<title>$GODOT_PROJECT_NAME</title>
+		<style>
+			html, body, #canvas {
+				margin: 0;
+				padding: 0;
+				border: 0;
+			}
+
+			body {
+				color: white;
+				background-color: #070a16;
+				overflow: hidden;
+				touch-action: none;
+				font-family: "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
+			}
+
+			#canvas {
+				display: block;
+			}
+
+			#canvas:focus {
+				outline: none;
+			}
+
+			/* ===== 游戏化开屏加载层 ===== */
+			#boot {
+				position: fixed;
+				inset: 0;
+				z-index: 100;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				background:
+					radial-gradient(ellipse 120% 80% at 50% -10%, rgba(72, 40, 120, 0.55), transparent 60%),
+					radial-gradient(ellipse 90% 60% at 80% 110%, rgba(20, 60, 100, 0.35), transparent 55%),
+					linear-gradient(180deg, #0b0f22 0%, #10142a 55%, #0a0d1c 100%);
+				transition: opacity 0.6s ease;
+			}
+
+			#boot.fade-out {
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			/* 星点（CSS 生成，无图片依赖） */
+			.star {
+				position: absolute;
+				background: #fdf6d8;
+				border-radius: 1px;
+				opacity: 0.7;
+				animation: twinkle 2.8s ease-in-out infinite;
+			}
+
+			@keyframes twinkle {
+				0%, 100% { opacity: 0.15; }
+				50% { opacity: 0.85; }
+			}
+
+			/* 流星动画 */
+			.meteor {
+				position: absolute;
+				width: 120px;
+				height: 2px;
+				background: linear-gradient(90deg, rgba(255, 209, 102, 0.9), transparent);
+				transform: rotate(-35deg);
+				animation: meteor-fly 3.2s linear infinite;
+				opacity: 0;
+			}
+
+			@keyframes meteor-fly {
+				0% { transform: translate(0, 0) rotate(-35deg); opacity: 0; }
+				8% { opacity: 0.9; }
+				60% { opacity: 0.5; }
+				100% { transform: translate(-340px, 240px) rotate(-35deg); opacity: 0; }
+			}
+
+			#boot-inner {
+				position: relative;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 22px;
+				padding: 24px;
+			}
+
+			#boot-logo {
+				width: 88px;
+				height: 88px;
+				image-rendering: pixelated;
+				filter: drop-shadow(0 0 18px rgba(255, 209, 102, 0.45));
+				animation: logo-float 3s ease-in-out infinite;
+			}
+
+			@keyframes logo-float {
+				0%, 100% { transform: translateY(0); }
+				50% { transform: translateY(-7px); }
+			}
+
+			#boot-title {
+				font-size: 34px;
+				font-weight: 700;
+				letter-spacing: 6px;
+				color: #ffd166;
+				text-shadow: 0 0 22px rgba(255, 209, 102, 0.35), 0 3px 0 rgba(0, 0, 0, 0.45);
+				margin: 0;
+			}
+
+			#boot-subtitle {
+				font-size: 12px;
+				letter-spacing: 4px;
+				color: rgba(160, 190, 230, 0.85);
+				margin-top: -12px;
+			}
+
+			/* 像素风进度条 */
+			#progress-frame {
+				width: min(420px, 78vw);
+				height: 18px;
+				border: 2px solid rgba(255, 209, 102, 0.85);
+				border-radius: 3px;
+				background: rgba(8, 12, 26, 0.9);
+				box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(0, 0, 0, 0.6);
+				overflow: hidden;
+				position: relative;
+			}
+
+			#progress-fill {
+				height: 100%;
+				width: 0%;
+				background:
+					repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 6px, transparent 6px 12px),
+					linear-gradient(180deg, #ffe29a 0%, #ffd166 45%, #e8a93c 100%);
+				transition: width 0.25s ease;
+			}
+
+			#progress-glow {
+				position: absolute;
+				top: 0;
+				left: 0%;
+				height: 100%;
+				width: 40px;
+				background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+				transition: left 0.25s ease;
+			}
+
+			#progress-text {
+				font-size: 13px;
+				letter-spacing: 1px;
+				color: rgba(226, 232, 245, 0.92);
+				min-height: 20px;
+				text-align: center;
+			}
+
+			#progress-text .pct {
+				color: #ffd166;
+				font-weight: 700;
+				font-variant-numeric: tabular-nums;
+			}
+
+			#boot-tip {
+				font-size: 12px;
+				color: rgba(140, 165, 205, 0.75);
+				max-width: 420px;
+				text-align: center;
+				line-height: 1.7;
+			}
+
+			#boot-footer {
+				position: absolute;
+				bottom: 22px;
+				font-size: 11px;
+				letter-spacing: 2px;
+				color: rgba(120, 140, 175, 0.6);
+			}
+
+			#status-notice {
+				display: none;
+				position: fixed;
+				left: 50%;
+				bottom: 18%;
+				transform: translateX(-50%);
+				max-width: 80vw;
+				background-color: #3d1f28;
+				border: 1px solid #9b3943;
+				border-radius: 0.5rem;
+				color: #e0e0e0;
+				font-family: inherit;
+				line-height: 1.5;
+				padding: 1rem 1.2rem;
+				text-align: center;
+				z-index: 200;
+			}
+		</style>
+		$GODOT_HEAD_INCLUDE
+	</head>
+	<body>
+		<canvas id="canvas">
+			Your browser does not support the canvas tag.
+		</canvas>
+
+		<noscript>
+			Your browser does not support JavaScript.
+		</noscript>
+
+		<div id="status-notice"></div>
+
+		<div id="boot">
+			<div id="boot-inner">
+				<img id="boot-logo" src="$GODOT_SPLASH" alt="">
+				<h1 id="boot-title">星陨幸存者</h1>
+				<div id="boot-subtitle">STARFALL SURVIVORS</div>
+				<div id="progress-frame">
+					<div id="progress-fill"></div>
+					<div id="progress-glow"></div>
+				</div>
+				<div id="progress-text"><span class="pct">0%</span>　正在唤醒引擎…</div>
+				<div id="boot-tip">提示：敌人成群而至，保持移动、持续升级，活得越久变得越强。</div>
+			</div>
+			<div id="boot-footer">v0.2 · WEB / ANDROID · GODOT ENGINE</div>
+		</div>
+
+		<script src="$GODOT_URL"></script>
+		<script>
+			const GODOT_CONFIG = $GODOT_CONFIG;
+			const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
+			const engine = new Engine(GODOT_CONFIG);
+
+			(function () {
+				const boot = document.getElementById('boot');
+				const fill = document.getElementById('progress-fill');
+				const glow = document.getElementById('progress-glow');
+				const text = document.getElementById('progress-text');
+				const notice = document.getElementById('status-notice');
+				const frame = document.getElementById('progress-frame');
+
+				// 生成星点
+				(function spawnStars() {
+					for (let i = 0; i < 42; i++) {
+						const s = document.createElement('div');
+						s.className = 'star';
+						const size = Math.random() < 0.85 ? 2 : 3;
+						s.style.width = size + 'px';
+						s.style.height = size + 'px';
+						s.style.left = (Math.random() * 100) + '%';
+						s.style.top = (Math.random() * 100) + '%';
+						s.style.animationDelay = (Math.random() * 3) + 's';
+						boot.appendChild(s);
+					}
+					const m = document.createElement('div');
+					m.className = 'meteor';
+					m.style.right = '12%';
+					m.style.top = '8%';
+					boot.appendChild(m);
+				})();
+
+				const PHASES = [
+					[0.00, '正在唤醒引擎…'],
+					[0.18, '下载运行时…'],
+					[0.55, '装载星陨之夜…'],
+					[0.82, '打磨武器与宝石…'],
+					[0.97, '即将进入战场…'],
+				];
+
+				function phaseFor(p) {
+					let label = PHASES[0][1];
+					for (const [thr, lbl] of PHASES) {
+						if (p >= thr) label = lbl;
+					}
+					return label;
+				}
+
+				function setStatusNotice(t) {
+					while (notice.lastChild) notice.removeChild(notice.lastChild);
+					const lines = t.split('\n');
+					lines.forEach((line) => {
+						notice.appendChild(document.createTextNode(line));
+						notice.appendChild(document.createElement('br'));
+					});
+					notice.style.display = 'block';
+				}
+
+				function displayFailureNotice(err) {
+					console.error(err);
+					if (err instanceof Error) setStatusNotice('加载失败：' + err.message);
+					else if (typeof err === 'string') setStatusNotice(err);
+					else setStatusNotice('An unknown error occurred.');
+				}
+
+				const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
+				if (missing.length !== 0) {
+					displayFailureNotice('运行所需的浏览器特性缺失：\n' + missing.join('\n'));
+				} else {
+					engine.startGame({
+						'onProgress': function (current, total) {
+							let pct = 0;
+							if (current > 0 && total > 0) {
+								pct = Math.min(100, Math.round((current / total) * 100));
+							}
+							fill.style.width = pct + '%';
+							glow.style.left = 'calc(' + pct + '% - 40px)';
+							text.innerHTML = '<span class="pct">' + pct + '%</span>　' + phaseFor(pct / 100);
+						},
+					}).then(() => {
+						fill.style.width = '100%';
+						text.innerHTML = '<span class="pct">100%</span>　准备就绪';
+						setTimeout(() => {
+							boot.classList.add('fade-out');
+							setTimeout(() => boot.remove(), 700);
+						}, 250);
+					}, displayFailureNotice);
+				}
+			}());
+		</script>
+	</body>
+</html>

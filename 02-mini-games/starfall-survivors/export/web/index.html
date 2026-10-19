@@ -1,94 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<title>星陨幸存者</title>
 		<style>
-html, body, #canvas {
-	margin: 0;
-	padding: 0;
-	border: 0;
-}
+			html, body, #canvas {
+				margin: 0;
+				padding: 0;
+				border: 0;
+			}
 
-body {
-	color: white;
-	background-color: black;
-	overflow: hidden;
-	touch-action: none;
-}
+			body {
+				color: white;
+				background-color: #070a16;
+				overflow: hidden;
+				touch-action: none;
+				font-family: "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
+			}
 
-#canvas {
-	display: block;
-}
+			#canvas {
+				display: block;
+			}
 
-#canvas:focus {
-	outline: none;
-}
+			#canvas:focus {
+				outline: none;
+			}
 
-#status, #status-splash, #status-progress {
-	position: absolute;
-	left: 0;
-	right: 0;
-}
+			/* ===== 游戏化开屏加载层 ===== */
+			#boot {
+				position: fixed;
+				inset: 0;
+				z-index: 100;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				background:
+					radial-gradient(ellipse 120% 80% at 50% -10%, rgba(72, 40, 120, 0.55), transparent 60%),
+					radial-gradient(ellipse 90% 60% at 80% 110%, rgba(20, 60, 100, 0.35), transparent 55%),
+					linear-gradient(180deg, #0b0f22 0%, #10142a 55%, #0a0d1c 100%);
+				transition: opacity 0.6s ease;
+			}
 
-#status, #status-splash {
-	top: 0;
-	bottom: 0;
-}
+			#boot.fade-out {
+				opacity: 0;
+				pointer-events: none;
+			}
 
-#status {
-	background-color: #242424;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	visibility: hidden;
-}
+			/* 星点（CSS 生成，无图片依赖） */
+			.star {
+				position: absolute;
+				background: #fdf6d8;
+				border-radius: 1px;
+				opacity: 0.7;
+				animation: twinkle 2.8s ease-in-out infinite;
+			}
 
-#status-splash {
-	max-height: 100%;
-	max-width: 100%;
-	margin: auto;
-}
+			@keyframes twinkle {
+				0%, 100% { opacity: 0.15; }
+				50% { opacity: 0.85; }
+			}
 
-#status-splash.show-image--false {
-	display: none;
-}
+			/* 流星动画 */
+			.meteor {
+				position: absolute;
+				width: 120px;
+				height: 2px;
+				background: linear-gradient(90deg, rgba(255, 209, 102, 0.9), transparent);
+				transform: rotate(-35deg);
+				animation: meteor-fly 3.2s linear infinite;
+				opacity: 0;
+			}
 
-#status-splash.fullsize--true {
-	height: 100%;
-	width: 100%;
-	object-fit: contain;
-}
+			@keyframes meteor-fly {
+				0% { transform: translate(0, 0) rotate(-35deg); opacity: 0; }
+				8% { opacity: 0.9; }
+				60% { opacity: 0.5; }
+				100% { transform: translate(-340px, 240px) rotate(-35deg); opacity: 0; }
+			}
 
-#status-splash.use-filter--false {
-	image-rendering: pixelated;
-}
+			#boot-inner {
+				position: relative;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 22px;
+				padding: 24px;
+			}
 
-#status-progress, #status-notice {
-	display: none;
-}
+			#boot-logo {
+				width: 88px;
+				height: 88px;
+				image-rendering: pixelated;
+				filter: drop-shadow(0 0 18px rgba(255, 209, 102, 0.45));
+				animation: logo-float 3s ease-in-out infinite;
+			}
 
-#status-progress {
-	bottom: 10%;
-	width: 50%;
-	margin: 0 auto;
-}
+			@keyframes logo-float {
+				0%, 100% { transform: translateY(0); }
+				50% { transform: translateY(-7px); }
+			}
 
-#status-notice {
-	background-color: #5b3943;
-	border-radius: 0.5rem;
-	border: 1px solid #9b3943;
-	color: #e0e0e0;
-	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
-	line-height: 1.3;
-	margin: 0 2rem;
-	overflow: hidden;
-	padding: 1rem;
-	text-align: center;
-	z-index: 1;
-}
+			#boot-title {
+				font-size: 34px;
+				font-weight: 700;
+				letter-spacing: 6px;
+				color: #ffd166;
+				text-shadow: 0 0 22px rgba(255, 209, 102, 0.35), 0 3px 0 rgba(0, 0, 0, 0.45);
+				margin: 0;
+			}
+
+			#boot-subtitle {
+				font-size: 12px;
+				letter-spacing: 4px;
+				color: rgba(160, 190, 230, 0.85);
+				margin-top: -12px;
+			}
+
+			/* 像素风进度条 */
+			#progress-frame {
+				width: min(420px, 78vw);
+				height: 18px;
+				border: 2px solid rgba(255, 209, 102, 0.85);
+				border-radius: 3px;
+				background: rgba(8, 12, 26, 0.9);
+				box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(0, 0, 0, 0.6);
+				overflow: hidden;
+				position: relative;
+			}
+
+			#progress-fill {
+				height: 100%;
+				width: 0%;
+				background:
+					repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 6px, transparent 6px 12px),
+					linear-gradient(180deg, #ffe29a 0%, #ffd166 45%, #e8a93c 100%);
+				transition: width 0.25s ease;
+			}
+
+			#progress-glow {
+				position: absolute;
+				top: 0;
+				left: 0%;
+				height: 100%;
+				width: 40px;
+				background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+				transition: left 0.25s ease;
+			}
+
+			#progress-text {
+				font-size: 13px;
+				letter-spacing: 1px;
+				color: rgba(226, 232, 245, 0.92);
+				min-height: 20px;
+				text-align: center;
+			}
+
+			#progress-text .pct {
+				color: #ffd166;
+				font-weight: 700;
+				font-variant-numeric: tabular-nums;
+			}
+
+			#boot-tip {
+				font-size: 12px;
+				color: rgba(140, 165, 205, 0.75);
+				max-width: 420px;
+				text-align: center;
+				line-height: 1.7;
+			}
+
+			#boot-footer {
+				position: absolute;
+				bottom: 22px;
+				font-size: 11px;
+				letter-spacing: 2px;
+				color: rgba(120, 140, 175, 0.6);
+			}
+
+			#status-notice {
+				display: none;
+				position: fixed;
+				left: 50%;
+				bottom: 18%;
+				transform: translateX(-50%);
+				max-width: 80vw;
+				background-color: #3d1f28;
+				border: 1px solid #9b3943;
+				border-radius: 0.5rem;
+				color: #e0e0e0;
+				font-family: inherit;
+				line-height: 1.5;
+				padding: 1rem 1.2rem;
+				text-align: center;
+				z-index: 200;
+			}
 		</style>
 		
 	</head>
@@ -101,117 +208,114 @@ body {
 			Your browser does not support JavaScript.
 		</noscript>
 
-		<div id="status">
-			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="index.png" alt="">
-			<progress id="status-progress"></progress>
-			<div id="status-notice"></div>
+		<div id="status-notice"></div>
+
+		<div id="boot">
+			<div id="boot-inner">
+				<img id="boot-logo" src="index.png" alt="">
+				<h1 id="boot-title">星陨幸存者</h1>
+				<div id="boot-subtitle">STARFALL SURVIVORS</div>
+				<div id="progress-frame">
+					<div id="progress-fill"></div>
+					<div id="progress-glow"></div>
+				</div>
+				<div id="progress-text"><span class="pct">0%</span>　正在唤醒引擎…</div>
+				<div id="boot-tip">提示：敌人成群而至，保持移动、持续升级，活得越久变得越强。</div>
+			</div>
+			<div id="boot-footer">v0.2 · WEB / ANDROID · GODOT ENGINE</div>
 		</div>
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":185908,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
-const GODOT_THREADS_ENABLED = false;
-const engine = new Engine(GODOT_CONFIG);
+			const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":185908,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+			const GODOT_THREADS_ENABLED = false;
+			const engine = new Engine(GODOT_CONFIG);
 
-(function () {
-	const statusOverlay = document.getElementById('status');
-	const statusProgress = document.getElementById('status-progress');
-	const statusNotice = document.getElementById('status-notice');
+			(function () {
+				const boot = document.getElementById('boot');
+				const fill = document.getElementById('progress-fill');
+				const glow = document.getElementById('progress-glow');
+				const text = document.getElementById('progress-text');
+				const notice = document.getElementById('status-notice');
+				const frame = document.getElementById('progress-frame');
 
-	let initializing = true;
-	let statusMode = '';
-
-	function setStatusMode(mode) {
-		if (statusMode === mode || !initializing) {
-			return;
-		}
-		if (mode === 'hidden') {
-			statusOverlay.remove();
-			initializing = false;
-			return;
-		}
-		statusOverlay.style.visibility = 'visible';
-		statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
-		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
-		statusMode = mode;
-	}
-
-	function setStatusNotice(text) {
-		while (statusNotice.lastChild) {
-			statusNotice.removeChild(statusNotice.lastChild);
-		}
-		const lines = text.split('\n');
-		lines.forEach((line) => {
-			statusNotice.appendChild(document.createTextNode(line));
-			statusNotice.appendChild(document.createElement('br'));
-		});
-	}
-
-	function displayFailureNotice(err) {
-		console.error(err);
-		if (err instanceof Error) {
-			setStatusNotice(err.message);
-		} else if (typeof err === 'string') {
-			setStatusNotice(err);
-		} else {
-			setStatusNotice('An unknown error occurred.');
-		}
-		setStatusMode('notice');
-		initializing = false;
-	}
-
-	const missing = Engine.getMissingFeatures({
-		threads: GODOT_THREADS_ENABLED,
-	});
-
-	if (missing.length !== 0) {
-		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
-			let serviceWorkerRegistrationPromise;
-			try {
-				serviceWorkerRegistrationPromise = navigator.serviceWorker.getRegistration();
-			} catch (err) {
-				serviceWorkerRegistrationPromise = Promise.reject(new Error('Service worker registration failed.'));
-			}
-			// There's a chance that installing the service worker would fix the issue
-			Promise.race([
-				serviceWorkerRegistrationPromise.then((registration) => {
-					if (registration != null) {
-						return Promise.reject(new Error('Service worker already exists.'));
+				// 生成星点
+				(function spawnStars() {
+					for (let i = 0; i < 42; i++) {
+						const s = document.createElement('div');
+						s.className = 'star';
+						const size = Math.random() < 0.85 ? 2 : 3;
+						s.style.width = size + 'px';
+						s.style.height = size + 'px';
+						s.style.left = (Math.random() * 100) + '%';
+						s.style.top = (Math.random() * 100) + '%';
+						s.style.animationDelay = (Math.random() * 3) + 's';
+						boot.appendChild(s);
 					}
-					return registration;
-				}).then(() => engine.installServiceWorker()),
-				// For some reason, `getRegistration()` can stall
-				new Promise((resolve) => {
-					setTimeout(() => resolve(), 2000);
-				}),
-			]).then(() => {
-				// Reload if there was no error.
-				window.location.reload();
-			}).catch((err) => {
-				console.error('Error while registering service worker:', err);
-			});
-		} else {
-			// Display the message as usual
-			const missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
-			displayFailureNotice(missingMsg + missing.join('\n'));
-		}
-	} else {
-		setStatusMode('progress');
-		engine.startGame({
-			'onProgress': function (current, total) {
-				if (current > 0 && total > 0) {
-					statusProgress.value = current;
-					statusProgress.max = total;
-				} else {
-					statusProgress.removeAttribute('value');
-					statusProgress.removeAttribute('max');
+					const m = document.createElement('div');
+					m.className = 'meteor';
+					m.style.right = '12%';
+					m.style.top = '8%';
+					boot.appendChild(m);
+				})();
+
+				const PHASES = [
+					[0.00, '正在唤醒引擎…'],
+					[0.18, '下载运行时…'],
+					[0.55, '装载星陨之夜…'],
+					[0.82, '打磨武器与宝石…'],
+					[0.97, '即将进入战场…'],
+				];
+
+				function phaseFor(p) {
+					let label = PHASES[0][1];
+					for (const [thr, lbl] of PHASES) {
+						if (p >= thr) label = lbl;
+					}
+					return label;
 				}
-			},
-		}).then(() => {
-			setStatusMode('hidden');
-		}, displayFailureNotice);
-	}
-}());
+
+				function setStatusNotice(t) {
+					while (notice.lastChild) notice.removeChild(notice.lastChild);
+					const lines = t.split('\n');
+					lines.forEach((line) => {
+						notice.appendChild(document.createTextNode(line));
+						notice.appendChild(document.createElement('br'));
+					});
+					notice.style.display = 'block';
+				}
+
+				function displayFailureNotice(err) {
+					console.error(err);
+					if (err instanceof Error) setStatusNotice('加载失败：' + err.message);
+					else if (typeof err === 'string') setStatusNotice(err);
+					else setStatusNotice('An unknown error occurred.');
+				}
+
+				const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
+				if (missing.length !== 0) {
+					displayFailureNotice('运行所需的浏览器特性缺失：\n' + missing.join('\n'));
+				} else {
+					engine.startGame({
+						'onProgress': function (current, total) {
+							let pct = 0;
+							if (current > 0 && total > 0) {
+								pct = Math.min(100, Math.round((current / total) * 100));
+							}
+							fill.style.width = pct + '%';
+							glow.style.left = 'calc(' + pct + '% - 40px)';
+							text.innerHTML = '<span class="pct">' + pct + '%</span>　' + phaseFor(pct / 100);
+						},
+					}).then(() => {
+						fill.style.width = '100%';
+						text.innerHTML = '<span class="pct">100%</span>　准备就绪';
+						setTimeout(() => {
+							boot.classList.add('fade-out');
+							setTimeout(() => boot.remove(), 700);
+						}, 250);
+					}, displayFailureNotice);
+				}
+			}());
 		</script>
 	</body>
 </html>
