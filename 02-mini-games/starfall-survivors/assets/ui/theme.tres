@@ -1,0 +1,86 @@
+[gd_resource type="Theme" load_steps=8 format=3 uid="uid://starfalltheme"]
+
+[sub_resource type="StyleBoxFlat" id="SB_panel"]
+bg_color = Color(0.05, 0.07, 0.13, 0.92)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.32, 0.45, 0.78, 0.45)
+
+[sub_resource type="StyleBoxFlat" id="SB_btn"]
+bg_color = Color(0.14, 0.18, 0.32, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.42, 0.56, 0.92, 0.55)
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_hover"]
+bg_color = Color(0.24, 0.3, 0.52, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.84, 0.36, 0.95)
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_pressed"]
+bg_color = Color(0.32, 0.26, 0.1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.84, 0.36, 1)
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_disabled"]
+bg_color = Color(0.1, 0.11, 0.16, 0.8)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_bg"]
+bg_color = Color(0.07, 0.09, 0.16, 0.88)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_fill"]
+bg_color = Color(0.45, 0.85, 0.38, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[resource]
+default_font_size = 16
+Button/colors/font_color = Color(0.9, 0.93, 1, 1)
+Button/colors/font_hover_color = Color(1, 0.88, 0.44, 1)
+Button/colors/font_pressed_color = Color(1, 0.95, 0.72, 1)
+Button/colors/font_disabled_color = Color(0.45, 0.48, 0.58, 1)
+Button/styles/normal = SubResource("SB_btn")
+Button/styles/hover = SubResource("SB_btn_hover")
+Button/styles/pressed = SubResource("SB_btn_pressed")
+Button/styles/focus = SubResource("SB_btn_hover")
+Button/styles/disabled = SubResource("SB_btn_disabled")
+PanelContainer/styles/panel = SubResource("SB_panel")
+ProgressBar/styles/background = SubResource("SB_bar_bg")
+ProgressBar/styles/fill = SubResource("SB_bar_fill")
+Label/colors/font_color = Color(0.9, 0.93, 1, 1)

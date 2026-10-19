@@ -24,7 +24,7 @@ AI 助手在此创建 / 整理文件时会自动读取并遵守 [AGENTS.md](./AG
 | `mini-mart` | 小小便利店 · 模拟经营 | 模拟经营小游戏 v4.0：AI 插画素材（背景/商品/顾客/员工）、响应式双端、存档/改价/补货/员工/天气事件 | 直接打开 `index.html` |
 | `neon-snake` | 霓虹贪吃蛇 · NEON SNAKE | 霓虹风贪吃蛇 | 直接打开 `index.html` |
 | `frozen-reincarnation` | 凛冬轮回 · 独自求生 v3.0 | 冰雪末世生活模拟（参考《我独自生活 2.0》）：体力制日常/地点导航/五维养成/主线任务/末日终端/低保救济/大寒潮结局/轮回继承 | 直接打开 `index.html` |
-| `starfall-survivors` | 星陨幸存者 · Survivors-like v0.2 | 肉鸽割草：三敌种（追击/蓄力冲刺/远程弹幕）+ 波次难度曲线 + 升级三选一 7 Buff + 震屏/粒子/飘字打击反馈；Godot 4.7 开发，26 项无头测试，Web + Android APK 双端 | 打开 `export/web/index.html` 或线上链接 |
+| `starfall-survivors` | 星陨幸存者 · Survivors-like v0.3 | 肉鸽割草：AI 生成荒原场景（平铺地面/视差星尘/装饰物）+ 三敌种 + 波次难度曲线 + 升级三选一（稀有度卡片）+ 全新 UI（主题/暗角/低血警示/结算评价）；32 项无头测试，Web + Android APK 双端 | 打开 `export/web/index.html` 或线上链接 |
 
 ## 🎨 03-designs
 

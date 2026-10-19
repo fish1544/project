@@ -15,7 +15,13 @@ FONTS="$PROJECT/assets/fonts"
 PYTHON_BIN="${PYTHON_BIN:-python}"
 ASEPRITE_BIN="${ASEPRITE_BIN:-E:/Aseprite/Aseprite/aseprite.exe}"
 # 可变字体源（按本机实际路径改）；缺失时跳过字体子集化，不阻断精灵构建
-VF_FONT_SRC="${VF_FONT_SRC:-C:/Windows/Fonts/NotoSansSC-VF.ttf}"
+VF_FONT_SRC="${VF_FONT_SRC:-/c/Windows/Fonts/NotoSansSC-VF.ttf}"
+# 字体子集化需要 fontTools，优先用隔离 venv 里的 python
+VENV_PY="$HOME/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
+PYTHON_FONT="$PYTHON_BIN"
+if [ -f "$VENV_PY" ] && "$VENV_PY" -c "import fontTools" 2>/dev/null; then
+  PYTHON_FONT="$VENV_PY"
+fi
 
 if [ ! -x "$ASEPRITE_BIN" ] && [ ! -f "$ASEPRITE_BIN" ]; then
   echo "ERROR: 找不到 Aseprite: $ASEPRITE_BIN（可设 ASEPRITE_BIN 环境变量指定）" >&2
@@ -34,11 +40,11 @@ done
 echo "art build done -> $SPRITES"
 
 # ---- 中文字体子集化（可选步骤：缺 python 包或字体源时跳过）----
-if [ -f "$VF_FONT_SRC" ] && "$PYTHON_BIN" -c "import fontTools" 2>/dev/null; then
+if [ -f "$VF_FONT_SRC" ] && "$PYTHON_FONT" -c "import fontTools" 2>/dev/null; then
   "$PYTHON_BIN" "$ART/collect_chars.py" "$PROJECT" > /dev/null
   REG_TTF="$FONTS/.noto_regular.tmp.ttf"
-  "$PYTHON_BIN" -m fontTools.varLib.instancer "$VF_FONT_SRC" wght=400 -o "$REG_TTF" > /dev/null
-  "$PYTHON_BIN" -m fontTools.subset "$REG_TTF" \
+  "$PYTHON_FONT" -m fontTools.varLib.instancer "$VF_FONT_SRC" wght=400 -o "$REG_TTF" > /dev/null
+  "$PYTHON_FONT" -m fontTools.subset "$REG_TTF" \
     --text-file="$FONTS/_chars.txt" \
     --output-file="$FONTS/noto_sc_cn.ttf" > /dev/null
   rm -f "$REG_TTF"

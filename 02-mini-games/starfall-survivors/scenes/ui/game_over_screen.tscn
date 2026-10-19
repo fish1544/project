@@ -1,120 +1,221 @@
-[gd_scene load_steps=7 format=3 uid="uid://starfallgameover"]
+[gd_scene load_steps=11 format=3 uid="uid://starfallgameover"]
 
 [ext_resource type="Script" path="res://scripts/ui/game_over_screen.gd" id="1_scr"]
-
-[sub_resource type="StyleBoxFlat" id="SB_panel"]
-bg_color = Color(0.07, 0.09, 0.16, 0.97)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-border_color = Color(0.95, 0.35, 0.35, 0.6)
+[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_sky.png" id="2_sky"]
 
 [sub_resource type="LabelSettings" id="LS_title"]
-font_size = 40
-font_color = Color(1, 0.42, 0.4, 1)
-outline_color = Color(0, 0, 0, 0.85)
-outline_size = 8
+font_size = 42
+font_color = Color(1, 0.4, 0.38, 1)
+outline_color = Color(0.03, 0.02, 0.08, 0.95)
+outline_size = 9
 
-[sub_resource type="LabelSettings" id="LS_stat"]
-font_size = 16
-font_color = Color(0.9, 0.92, 0.97, 1)
-outline_color = Color(0, 0, 0, 0.7)
+[sub_resource type="LabelSettings" id="LS_sub"]
+font_size = 15
+font_color = Color(0.72, 0.76, 0.88, 1)
+outline_color = Color(0, 0, 0, 0.8)
 outline_size = 4
 
+[sub_resource type="LabelSettings" id="LS_key"]
+font_size = 15
+font_color = Color(0.62, 0.68, 0.85, 1)
+outline_color = Color(0, 0, 0, 0.75)
+outline_size = 4
+
+[sub_resource type="LabelSettings" id="LS_value"]
+font_size = 17
+font_color = Color(1, 0.86, 0.42, 1)
+outline_color = Color(0, 0, 0, 0.85)
+outline_size = 5
+
+[sub_resource type="LabelSettings" id="LS_rank"]
+font_size = 20
+font_color = Color(0.72, 0.92, 1, 1)
+outline_color = Color(0, 0, 0, 0.9)
+outline_size = 6
+
 [sub_resource type="LabelSettings" id="LS_hint"]
-font_size = 13
-font_color = Color(0.62, 0.65, 0.75, 1)
+font_size = 12
+font_color = Color(0.55, 0.59, 0.72, 1)
 
-[sub_resource type="StyleBoxFlat" id="SB_btn"]
-bg_color = Color(0.2, 0.25, 0.42, 1)
+[sub_resource type="StyleBoxFlat" id="SB_panel"]
+bg_color = Color(0.05, 0.07, 0.14, 0.95)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.92, 0.35, 0.38, 0.55)
+
+[sub_resource type="StyleBoxFlat" id="SB_primary"]
+bg_color = Color(0.22, 0.42, 0.3, 1)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
-border_color = Color(1, 0.85, 0.35, 0.7)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.95, 0.55, 0.8)
 
-[sub_resource type="StyleBoxFlat" id="SB_btn_hover"]
-bg_color = Color(0.28, 0.34, 0.55, 1)
+[sub_resource type="StyleBoxFlat" id="SB_primary_hover"]
+bg_color = Color(0.3, 0.58, 0.4, 1)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
-border_color = Color(1, 0.85, 0.35, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.9, 0.45, 1)
 
 [node name="GameOverScreen" type="CanvasLayer"]
 process_mode = 2
 layer = 20
 script = ExtResource("1_scr")
 
-[node name="Dim" type="ColorRect" parent="."]
+[node name="Sky" type="TextureRect" parent="."]
+mouse_filter = 2
+texture_filter = 1
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-mouse_filter = 2
-color = Color(0.02, 0.02, 0.05, 0.6)
-
-[node name="Panel" type="PanelContainer" parent="."]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -240.0
-offset_top = -130.0
-offset_right = 240.0
-offset_bottom = 130.0
 grow_horizontal = 2
 grow_vertical = 2
+texture = ExtResource("2_sky")
+expand_mode = 1
+stretch_mode = 6
+modulate = Color(0.32, 0.35, 0.5, 1)
+
+[node name="Dim" type="ColorRect" parent="."]
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.02, 0.06, 0.62)
+
+[node name="PanelRoot" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="PanelRoot"]
+layout_mode = 2
 theme_override_styles/panel = SubResource("SB_panel")
 
-[node name="VBox" type="VBoxContainer" parent="Panel"]
-offset_left = 24.0
-offset_top = 22.0
-offset_right = 456.0
-offset_bottom = 238.0
-theme_override_constants/separation = 20
+[node name="VBox" type="VBoxContainer" parent="PanelRoot/Panel"]
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
 alignment = 1
 
-[node name="Title" type="Label" parent="Panel/VBox"]
+[node name="Title" type="Label" parent="PanelRoot/Panel/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 40
+theme_override_font_sizes/font_size = 42
 label_settings = SubResource("LS_title")
 text = "游戏结束"
 horizontal_alignment = 1
 
-[node name="StatsLabel" type="Label" parent="Panel"]
+[node name="Subtitle" type="Label" parent="PanelRoot/Panel/VBox"]
 layout_mode = 2
-offset_left = 24.0
-offset_top = 96.0
-offset_right = 456.0
-offset_bottom = 128.0
-theme_override_font_sizes/font_size = 16
-label_settings = SubResource("LS_stat")
-text = "统计"
+label_settings = SubResource("LS_sub")
+text = "你被星陨之夜吞没"
 horizontal_alignment = 1
 
-[node name="RestartButton" type="Button" parent="Panel"]
-custom_minimum_size = Vector2(220, 46)
+[node name="Sep1" type="HSeparator" parent="PanelRoot/Panel/VBox"]
 layout_mode = 2
-offset_left = 130.0
-offset_top = 148.0
-offset_right = 350.0
-offset_bottom = 194.0
-theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
-theme_override_font_sizes/font_size = 19
-theme_override_styles/normal = SubResource("SB_btn")
-theme_override_styles/hover = SubResource("SB_btn_hover")
-theme_override_styles/pressed = SubResource("SB_btn_hover")
-text = "再来一局 (Enter)"
 
-[node name="MenuButton" type="Button" parent="Panel"]
-custom_minimum_size = Vector2(160, 30)
+[node name="StatsGrid" type="GridContainer" parent="PanelRoot/Panel/VBox"]
 layout_mode = 2
-offset_left = 160.0
-offset_top = 200.0
-offset_right = 320.0
-offset_bottom = 230.0
+theme_override_constants/h_separation = 40
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="TimeKey" type="Label" parent="PanelRoot/Panel/VBox/StatsGrid"]
+layout_mode = 2
+label_settings = SubResource("LS_key")
+text = "存活时间"
+
+[node name="TimeValue" type="Label" parent="PanelRoot/Panel/VBox/StatsGrid"]
+layout_mode = 2
+label_settings = SubResource("LS_value")
+text = "00:00"
+horizontal_alignment = 2
+
+[node name="KillKey" type="Label" parent="PanelRoot/Panel/VBox/StatsGrid"]
+layout_mode = 2
+label_settings = SubResource("LS_key")
+text = "击杀总数"
+
+[node name="KillValue" type="Label" parent="PanelRoot/Panel/VBox/StatsGrid"]
+layout_mode = 2
+label_settings = SubResource("LS_value")
+text = "0"
+horizontal_alignment = 2
+
+[node name="LevelKey" type="Label" parent="PanelRoot/Panel/VBox/StatsGrid"]
+layout_mode = 2
+label_settings = SubResource("LS_key")
+text = "最终等级"
+
+[node name="LevelValue" type="Label" parent="PanelRoot/Panel/VBox/StatsGrid"]
+layout_mode = 2
+label_settings = SubResource("LS_value")
+text = "Lv.1"
+horizontal_alignment = 2
+
+[node name="WaveKey" type="Label" parent="PanelRoot/Panel/VBox/StatsGrid"]
+layout_mode = 2
+label_settings = SubResource("LS_key")
+text = "抵达波次"
+
+[node name="WaveValue" type="Label" parent="PanelRoot/Panel/VBox/StatsGrid"]
+layout_mode = 2
+label_settings = SubResource("LS_value")
+text = "第 1 波"
+horizontal_alignment = 2
+
+[node name="RankLabel" type="Label" parent="PanelRoot/Panel/VBox"]
+layout_mode = 2
+label_settings = SubResource("LS_rank")
+text = "评价：新兵"
+horizontal_alignment = 1
+
+[node name="Sep2" type="HSeparator" parent="PanelRoot/Panel/VBox"]
+layout_mode = 2
+
+[node name="RestartButton" type="Button" parent="PanelRoot/Panel/VBox"]
+custom_minimum_size = Vector2(240, 46)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85, 1, 0.88, 1)
+theme_override_colors/font_hover_color = Color(1, 0.95, 0.6, 1)
+theme_override_styles/normal = SubResource("SB_primary")
+theme_override_styles/hover = SubResource("SB_primary_hover")
+theme_override_styles/pressed = SubResource("SB_primary_hover")
+theme_override_styles/focus = SubResource("SB_primary_hover")
+text = "再来一局  (Enter)"
+
+[node name="MenuButton" type="Button" parent="PanelRoot/Panel/VBox"]
+custom_minimum_size = Vector2(180, 34)
+layout_mode = 2
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.85, 0.87, 0.93, 1)
-text = "返回主菜单 (Esc)"
+theme_override_colors/font_color = Color(0.8, 0.84, 0.94, 1)
+text = "返回主菜单  (Esc)"
+
+[node name="HintLabel" type="Label" parent="PanelRoot/Panel/VBox"]
+layout_mode = 2
+label_settings = SubResource("LS_hint")
+text = "提示：升级时优先补攻击速度，活得更久"
+horizontal_alignment = 1

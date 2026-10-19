@@ -8,6 +8,7 @@ const XPGemScene := preload("res://scenes/pickups/xp_gem.tscn")
 const HUDScene := preload("res://scenes/ui/hud.tscn")
 const UpgradePanelScene := preload("res://scenes/ui/upgrade_panel.tscn")
 const GameOverScreenScene := preload("res://scenes/ui/game_over_screen.tscn")
+const BackgroundScene := preload("res://scenes/world/background.tscn")
 
 const WAVE_DURATION := 30.0  # 每 30 秒推进一波
 
@@ -23,8 +24,12 @@ func _ready() -> void:
 	world = Node2D.new()
 	world.name = "World"
 	add_child(world)
+	# 背景先入树，保证绘制在玩家/敌人之下
+	var bg := BackgroundScene.instantiate()
+	world.add_child(bg)
 	player = PlayerScene.instantiate()
 	world.add_child(player)
+	bg.follow_target = player
 	var camera := ScreenShake.new()
 	camera.zoom = Vector2(2.5, 2.5)
 	player.add_child(camera)

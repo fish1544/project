@@ -13,6 +13,15 @@ func check(condition: bool, label: String) -> void:
 		print("FAIL  " + label)
 
 
+func _collect_leaf_controls(node: Node, out: Array) -> void:
+	## 收集某控件下所有「叶子」控件（自身不再含子节点），用于布局重叠检测。
+	for c in node.get_children():
+		if c is Control and c.get_child_count() == 0:
+			out.append(c)
+		else:
+			_collect_leaf_controls(c, out)
+
+
 func _frames(n: int) -> void:
 	var tree := get_tree()
 	for i in n:
@@ -175,6 +184,23 @@ func _ready() -> void:
 	check(shake_node.offset == Vector2.ZERO, "屏幕震动结束后复位")
 	shake_node.free()
 
+	# ===== v0.3 场景与 UI 回归 =====
+	GameState.reset_state()
+	GameState.xp_to_next = 999999
+
+	var theme_res: Theme = load("res://assets/ui/theme.tres")
+	check(theme_res != null and theme_res.has_stylebox("normal", "Button"), "统一主题资源可加载")
+
+	var bg = load("res://scenes/world/background.tscn").instantiate()
+	bg.follow_target = player
+	main.world.add_child(bg)
+	await _frames(6)
+	check(bg.get_node("Props").get_child_count() > 0, "背景装饰物按视野生成")
+	check(bg.get_node("Motes").get_child_count() > 0, "漂浮星尘已生成")
+	check(bg.get_node("Ground").position == player.global_position, "地面平铺跟随镜头")
+	bg.queue_free()
+	await _frames(2)
+
 	# 主菜单可加载
 	var menu = load("res://scenes/ui/main_menu.tscn").instantiate()
 	get_tree().root.add_child.call_deferred(menu)
@@ -183,10 +209,32 @@ func _ready() -> void:
 	menu.queue_free()
 	await _frames(2)
 
-	# 生命归零游戏结束（放最后：结算面板会暂停世界）
+	# 生命归零游戏结束
 	GameState.reset_state()
 	GameState.damage(999)
 	check(GameState.hp == 0 and GameState.is_game_over, "生命归零游戏结束")
+
+	# 结算界面布局：所有叶子控件不得相互重叠（曾因 PanelContainer 多子节点全被铺满而叠成一团）
+	var over = load("res://scenes/ui/game_over_screen.tscn").instantiate()
+	get_tree().root.add_child(over)
+	await _frames(4)
+	get_tree().paused = false
+	var leaves: Array = []
+	_collect_leaf_controls(over.get_node("PanelRoot/Panel"), leaves)
+	var overlapping := false
+	for i in leaves.size():
+		for j in range(i + 1, leaves.size()):
+			var a: Control = leaves[i]
+			var b: Control = leaves[j]
+			if a.size.x <= 1.0 or a.size.y <= 1.0 or b.size.x <= 1.0 or b.size.y <= 1.0:
+				continue
+			if a.get_global_rect().intersects(b.get_global_rect()):
+				overlapping = true
+				print("  overlap: %s <-> %s" % [a.get_path(), b.get_path()])
+	check(leaves.size() >= 10, "结算界面控件全部就位（%d 个）" % leaves.size())
+	check(not overlapping, "结算界面控件互不重叠")
+	over.queue_free()
+	await _frames(2)
 
 	if failures.is_empty():
 		print("RESULT: ALL %d CHECKS PASSED" % total)

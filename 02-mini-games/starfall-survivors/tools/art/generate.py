@@ -175,6 +175,106 @@ def draw_projectile() -> Canvas:
     return c
 
 
+def draw_prop_rock() -> Canvas:
+    """场景装饰：荒石（16x16，带高光与裂纹）。"""
+    c = Canvas(16, 16)
+    edge = (26, 30, 46, 255)
+    mid = (58, 64, 88, 255)
+    hi = (92, 100, 128, 255)
+    c.rect(4, 6, 8, 1, edge)
+    c.rect(3, 7, 10, 5, edge)
+    c.rect(4, 8, 8, 4, mid)
+    c.rect(5, 8, 4, 2, hi)
+    c.rect(4, 12, 9, 2, edge)
+    c.rect(5, 12, 6, 1, mid)
+    c.rect(7, 9, 1, 3, edge)  # 裂纹
+    c.rect(6, 11, 1, 1, edge)
+    return c
+
+
+def draw_prop_crystal() -> Canvas:
+    """场景装饰：发光星陨晶体（16x16，顶部发光）。"""
+    c = Canvas(16, 16)
+    edge = (24, 46, 74, 255)
+    body = (64, 156, 200, 255)
+    light = (168, 232, 255, 255)
+    glow = (232, 250, 255, 255)
+    c.rect(7, 2, 2, 1, edge)
+    c.rect(6, 3, 4, 1, edge)
+    c.rect(7, 3, 2, 1, light)
+    c.rect(5, 4, 6, 1, edge)
+    c.rect(6, 4, 4, 1, body)
+    c.rect(7, 4, 1, 1, glow)
+    c.rect(4, 5, 8, 6, edge)
+    c.rect(5, 5, 6, 6, body)
+    c.rect(6, 6, 2, 4, light)
+    c.rect(8, 7, 1, 3, glow)
+    c.rect(4, 11, 8, 3, edge)
+    c.rect(5, 11, 6, 2, body)
+    c.rect(6, 12, 2, 1, light)
+    return c
+
+
+def draw_prop_grass() -> Canvas:
+    """场景装饰：枯草丛（16x16，三簇细叶）。"""
+    c = Canvas(16, 16)
+    dark = (30, 52, 44, 255)
+    mid = (62, 104, 78, 255)
+    light = (104, 148, 96, 255)
+    for x0, top in ((3, 8), (7, 6), (11, 9)):
+        c.rect(x0, 13, 2, 2, dark)
+        c.rect(x0, top + 2, 1, 11 - top, mid)
+        c.rect(x0, top, 1, 2, light)
+        c.rect(x0 + 1, top + 1, 1, 11 - top, dark)
+    return c
+
+
+def draw_prop_crater() -> Canvas:
+    """场景装饰：星陨撞击坑（32x32，焦痕 + 余烬）。"""
+    c = Canvas(32, 32)
+    rim = (34, 36, 52, 255)
+    inner = (18, 18, 30, 255)
+    ember = (150, 70, 40, 255)
+    hot = (226, 138, 58, 255)
+    import math
+    cx, cy, r = 15.5, 15.5, 13.0
+    for y in range(32):
+        for x in range(32):
+            d = math.hypot(x - cx, y - cy)
+            if d < r - 4.0:
+                c.px[y][x] = inner
+            elif d < r - 1.5:
+                c.px[y][x] = rim
+            elif d < r:
+                c.px[y][x] = ember
+    c.rect(13, 12, 5, 3, inner)
+    c.rect(14, 13, 3, 1, ember)
+    c.rect(19, 19, 3, 2, hot)
+    c.rect(10, 21, 2, 2, ember)
+    c.rect(21, 11, 2, 1, ember)
+    return c
+
+
+def draw_prop_pillar() -> Canvas:
+    """场景装饰：远古石柱残骸（16x16，断裂顶部）。"""
+    c = Canvas(16, 16)
+    edge = (22, 26, 40, 255)
+    mid = (66, 72, 96, 255)
+    hi = (104, 112, 140, 255)
+    moss = (58, 96, 80, 255)
+    c.rect(5, 2, 6, 1, edge)
+    c.rect(5, 3, 6, 11, edge)
+    c.rect(6, 3, 4, 11, mid)
+    c.rect(6, 3, 1, 9, hi)
+    c.rect(4, 4, 1, 9, edge)
+    c.rect(11, 4, 1, 9, edge)
+    c.rect(4, 13, 8, 2, edge)
+    c.rect(5, 13, 6, 1, mid)
+    c.rect(9, 9, 2, 2, moss)  # 苔痕
+    c.rect(5, 11, 1, 1, moss)
+    return c
+
+
 def draw_icon() -> Canvas:
     """256x256 应用图标：星陨之夜（夜空 + 金星 + 幸存者剪影）。"""
     import math
@@ -249,6 +349,11 @@ def main() -> None:
         "projectile": draw_projectile,
         "enemy_bullet": draw_enemy_bullet,
         "icon": draw_icon,
+        "prop_rock": draw_prop_rock,
+        "prop_crystal": draw_prop_crystal,
+        "prop_grass": draw_prop_grass,
+        "prop_pillar": draw_prop_pillar,
+        "prop_crater": draw_prop_crater,
     }
     for name, fn in painters.items():
         fn().save(os.path.join(out, name + ".png"))
