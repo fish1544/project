@@ -16,9 +16,9 @@ func _physics_process(delta: float) -> void:
 		var to_target: Vector2 = target.global_position - global_position
 		var dist: float = to_target.length()
 		if dist > preferred_range + 30.0:
-			velocity = to_target.normalized() * move_speed
+			velocity = _apply_avoid(to_target.normalized(), delta) * move_speed
 		elif dist < preferred_range - 30.0:
-			velocity = -to_target.normalized() * move_speed
+			velocity = _apply_avoid(-to_target.normalized(), delta) * move_speed
 		else:
 			velocity = velocity.move_toward(Vector2.ZERO, 300.0 * delta)
 		if fire_cooldown <= 0.0 and dist < 460.0:

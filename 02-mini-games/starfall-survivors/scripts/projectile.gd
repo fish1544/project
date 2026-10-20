@@ -17,6 +17,19 @@ func _on_body_entered(body: Node) -> void:
 	if body.is_in_group("enemies"):
 		body.take_damage(damage, direction)
 		call_deferred("_spawn_fx_and_free")
+	elif body.is_in_group("obstacles"):
+		# 打在岩石/石柱上：只溅火花，不飘伤害数字
+		call_deferred("_spawn_spark_and_free")
+
+
+func _spawn_spark_and_free() -> void:
+	var parent := get_parent()
+	if parent == null:
+		return
+	var spark := HitSparkScene.instantiate()
+	spark.position = global_position
+	parent.add_child(spark)
+	queue_free()
 
 
 func _spawn_fx_and_free() -> void:

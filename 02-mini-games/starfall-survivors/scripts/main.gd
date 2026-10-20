@@ -23,6 +23,8 @@ func _ready() -> void:
 	GameState.reset_state()
 	world = Node2D.new()
 	world.name = "World"
+	# 开启 y 排序：角色走到岩石上方/下方时产生正确的前后遮挡
+	world.y_sort_enabled = true
 	add_child(world)
 	# 背景先入树，保证绘制在玩家/敌人之下
 	var bg := BackgroundScene.instantiate()
@@ -83,12 +85,28 @@ func spawn_enemy(scene: PackedScene) -> void:
 	if GameState.is_game_over or not is_instance_valid(player):
 		return
 	var enemy := scene.instantiate()
-	var angle := randf() * TAU
-	var dist := 260.0 + randf() * 140.0
-	enemy.position = player.position + Vector2(cos(angle), sin(angle)) * dist
+	enemy.position = _find_free_spawn(player.position)
 	enemy.target = player
 	enemy.scale_difficulty(GameState.wave)
 	world.add_child(enemy)
+
+
+## 在玩家周围找一个不与装饰物重叠的落点，避免敌人卡在石头里出生。
+func _find_free_spawn(center: Vector2) -> Vector2:
+	for _attempt in 8:
+		var angle := randf() * TAU
+		var dist := 260.0 + randf() * 140.0
+		var p := center + Vector2(cos(angle), sin(angle)) * dist
+		if not _is_blocked(p):
+			return p
+	return center + Vector2(cos(randf() * TAU), sin(randf() * TAU)) * 300.0
+
+
+func _is_blocked(at: Vector2) -> bool:
+	for obstacle in get_tree().get_nodes_in_group("obstacles"):
+		if obstacle.global_position.distance_to(at) < 16.0:
+			return true
+	return false
 
 
 func spawn_gem() -> void:

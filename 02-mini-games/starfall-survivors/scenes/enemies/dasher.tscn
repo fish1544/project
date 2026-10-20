@@ -8,7 +8,7 @@ size = Vector2(12, 12)
 
 [node name="Dasher" type="CharacterBody2D"]
 collision_layer = 1
-collision_mask = 0
+collision_mask = 16
 script = ExtResource("1_scr")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

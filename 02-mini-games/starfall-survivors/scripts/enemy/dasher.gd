@@ -24,7 +24,7 @@ func _physics_process(delta: float) -> void:
 	match state:
 		State.APPROACH:
 			if is_instance_valid(target):
-				velocity = to_target.normalized() * approach_speed
+				velocity = _apply_avoid(to_target.normalized(), delta) * approach_speed
 			if dist < windup_range and dist > 24.0 and state_timer <= 0.0:
 				_enter_state(State.WINDUP)
 		State.WINDUP:

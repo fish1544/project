@@ -15,6 +15,10 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	velocity = direction * speed
 	move_and_slide()
+	# 撞上岩石/石柱就地湮灭：障碍能替玩家挡冷枪
+	if get_slide_collision_count() > 0:
+		queue_free()
+		return
 	_life += delta
 	if _life > 6.0:
 		queue_free()

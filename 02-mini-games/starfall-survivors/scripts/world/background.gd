@@ -1,34 +1,43 @@
 extends Node2D
 ## 世界背景与场景装饰系统（无限世界，恒定开销）。
 ##
-## 三层结构：
-##   Ground —— AI 生成的荒原地面大图，开启 repeat 后按镜头位置无缝平铺
-##   Props  —— 岩石 / 星陨晶体 / 枯草 / 远古石柱 / 撞击坑，按网格动态回收
-##   Motes  —— 漂浮星尘，0.55 视差营造空气层次
+## 四层结构：
+##   Ground    —— AI 生成的荒原地面大图，开启 repeat 后按镜头位置无缝平铺
+##   Props     —— 贴地装饰（枯草 / 撞击坑），不参与碰撞
+##   Obstacles —— 实体装饰（岩石 / 星陨晶体 / 远古石柱），StaticBody2D 参与碰撞，
+##                直接挂到宿主节点（world）以便与玩家/敌人一起按 y 排序遮挡
+##   Motes     —— 漂浮星尘，0.55 视差营造空气层次
 ##
 ## 用法：实例化后把 follow_target 指向玩家节点即可。
 
 const CELL_SIZE := 104.0        # 装饰物网格边长（世界单位）
 const KEEP_CELLS := 2           # 视野外多保留几格，避免边缘穿帮
 const FALLBACK_VIEW := Vector2(384.0, 216.0)
+const SPAWN_CLEAR_RADIUS := 78.0  # 出生点附近不放实体障碍，避免开局被卡
+const OBSTACLE_LAYER := 16        # 障碍专用碰撞层
 
-# 加权抽取：数组重复次数即权重
-const PROP_TEXTURES: Array[Texture2D] = [
-	preload("res://assets/sprites/prop_rock.png"),
-	preload("res://assets/sprites/prop_rock.png"),
-	preload("res://assets/sprites/prop_rock.png"),
-	preload("res://assets/sprites/prop_grass.png"),
-	preload("res://assets/sprites/prop_grass.png"),
-	preload("res://assets/sprites/prop_grass.png"),
-	preload("res://assets/sprites/prop_crystal.png"),
-	preload("res://assets/sprites/prop_crystal.png"),
-	preload("res://assets/sprites/prop_pillar.png"),
-	preload("res://assets/sprites/prop_pillar.png"),
-	preload("res://assets/sprites/prop_crater.png"),
-	preload("res://assets/sprites/prop_crater.png"),
-]
-const CRATER_TEXTURE := preload("res://assets/sprites/prop_crater.png")
+const TEX_ROCK := preload("res://assets/sprites/prop_rock.png")
+const TEX_CRYSTAL := preload("res://assets/sprites/prop_crystal.png")
+const TEX_PILLAR := preload("res://assets/sprites/prop_pillar.png")
+const TEX_GRASS := preload("res://assets/sprites/prop_grass.png")
+const TEX_CRATER := preload("res://assets/sprites/prop_crater.png")
 const MOTE_TEXTURE := preload("res://assets/backgrounds/mote.png")
+
+# 加权抽取表：[贴图, 是否实体, 碰撞半径]，重复次数即权重
+const SPAWN_TABLE := [
+	[TEX_ROCK, true, 6.5],
+	[TEX_ROCK, true, 6.5],
+	[TEX_ROCK, true, 6.5],
+	[TEX_CRYSTAL, true, 5.0],
+	[TEX_CRYSTAL, true, 5.0],
+	[TEX_PILLAR, true, 6.0],
+	[TEX_PILLAR, true, 6.0],
+	[TEX_GRASS, false, 0.0],
+	[TEX_GRASS, false, 0.0],
+	[TEX_GRASS, false, 0.0],
+	[TEX_CRATER, false, 0.0],
+	[TEX_CRATER, false, 0.0],
+]
 
 @export var motes_count := 34
 @export var motes_parallax := 0.55
@@ -39,9 +48,15 @@ var _props := {}
 var _motes: Array[Sprite2D] = []
 var _view_size := FALLBACK_VIEW
 var _mote_box := FALLBACK_VIEW * 1.3
+var _host: Node2D      # 实体障碍的宿主（应为 world，使其参与 y 排序）
 
 
 func _ready() -> void:
+	# 整个背景层永远压在最底，避免 y 排序把它抬到角色前面
+	z_index = -20
+	_host = get_parent() as Node2D
+	if _host == null:
+		_host = self
 	_refresh_view_size()
 	if _motes.is_empty():
 		_spawn_motes()
@@ -90,23 +105,65 @@ func _update_props(cam: Vector2) -> void:
 				node.queue_free()
 
 
-func _make_prop(cell: Vector2i) -> Sprite2D:
+func _cell_center(cell: Vector2i) -> Vector2:
+	return (Vector2(cell) + Vector2(0.5, 0.5)) * CELL_SIZE
+
+
+func _make_prop(cell: Vector2i) -> Node2D:
 	# 用坐标哈希做种子：同一格永远生成同样的装饰，来回移动不会闪烁
 	var rng := RandomNumberGenerator.new()
 	rng.seed = absi((cell.x * 73856093) ^ (cell.y * 19349663))
-	var sprite := Sprite2D.new()
-	sprite.texture = PROP_TEXTURES[rng.randi() % PROP_TEXTURES.size()]
-	sprite.position = (Vector2(cell) + Vector2(rng.randf(), rng.randf())) * CELL_SIZE
-	if sprite.texture == CRATER_TEXTURE:
-		sprite.z_index = -1          # 坑痕压在地面之上、其他装饰之下
-		sprite.scale = Vector2.ONE * rng.randf_range(1.4, 2.4)
-		sprite.modulate = Color(1.0, 1.0, 1.0, rng.randf_range(0.35, 0.6))
-		sprite.rotation = rng.randf() * TAU
+	var entry: Array = SPAWN_TABLE[rng.randi() % SPAWN_TABLE.size()]
+	var tex: Texture2D = entry[0]
+	var solid: bool = entry[1]
+	var radius: float = entry[2]
+	# 出生点附近强制降级为贴地装饰，保证开局不被石头围住
+	if solid and _cell_center(cell).length() < SPAWN_CLEAR_RADIUS:
+		solid = false
+	var scale_f: float = rng.randf_range(0.82, 1.22)
+	var pos := _cell_center(cell) + Vector2(rng.randf_range(-18.0, 18.0), rng.randf_range(-18.0, 18.0))
+	if solid:
+		return _make_obstacle(pos, tex, radius * scale_f, scale_f, rng)
+	return _make_decor(pos, tex, scale_f, rng)
+
+
+func _make_obstacle(pos: Vector2, tex: Texture2D, radius: float, scale_f: float, rng: RandomNumberGenerator) -> StaticBody2D:
+	var body := StaticBody2D.new()
+	body.position = pos
+	body.collision_layer = OBSTACLE_LAYER
+	body.collision_mask = 0
+	body.add_to_group("obstacles")
+
+	var shape := CircleShape2D.new()
+	shape.radius = radius
+	var cs := CollisionShape2D.new()
+	cs.shape = shape
+	body.add_child(cs)
+
+	var spr := Sprite2D.new()
+	spr.texture = tex
+	spr.position = Vector2(0.0, -4.0)   # 视觉略抬高，碰撞体留在“脚部”
+	spr.scale = Vector2.ONE * scale_f
+	spr.modulate = Color(1.0, 1.0, 1.0, rng.randf_range(0.82, 1.0))
+	body.add_child(spr)
+
+	_host.add_child(body)
+	return body
+
+
+func _make_decor(pos: Vector2, tex: Texture2D, scale_f: float, rng: RandomNumberGenerator) -> Sprite2D:
+	var spr := Sprite2D.new()
+	spr.texture = tex
+	spr.position = pos
+	spr.scale = Vector2.ONE * scale_f
+	if tex == TEX_CRATER:
+		spr.scale = Vector2.ONE * rng.randf_range(1.4, 2.4)
+		spr.modulate = Color(1.0, 1.0, 1.0, rng.randf_range(0.35, 0.6))
+		spr.rotation = rng.randf() * TAU
 	else:
-		sprite.scale = Vector2.ONE * rng.randf_range(0.8, 1.25)
-		sprite.modulate = Color(1.0, 1.0, 1.0, rng.randf_range(0.7, 1.0))
-	$Props.add_child(sprite)
-	return sprite
+		spr.modulate = Color(1.0, 1.0, 1.0, rng.randf_range(0.7, 1.0))
+	$Props.add_child(spr)
+	return spr
 
 
 func _spawn_motes() -> void:

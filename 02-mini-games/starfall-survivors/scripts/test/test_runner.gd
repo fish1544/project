@@ -201,6 +201,71 @@ func _ready() -> void:
 	bg.queue_free()
 	await _frames(2)
 
+	# 装饰物参与碰撞：实体装饰应是 layer 16 的 StaticBody2D
+	var obstacles := get_tree().get_nodes_in_group("obstacles")
+	var solid_ok := false
+	for o in obstacles:
+		if o is StaticBody2D and o.collision_layer == 16:
+			solid_ok = true
+			break
+	check(obstacles.size() > 0 and solid_ok, "装饰物实体参与碰撞（%d 个障碍）" % obstacles.size())
+
+	# 玩家被装饰物挡住
+	for e in get_tree().get_nodes_in_group("enemies"):
+		e.queue_free()
+	for b in get_tree().get_nodes_in_group("enemy_bullets"):
+		b.queue_free()
+	await _frames(2)
+	var wall := StaticBody2D.new()
+	wall.collision_layer = 16
+	wall.collision_mask = 0
+	wall.add_to_group("obstacles")
+	var wall_shape := RectangleShape2D.new()
+	wall_shape.size = Vector2(20, 160)
+	var wall_cs := CollisionShape2D.new()
+	wall_cs.shape = wall_shape
+	wall.add_child(wall_cs)
+	wall.position = player.position + Vector2(46.0, 0.0)
+	main.world.add_child(wall)
+	await _frames(2)
+	Input.action_press("ui_right")
+	await _frames(36)
+	Input.action_release("ui_right")
+	check(player.position.x < wall.position.x, "玩家被装饰物阻挡在墙外")
+	wall.queue_free()
+	await _frames(2)
+
+	# 敌人遇障绕行，而不是顶着石头原地打滑
+	var block := StaticBody2D.new()
+	block.collision_layer = 16
+	block.collision_mask = 0
+	block.add_to_group("obstacles")
+	var block_shape := CircleShape2D.new()
+	block_shape.radius = 8.0
+	var block_cs := CollisionShape2D.new()
+	block_cs.shape = block_shape
+	block.add_child(block_cs)
+	block.position = player.position + Vector2(60.0, 0.0)
+	main.world.add_child(block)
+	var detour = load("res://scenes/enemies/enemy.tscn").instantiate()
+	detour.target = player
+	detour.hp = 99999
+	detour.position = player.position + Vector2(120.0, 0.0)
+	main.world.add_child(detour)
+	var start_dist: float = detour.position.distance_to(player.position)
+	var got_closer := false
+	for _i in 120:
+		await _frames(1)
+		if not is_instance_valid(detour):
+			break
+		if detour.position.distance_to(player.position) < start_dist - 25.0:
+			got_closer = true
+			break
+	check(got_closer, "敌人绕开装饰物继续逼近")
+	detour.queue_free()
+	block.queue_free()
+	await _frames(2)
+
 	# 主菜单可加载
 	var menu = load("res://scenes/ui/main_menu.tscn").instantiate()
 	get_tree().root.add_child.call_deferred(menu)

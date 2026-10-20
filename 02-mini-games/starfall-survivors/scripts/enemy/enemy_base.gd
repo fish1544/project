@@ -11,15 +11,41 @@ const DeathBurstScene := preload("res://scenes/fx/death_burst.tscn")
 var target: Node2D
 var knockback_vel := Vector2.ZERO
 
+# 绕障转向：撞到障碍后沿碰撞法线的切线侧移一小段时间，避免顶着石头原地打滑
+var _avoid_dir := Vector2.ZERO
+var _avoid_timer := 0.0
+const AVOID_DURATION := 0.6
+const AVOID_STRENGTH := 1.4
+
 
 func _ready() -> void:
 	add_to_group("enemies")
 
 
+## 子类在计算期望方向后调用：返回一个已掺入侧移的朝向（单位向量）。
+func _apply_avoid(desired: Vector2, delta: float) -> Vector2:
+	if _avoid_timer <= 0.0:
+		return desired
+	_avoid_timer -= delta
+	return (desired + _avoid_dir * AVOID_STRENGTH).normalized()
+
+
 func _integrate_common(delta: float) -> void:
 	velocity += knockback_vel
 	move_and_slide()
+	_update_avoid()
 	knockback_vel = knockback_vel.move_toward(Vector2.ZERO, 420.0 * delta)
+
+
+func _update_avoid() -> void:
+	if _avoid_timer > 0.0 or get_slide_collision_count() == 0:
+		return
+	var n: Vector2 = get_slide_collision(0).get_normal()
+	var t1 := Vector2(-n.y, n.x)
+	var t2 := Vector2(n.y, -n.x)
+	# 取与当前行进方向更接近的那条切线，保持“继续往前”的意图
+	_avoid_dir = t1 if t1.dot(velocity) > t2.dot(velocity) else t2
+	_avoid_timer = AVOID_DURATION
 
 
 func take_damage(amount: int, from_direction: Vector2 = Vector2.ZERO) -> void:

@@ -9,6 +9,7 @@ outline_color = Color(0, 0, 0, 1)
 outline_size = 4
 
 [node name="DamageNumber" type="Label"]
+z_index = 10
 offset_right = 48.0
 offset_bottom = 16.0
 pivot_offset = Vector2(24, 8)
