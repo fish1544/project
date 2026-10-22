@@ -3,9 +3,9 @@ extends CharacterBody2D
 const ProjectileScene := preload("res://scenes/attacks/projectile.tscn")
 
 @export var speed := 140.0
-@export var shoot_interval := 1.2
+@export var shoot_interval := 1.05
 @export var shoot_range := 380.0
-@export var damage := 10
+@export var damage := 12
 @export var projectiles_per_shot := 1
 @export var magnet_range := 140.0
 
@@ -56,9 +56,12 @@ func _physics_process(delta: float) -> void:
 
 func shoot_at(target: Node2D) -> void:
 	var base_dir: Vector2 = (target.global_position - global_position).normalized()
-	var per_damage: int = maxi(1, int(round(damage * damage_multiplier / float(projectiles_per_shot))))
-	var spread := 0.16  # 多弹丸扇形展开弧度
 	var n := projectiles_per_shot
+	# 多弹丸不是纯摊薄：总伤害按 1 + 0.35*(n-1) 放大后再平分，
+	# 否则"多重射击"只是把伤害分散到更大范围、DPS 一点没涨，拿了这个 Buff 等于白拿
+	var total_damage: float = damage * damage_multiplier * (1.0 + 0.35 * (n - 1))
+	var per_damage: int = maxi(1, int(round(total_damage / float(n))))
+	var spread := 0.16  # 多弹丸扇形展开弧度
 	for i in n:
 		var dir := base_dir.rotated(spread * (i - (n - 1) / 2.0))
 		var projectile := ProjectileScene.instantiate()

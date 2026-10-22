@@ -57,7 +57,14 @@ func _ready() -> void:
 		g.queue_free()
 	await _frames(2)
 
+	# 确定性构造：直接放一只在射程内，不依赖刷怪计时与随机生成点
+	# （原先靠等刷怪，敌人生成时机随机会让这条断言偶发失败）
 	GameState.reset_state()
+	GameState.xp_to_next = 999999   # 避免击杀掉落触发升级面板暂停世界
+	var kill_target = load("res://scenes/enemies/enemy.tscn").instantiate()
+	kill_target.target = player
+	kill_target.position = player.position + Vector2(150.0, 0.0)
+	main.world.add_child(kill_target)
 	var kills_reached := false
 	for i in 240:
 		await _frames(1)
@@ -65,6 +72,7 @@ func _ready() -> void:
 			kills_reached = true
 			break
 	check(kills_reached, "自动攻击击杀敌人")
+	GameState.reset_state()
 
 	var loot_enemy = load("res://scenes/enemies/enemy.tscn").instantiate()
 	loot_enemy.target = player
@@ -177,6 +185,16 @@ func _ready() -> void:
 	await _frames(40)
 	check(not is_instance_valid(spark) and not is_instance_valid(num), "命中特效与飘字播完自毁")
 
+	# 镜头命名修复：ScreenShake 节点名必须叫 Camera2D，否则-player/背景都取不到镜头
+	var cam_node := player.get_node_or_null("Camera2D") as ScreenShake
+	check(cam_node != null, "玩家身上可按 Camera2D 取到镜头")
+	if cam_node != null:
+		cam_node.shake(0.4, 10.0)
+		await _frames(3)
+		check(cam_node.offset != Vector2.ZERO, "震屏生效（镜头 offset 被驱动）")
+		await _frames(40)
+		check(cam_node.offset == Vector2.ZERO, "震屏结束后复位")
+
 	# 屏幕震动后复位
 	var shake_node := ScreenShake.new()
 	shake_node.shake(0.3, 10.0)
@@ -266,6 +284,23 @@ func _ready() -> void:
 	block.queue_free()
 	await _frames(2)
 
+	# 多重射击应带来净伤害提升，而不是把伤害摊薄出去（拿了这个 Buff 不能等于白拿）
+	var mult_before: int = player.projectiles_per_shot
+	player.apply_upgrade("multishot")
+	check(player.projectiles_per_shot == mult_before + 1, "多重射击增加弹丸数")
+	var dps_scale_before: float = 1.0 + 0.35 * (mult_before - 1)
+	var dps_scale_after: float = 1.0 + 0.35 * (player.projectiles_per_shot - 1)
+	check(dps_scale_after > dps_scale_before, "多重射击带来净伤害提升而非摊薄")
+
+	# 波次成长曲线受控：第 8 波不能膨胀到玩家清不动
+	var curve_enemy = load("res://scenes/enemies/enemy.tscn").instantiate()
+	var base_hp: int = curve_enemy.hp
+	curve_enemy.scale_difficulty(8)
+	check(curve_enemy.hp > base_hp, "波次缩放提升敌人血量")
+	check(curve_enemy.hp < base_hp * 2.5, "第 8 波血量增长受控（%.1f 倍）" % (float(curve_enemy.hp) / base_hp))
+	curve_enemy.queue_free()
+	await _frames(2)
+
 	# 尸潮软分离：一群敌人不该叠成一个点（曾因敌人之间无碰撞而完全重合）
 	var pack: Array = []
 	for i in 8:
@@ -295,7 +330,7 @@ func _ready() -> void:
 	if live_obstacles.size() > 0:
 		var host_obs: Node2D = live_obstacles[0]
 		player.global_position = host_obs.global_position
-		await _frames(3)
+		await _frames(10)   # 脱困检查每 4 帧一次，留足余量
 		check(player.global_position.distance_to(host_obs.global_position) > 4.0, "嵌入障碍后自动脱困")
 		player.position = Vector2.ZERO
 		await _frames(3)

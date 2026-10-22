@@ -6,7 +6,7 @@ extends CharacterBody2D
 const XPGemScene := preload("res://scenes/pickups/xp_gem.tscn")
 const DeathBurstScene := preload("res://scenes/fx/death_burst.tscn")
 
-@export var hp := 20
+@export var hp := 16
 
 var target: Node2D
 var knockback_vel := Vector2.ZERO
@@ -46,6 +46,18 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
 	_swarm_unregister()
+
+
+## 自检用：统计群体网格内的格子数与登记数，用于侦测回收是否彻底。
+static func debug_stats() -> Dictionary:
+	var bodies := 0
+	for k in _swarm:
+		bodies += _swarm[k].size()
+	return {"cells": _swarm.size(), "bodies": bodies}
+
+
+static func key(at: Vector2) -> Vector2i:
+	return Vector2i(int(floor(at.x / SWARM_CELL)), int(floor(at.y / SWARM_CELL)))
 
 
 func _swarm_key(at: Vector2) -> Vector2i:
@@ -163,10 +175,15 @@ func _flash_white() -> void:
 	tw.tween_property(spr, "self_modulate", Color(1, 1, 1), 0.09)
 
 
+## 波次缩放：血量成长比速度成长更陡，但都比原来放缓——
+## 旧曲线下第 8 波杀一只要 7 秒（刷怪只要 0.9 秒），玩家永远清不完场。
+const HP_GROWTH := 0.16
+const SPEED_GROWTH := 0.18
+
+
 func scale_difficulty(wave: int) -> void:
-	var mult: float = 1.0 + 0.28 * (wave - 1)
-	hp = int(round(hp * mult))
-	_apply_difficulty(wave, mult)
+	hp = int(round(hp * (1.0 + HP_GROWTH * (wave - 1))))
+	_apply_difficulty(wave, 1.0 + SPEED_GROWTH * (wave - 1))
 
 
 func _apply_difficulty(_wave: int, _mult: float) -> void:

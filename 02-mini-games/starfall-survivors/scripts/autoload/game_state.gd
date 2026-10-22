@@ -42,7 +42,7 @@ func add_xp(amount: int) -> void:
 	while xp >= xp_to_next:
 		xp -= xp_to_next
 		level += 1
-		xp_to_next = 5 + (level - 1) * 5
+		xp_to_next = 5 + (level - 1) * 3
 		pending_upgrades += 1
 		level_changed.emit(level)
 	xp_changed.emit(xp, xp_to_next)

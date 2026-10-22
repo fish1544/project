@@ -55,6 +55,14 @@ static func query(at: Vector2, radius: float) -> Array:
 	return out
 
 
+## 自检用：统计索引内的格子数与实体数，用于侦测回收是否彻底。
+static func debug_stats() -> Dictionary:
+	var bodies := 0
+	for k in _grid:
+		bodies += _grid[k].size()
+	return {"cells": _grid.size(), "bodies": bodies}
+
+
 ## 该点是否空得下（不与任何角色重叠）。生成障碍前调用。
 static func has_room_at(at: Vector2, radius: float) -> bool:
 	var need := radius + 9.0
@@ -71,6 +79,12 @@ static func has_room_at(at: Vector2, radius: float) -> bool:
 
 ## 把嵌入障碍的角色推出来；返回是否发生了推移。
 static func push_out(body: Node2D, body_radius: float) -> bool:
+	# 嵌入是罕见事件，每 4 帧查一次就够，省下每帧上千次网格查询
+	var tick: int = body.get_meta("obstacle_tick", 0) - 1
+	body.set_meta("obstacle_tick", tick)
+	if tick > 0:
+		return false
+	body.set_meta("obstacle_tick", 4)
 	var p := body.global_position
 	var moved := false
 	# 两遍迭代：夹在两个石头之间时，第一遍推出后可能又嵌入另一个

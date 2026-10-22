@@ -49,6 +49,8 @@ var _motes: Array[Sprite2D] = []
 var _view_size := FALLBACK_VIEW
 var _mote_box := FALLBACK_VIEW * 1.3
 var _host: Node2D      # 实体障碍的宿主（应为 world，使其参与 y 排序）
+var _last_origin := Vector2i(1 << 30, 1 << 30)
+var _last_half := Vector2i(-1, -1)
 
 
 func _ready() -> void:
@@ -62,6 +64,17 @@ func _ready() -> void:
 		_spawn_motes()
 
 
+func _exit_tree() -> void:
+	# 实体障碍挂在宿主（world）而非本节点下，背景被销毁时必须自己收走，
+	# 否则会残留一堆 StaticBody2D 与失效的索引条目
+	for cell in _props.keys():
+		var node: Node2D = _props[cell]
+		if is_instance_valid(node):
+			ObstacleField.unregister(node)
+			node.queue_free()
+	_props.clear()
+
+
 func _process(delta: float) -> void:
 	if not is_instance_valid(follow_target):
 		return
@@ -72,14 +85,27 @@ func _process(delta: float) -> void:
 	_update_motes(cam, delta)
 
 
+## 取跟随目标身上的镜头：不依赖节点名，ScreenShake 之类子类也能命中。
+func _find_camera(node: Node) -> Camera2D:
+	if node is Camera2D:
+		return node
+	for c in node.get_children():
+		var found := _find_camera(c)
+		if found != null:
+			return found
+	return null
+
+
 func _refresh_view_size() -> void:
 	var zoom := 1.0
 	if is_instance_valid(follow_target):
-		var cam := follow_target.get_node_or_null("Camera2D") as Camera2D
+		var cam := _find_camera(follow_target)
 		if cam != null:
 			zoom = maxf(cam.zoom.x, 0.01)
 	var size := get_viewport_rect().size / zoom
 	if size.x > 1.0 and size.y > 1.0:
+		if not _view_size.is_equal_approx(size):
+			_last_origin = Vector2i(1 << 30, 1 << 30)  # 视野变了，强制重算网格
 		_view_size = size
 		_mote_box = _view_size * 1.3
 
@@ -90,6 +116,11 @@ func _update_props(cam: Vector2) -> void:
 		int(_view_size.y * 0.5 / CELL_SIZE) + KEEP_CELLS
 	)
 	var origin := Vector2i(int(floor(cam.x / CELL_SIZE)), int(floor(cam.y / CELL_SIZE)))
+	# 只有镜头跨格或视野变化时才有活干；否则直接跳过，省掉每帧上百次字典操作
+	if origin == _last_origin and half == _last_half:
+		return
+	_last_origin = origin
+	_last_half = half
 	var needed := {}
 	for gx in range(origin.x - half.x, origin.x + half.x + 1):
 		for gy in range(origin.y - half.y, origin.y + half.y + 1):

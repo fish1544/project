@@ -33,6 +33,8 @@ func _ready() -> void:
 	world.add_child(player)
 	bg.follow_target = player
 	var camera := ScreenShake.new()
+	# 必须叫 Camera2D：player/background 都按这个名字取镜头（震屏与视野缩放都依赖它）
+	camera.name = "Camera2D"
 	camera.zoom = Vector2(2.5, 2.5)
 	player.add_child(camera)
 	add_child(HUDScene.instantiate())
