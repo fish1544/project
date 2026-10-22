@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://btcollaudit7"]
+
+[ext_resource type="Script" path="res://scripts/test/collision_audit.gd" id="1_audit"]
+
+[node name="CollisionAudit" type="Node"]
+script = ExtResource("1_audit")

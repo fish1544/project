@@ -102,6 +102,7 @@ func _update_props(cam: Vector2) -> void:
 			var node: Node2D = _props[cell]
 			_props.erase(cell)
 			if is_instance_valid(node):
+				ObstacleField.unregister(node)
 				node.queue_free()
 
 
@@ -122,6 +123,13 @@ func _make_prop(cell: Vector2i) -> Node2D:
 		solid = false
 	var scale_f: float = rng.randf_range(0.82, 1.22)
 	var pos := _cell_center(cell) + Vector2(rng.randf_range(-18.0, 18.0), rng.randf_range(-18.0, 18.0))
+	if solid:
+		# 出生点附近、以及此刻正好压着玩家/敌人的位置，一律降级为贴地装饰，
+		# 否则石头会凭空长在角色身上把它卡死在碰撞体里
+		if _cell_center(cell).length() < SPAWN_CLEAR_RADIUS:
+			solid = false
+		elif not ObstacleField.has_room_at(pos, radius * scale_f):
+			solid = false
 	if solid:
 		return _make_obstacle(pos, tex, radius * scale_f, scale_f, rng)
 	return _make_decor(pos, tex, scale_f, rng)
@@ -148,6 +156,7 @@ func _make_obstacle(pos: Vector2, tex: Texture2D, radius: float, scale_f: float,
 	body.add_child(spr)
 
 	_host.add_child(body)
+	ObstacleField.register(body, radius)
 	return body
 
 

@@ -43,6 +43,8 @@ func _physics_process(delta: float) -> void:
 	var dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	velocity = dir * speed
 	move_and_slide()
+	# 兜底：万一被新生成的石头或尸潮挤进碰撞体内部，自动脱困
+	ObstacleField.push_out(self, 6.5)
 	invulnerable = maxf(0.0, invulnerable - delta)
 	shoot_cooldown -= delta
 	if shoot_cooldown <= 0.0:

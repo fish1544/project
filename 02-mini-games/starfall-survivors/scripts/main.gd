@@ -103,8 +103,9 @@ func _find_free_spawn(center: Vector2) -> Vector2:
 
 
 func _is_blocked(at: Vector2) -> bool:
-	for obstacle in get_tree().get_nodes_in_group("obstacles"):
-		if obstacle.global_position.distance_to(at) < 16.0:
+	for b in ObstacleField.query(at, 32.0):
+		var r: float = b.get_meta("obstacle_radius", 6.0)
+		if b.global_position.distance_to(at) < r + 10.0:
 			return true
 	return false
 

@@ -266,6 +266,40 @@ func _ready() -> void:
 	block.queue_free()
 	await _frames(2)
 
+	# 尸潮软分离：一群敌人不该叠成一个点（曾因敌人之间无碰撞而完全重合）
+	var pack: Array = []
+	for i in 8:
+		var member = load("res://scenes/enemies/enemy.tscn").instantiate()
+		member.hp = 99999
+		member.position = player.position + Vector2(320.0, -260.0) + Vector2(randf_range(-4.0, 4.0), randf_range(-4.0, 4.0))
+		main.world.add_child(member)
+		pack.append(member)
+	await _frames(150)
+	var min_gap := 9999.0
+	for i in pack.size():
+		for j in range(i + 1, pack.size()):
+			if not is_instance_valid(pack[i]) or not is_instance_valid(pack[j]):
+				continue
+			min_gap = minf(min_gap, pack[i].global_position.distance_to(pack[j].global_position))
+	check(min_gap > 10.0, "尸潮软分离：8 个敌人最小间距 %.1f" % min_gap)
+	for member in pack:
+		if is_instance_valid(member):
+			member.queue_free()
+	await _frames(3)
+
+	# 障碍空间索引：角色所在位置不允许再生成障碍（否则石头会长在人身上）
+	check(not ObstacleField.has_room_at(player.global_position, 40.0), "障碍生成避开角色所在位置")
+
+	# 嵌入障碍后能自动脱困
+	var live_obstacles := get_tree().get_nodes_in_group("obstacles")
+	if live_obstacles.size() > 0:
+		var host_obs: Node2D = live_obstacles[0]
+		player.global_position = host_obs.global_position
+		await _frames(3)
+		check(player.global_position.distance_to(host_obs.global_position) > 4.0, "嵌入障碍后自动脱困")
+		player.position = Vector2.ZERO
+		await _frames(3)
+
 	# 主菜单可加载
 	var menu = load("res://scenes/ui/main_menu.tscn").instantiate()
 	get_tree().root.add_child.call_deferred(menu)

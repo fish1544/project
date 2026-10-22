@@ -1,84 +1,87 @@
-[gd_scene load_steps=11 format=3 uid="uid://starfallmenu"]
+[gd_scene format=3 uid="uid://starfallmenu"]
 
-[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_scr"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_sky.png" id="2_sky"]
-[ext_resource type="Texture2D" path="res://assets/sprites/player.png" id="3_player"]
-[ext_resource type="Texture2D" path="res://assets/sprites/dasher.png" id="4_dasher"]
+[ext_resource type="Script" uid="uid://bybqstnldvkvp" path="res://scripts/ui/main_menu.gd" id="1_scr"]
+[ext_resource type="Texture2D" uid="uid://yidxpklhixxm" path="res://assets/backgrounds/bg_sky.png" id="2_sky"]
+[ext_resource type="Texture2D" uid="uid://buxvbtl8uk7pm" path="res://assets/sprites/player.png" id="3_player"]
+[ext_resource type="Texture2D" uid="uid://df4nnhy8qik7w" path="res://assets/sprites/dasher.png" id="4_dasher"]
+
+[sub_resource type="StyleBoxFlat" id="SB_panel"]
+bg_color = Color(0.04, 0.06, 0.12, 0.82)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.56, 0.92, 0.4)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [sub_resource type="LabelSettings" id="LS_title"]
 font_size = 54
 font_color = Color(1, 0.86, 0.38, 1)
-outline_color = Color(0.02, 0.02, 0.08, 0.95)
 outline_size = 10
+outline_color = Color(0.02, 0.02, 0.08, 0.95)
 shadow_color = Color(0, 0, 0, 0.45)
 shadow_offset = Vector2(0, 4)
 
 [sub_resource type="LabelSettings" id="LS_sub"]
 font_size = 15
 font_color = Color(0.62, 0.84, 1, 1)
-outline_color = Color(0, 0, 0, 0.8)
 outline_size = 4
+outline_color = Color(0, 0, 0, 0.8)
 
 [sub_resource type="LabelSettings" id="LS_desc"]
 font_size = 14
 font_color = Color(0.84, 0.87, 0.94, 1)
-outline_color = Color(0, 0, 0, 0.7)
 outline_size = 4
-
-[sub_resource type="LabelSettings" id="LS_hint"]
-font_size = 13
-font_color = Color(0.66, 0.7, 0.84, 1)
 outline_color = Color(0, 0, 0, 0.7)
-outline_size = 4
-
-[sub_resource type="LabelSettings" id="LS_ver"]
-font_size = 12
-font_color = Color(0.5, 0.56, 0.72, 1)
-
-[sub_resource type="StyleBoxFlat" id="SB_panel"]
-bg_color = Color(0.04, 0.06, 0.12, 0.82)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.4, 0.56, 0.92, 0.4)
 
 [sub_resource type="StyleBoxFlat" id="SB_start"]
 bg_color = Color(0.2, 0.38, 0.28, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.55, 0.95, 0.6, 0.75)
-
-[sub_resource type="StyleBoxFlat" id="SB_start_hover"]
-bg_color = Color(0.28, 0.55, 0.38, 1)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="SB_start_hover"]
+bg_color = Color(0.28, 0.55, 0.38, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(1, 0.9, 0.45, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
-[node name="MainMenu" type="Control"]
+[sub_resource type="LabelSettings" id="LS_hint"]
+font_size = 13
+font_color = Color(0.66, 0.7, 0.84, 1)
+outline_size = 4
+outline_color = Color(0, 0, 0, 0.7)
+
+[sub_resource type="LabelSettings" id="LS_ver"]
+font_size = 12
+font_color = Color(0.5, 0.56, 0.72, 1)
+
+[node name="MainMenu" type="Control" unique_id=67888307]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_scr")
 
-[node name="Sky" type="TextureRect" parent="."]
-mouse_filter = 2
+[node name="Sky" type="TextureRect" parent="." unique_id=868571681]
+modulate = Color(0.6, 0.66, 0.9, 1)
 texture_filter = 1
 layout_mode = 1
 anchors_preset = 15
@@ -86,24 +89,24 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 texture = ExtResource("2_sky")
 expand_mode = 1
 stretch_mode = 6
-modulate = Color(0.6, 0.66, 0.9, 1)
 
-[node name="Darken" type="ColorRect" parent="."]
-mouse_filter = 2
+[node name="Darken" type="ColorRect" parent="." unique_id=689644026]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.02, 0.03, 0.09, 0.55)
 
-[node name="Stars" type="Node2D" parent="."]
+[node name="Stars" type="Node2D" parent="." unique_id=1071886238]
 
-[node name="Root" type="CenterContainer" parent="."]
+[node name="Root" type="CenterContainer" parent="." unique_id=1739606869]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -111,94 +114,95 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="PanelContainer" parent="Root"]
+[node name="Panel" type="PanelContainer" parent="Root" unique_id=912457007]
 layout_mode = 2
 theme_override_styles/panel = SubResource("SB_panel")
 
-[node name="VBox" type="VBoxContainer" parent="Root/Panel"]
+[node name="VBox" type="VBoxContainer" parent="Root/Panel" unique_id=831946553]
 custom_minimum_size = Vector2(600, 0)
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="TitleRow" type="HBoxContainer" parent="Root/Panel/VBox"]
+[node name="TitleRow" type="HBoxContainer" parent="Root/Panel/VBox" unique_id=1988925814]
 layout_mode = 2
+localize_numeral_system = false
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="LeftIcon" type="TextureRect" parent="Root/Panel/VBox/TitleRow"]
+[node name="LeftIcon" type="TextureRect" parent="Root/Panel/VBox/TitleRow" unique_id=1469840879]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 texture = ExtResource("3_player")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Title" type="Label" parent="Root/Panel/VBox/TitleRow"]
+[node name="Title" type="Label" parent="Root/Panel/VBox/TitleRow" unique_id=1324352798]
 layout_mode = 2
 theme_override_font_sizes/font_size = 54
-label_settings = SubResource("LS_title")
 text = "星陨幸存者"
+label_settings = SubResource("LS_title")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="RightIcon" type="TextureRect" parent="Root/Panel/VBox/TitleRow"]
+[node name="RightIcon" type="TextureRect" parent="Root/Panel/VBox/TitleRow" unique_id=657773460]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 texture = ExtResource("4_dasher")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Subtitle" type="Label" parent="Root/Panel/VBox"]
+[node name="Subtitle" type="Label" parent="Root/Panel/VBox" unique_id=958594452]
 layout_mode = 2
-label_settings = SubResource("LS_sub")
 text = "STARFALL  SURVIVORS  ·  肉鸽割草"
+label_settings = SubResource("LS_sub")
 horizontal_alignment = 1
 
-[node name="Sep1" type="HSeparator" parent="Root/Panel/VBox"]
+[node name="Sep1" type="HSeparator" parent="Root/Panel/VBox" unique_id=16803366]
 layout_mode = 2
 
-[node name="Desc" type="Label" parent="Root/Panel/VBox"]
+[node name="Desc" type="Label" parent="Root/Panel/VBox" unique_id=23979868]
 layout_mode = 2
+text = "星陨之夜，怪物成群而至。自动射击、拾取宝石，每次升级三选一强化！"
 label_settings = SubResource("LS_desc")
-text = "星陨之夜，怪物成群而至。自动射击、拾取宝石，每次升级三选一强化——活得越久，变得越强。"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="Spacer" type="Control" parent="Root/Panel/VBox"]
+[node name="Spacer" type="Control" parent="Root/Panel/VBox" unique_id=1087700093]
 custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 
-[node name="StartButton" type="Button" parent="Root/Panel/VBox"]
+[node name="StartButton" type="Button" parent="Root/Panel/VBox" unique_id=485257471]
 custom_minimum_size = Vector2(260, 54)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.88, 1, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 0.95, 0.6, 1)
+theme_override_font_sizes/font_size = 22
 theme_override_styles/normal = SubResource("SB_start")
-theme_override_styles/hover = SubResource("SB_start_hover")
 theme_override_styles/pressed = SubResource("SB_start_hover")
+theme_override_styles/hover = SubResource("SB_start_hover")
 theme_override_styles/focus = SubResource("SB_start_hover")
 text = "开 始 游 戏"
 
-[node name="QuitButton" type="Button" parent="Root/Panel/VBox"]
+[node name="QuitButton" type="Button" parent="Root/Panel/VBox" unique_id=461642556]
 custom_minimum_size = Vector2(160, 32)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.78, 0.82, 0.92, 1)
-text = "退出游戏"
+theme_override_font_sizes/font_size = 13
+text = "退 出 游 戏"
 
-[node name="Hint" type="Label" parent="Root/Panel/VBox"]
+[node name="Hint" type="Label" parent="Root/Panel/VBox" unique_id=2122511821]
 layout_mode = 2
-label_settings = SubResource("LS_hint")
 text = "WASD / 方向键移动 · 自动攻击最近敌人 · 升级时按 1 / 2 / 3 选择强化"
+label_settings = SubResource("LS_hint")
 horizontal_alignment = 1
 
-[node name="Version" type="Label" parent="Root/Panel/VBox"]
+[node name="Version" type="Label" parent="Root/Panel/VBox" unique_id=403622945]
 layout_mode = 2
-label_settings = SubResource("LS_ver")
 text = "v0.3 · Web / Android 双端 · Godot 4.7"
+label_settings = SubResource("LS_ver")
 horizontal_alignment = 1
 
 [connection signal="pressed" from="Root/Panel/VBox/StartButton" to="." method="_on_start_pressed"]
