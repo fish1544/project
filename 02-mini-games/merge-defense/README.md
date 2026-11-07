@@ -11,7 +11,7 @@
 - Node 侧校验（可选）：
   - `node -e "const E=require('./js/engine.js'); const r=E.selftest(); console.log(r.fails, r.results.length)"`
   - `node tests/balance.mjs competent` 或 `node tests/balance.mjs sloppy`（固定种子的逐波数值模拟）
-  - `node tests/browser-test.mjs`（Chrome headless + CDP 走查，需要本机 Chrome）
+  - `node tests/browser-test.mjs`（Chrome headless + CDP 走查 21 项，需要本机 Chrome；设 `GAME_URL` 可直接验收线上入口）
 
 ## 要验证的假设
 

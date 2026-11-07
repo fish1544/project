@@ -1,8 +1,11 @@
-/*
+﻿/*
  * browser-test.mjs — 真实浏览器验收（Chrome headless + DevTools 协议）
- * 覆盖：页面自检、开始→购买→合成→开战→结算→下一轮、失败与重开、画布非空、截图存档。
- * 用法: node tests/browser-test.mjs
- * 输出最后一行 TEST PASS / TEST ERROR
+ * 覆盖：页面自检、开始 → 购买 → 合成 → 开战 → 结算 → 下一轮、失败与重开、
+ *       规则浮层、画布像素非空、窄屏不裁切、截图存档。
+ * 用法:
+ *   node tests/browser-test.mjs
+ *   或先在 PowerShell 设置 $env:GAME_URL="https://.../merge-defense/" 再运行（验收线上入口）
+ * 末行输出 TEST PASS / TEST ERROR
  */
 import { spawn } from 'node:child_process';
 import { mkdtempSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -12,8 +15,10 @@ import { pathToFileURL, fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
-const INDEX = join(ROOT, 'index.html');
 const SHOTS = join(ROOT, '_shots');
+/* 默认验收本地文件；传 GAME_URL 可验收线上入口（例如 GitHub Pages） */
+const TARGET_URL = process.env.GAME_URL || pathToFileURL(join(ROOT, 'index.html')).href;
+const q = (s) => TARGET_URL + (TARGET_URL.includes('?') ? '&' : '?') + s;
 
 const PORT = 9600 + Math.floor(Math.random() * 200);
 const profile = mkdtempSync(join(tmpdir(), 'md-cdp-'));
@@ -81,7 +86,7 @@ async function main() {
   await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
 
   /* ---------- 1. 页面自检（规则断言） ---------- */
-  await goto(pathToFileURL(INDEX).href + '?selftest=1');
+  await goto(q('selftest=1'));
   let out = '';
   for (let i = 0; i < 40; i++) {
     out = await evalJS('document.body ? document.body.innerText : ""') || '';
@@ -89,28 +94,25 @@ async function main() {
     await sleep(300);
   }
   check('页面自检通过（33 项规则断言）', out.includes('TEST PASS'), out.includes('TEST ERROR') ? '有断言失败' : 'ok');
-  const testDetail = await evalJS('window.__TEST ? window.__TEST.results.filter(r=>!r.pass).map(r=>r.name).join("|") : "no __TEST"');
+  const testDetail = await evalJS(`window.__TEST ? window.__TEST.results.filter(r => !r.pass).map(r => r.name).join('|') : 'no __TEST'`);
   check('自检无失败项', !testDetail || testDetail === '', testDetail);
 
   /* ---------- 2. 正常游玩路径 ---------- */
-  await goto(pathToFileURL(INDEX).href);
+  await goto(TARGET_URL);
   await sleep(600);
   const boot = await evalJS(`(() => {
     const g = window.__GAME.state;
     return { hasGame: !!g, phase: g.phase, gold: g.gold, overlay: document.querySelector('#overlay').classList.contains('show'), rules: g.cfg.ruleset_id, cvW: document.getElementById('cv').width };
   })()`);
-  check('首帧加载无阻断错误', boot && boot.hasGame, JSON.stringify(boot));
+  check('首帧加载无阻断错误', boot && boot.hasGame && boot.rules === 'MERGE-DEF-001-v1', JSON.stringify(boot));
   check('开局显示玩法说明浮层', boot.overlay === true, String(boot.overlay));
   check('画布已完成 DPR 适配', boot.cvW > 900, boot.cvW);
-  await shot('01-start.png');
 
-  /* 点开始 */
   await evalJS(`document.querySelector('#mStart').click(); true`);
   await sleep(500);
   const afterStart = await evalJS(`(() => { const g = window.__GAME.state; return { phase: g.phase, paused: g.paused, modal: window.__GAME.ui.modal, overlay: document.querySelector('#overlay').classList.contains('show') }; })()`);
   check('点开始后进入布防且计时运行', afterStart.phase === 'prep' && !afterStart.paused && !afterStart.overlay, JSON.stringify(afterStart));
 
-  /* 购买第一个商品 */
   const buy1 = await evalJS(`(() => {
     const G = window.__GAME, g = G.state;
     const before = { gold: g.gold, units: g.units.length };
@@ -119,7 +121,6 @@ async function main() {
   })()`);
   check('点商店卡片可购买并落位', buy1.after.units === buy1.before.units + 1 && buy1.after.gold < buy1.before.gold, JSON.stringify(buy1));
 
-  /* 强制两次同型购买 + 合成（走引擎同一入口） */
   const mergeRes = await evalJS(`(() => {
     const G = window.__GAME, g = G.state, E = G.api;
     g.gold = 20;
@@ -131,38 +132,35 @@ async function main() {
     const res = E.merge(g, b.id, a.id);
     return { ok: res.ok, level: a.level, archers: g.units.filter(u => u.type === 'archer').length, merges: g.stats.merges };
   })()`);
-  check('拖拽合成入口可升到 L2', mergeRes.ok && mergeRes.level === 2 && mergeRes.merges === 1, JSON.stringify(mergeRes));
+  check('合成入口可升到 L2（两格并一格）', mergeRes.ok && mergeRes.level === 2 && mergeRes.archers === 1 && mergeRes.merges === 1, JSON.stringify(mergeRes));
 
   /* 画布像素非空（深色主题：判定必须有亮像素与足够多的不同颜色） */
   const px = await evalJS(`(() => {
     const cv = document.getElementById('cv');
     const c = cv.getContext('2d');
     const d = c.getImageData(0, 0, cv.width, cv.height).data;
-    let lit = 0, total = 0, maxBright = 0;
+    let lit = 0, maxBright = 0;
     const colors = new Set();
     for (let i = 0; i < d.length; i += 4 * 37) {
-      total++;
       const br = Math.max(d[i], d[i + 1], d[i + 2]);
       if (br > maxBright) maxBright = br;
       if (br > 90) lit++;
       colors.add((d[i] >> 4) + '-' + (d[i + 1] >> 4) + '-' + (d[i + 2] >> 4));
     }
-    return { lit, total, ratio: +(lit / total).toFixed(3), maxBright, colors: colors.size };
+    return { lit, maxBright, colors: colors.size };
   })()`);
   check('画布首帧像素非空（有可见内容）', px && px.lit >= 40 && px.maxBright >= 120 && px.colors >= 10, JSON.stringify(px));
 
-  /* 立即开战 */
   await evalJS(`document.querySelector('#btnFight').click(); true`);
   await sleep(2500);
   const combat = await evalJS(`(() => { const g = window.__GAME.state; return { phase: g.phase, enemies: g.enemies.length, spawned: g.wave.spawns.length, timer: +g.timer.toFixed(1) }; })()`);
   check('开战后进入交战并生成敌人', combat.phase === 'combat' && combat.enemies > 0, JSON.stringify(combat));
   await shot('02-combat.png');
 
-  /* 加速跑完本波 */
   await evalJS(`window.__GAME.state.speed = 8; true`);
   let settle = null;
   for (let i = 0; i < 80; i++) {
-    settle = await evalJS(`(() => { const g = window.__GAME.state; return { phase: g.phase, res: g.waveResult && { reason: g.waveResult.reason, kills: g.waveResult.kills, leaks: g.waveResult.leaks, bonus: g.waveResult.bonus }, overlay: document.querySelector('#overlay').classList.contains('show'), title: (document.querySelector('#overlay h2')||{}).textContent || '' }; })()`);
+    settle = await evalJS(`(() => { const g = window.__GAME.state; return { phase: g.phase, res: g.waveResult && { reason: g.waveResult.reason, kills: g.waveResult.kills, leaks: g.waveResult.leaks }, overlay: document.querySelector('#overlay').classList.contains('show'), title: (document.querySelector('#overlay h2') || {}).textContent || '' }; })()`);
     if (settle.phase === 'settle') break;
     await sleep(500);
   }
@@ -172,7 +170,6 @@ async function main() {
   check('结算面板数值无 NaN / undefined', !/NaN|undefined/.test(settleText), (settleText || '').replace(/\n/g, ' ').slice(0, 120));
   await shot('03-settle.png');
 
-  /* 继续下一轮 */
   const nextRes = await evalJS(`(() => {
     document.querySelector('#mNext').click();
     const g = window.__GAME.state;
@@ -184,18 +181,18 @@ async function main() {
 
   /* ---------- 3. 失败与重开路径 ---------- */
   const fail = await evalJS(`(() => {
-    const G = window.__GAME, g = G.state, E = G.api;
+    const G = window.__GAME, E = G.api;
     G.newRun(4242);
-    const g2 = window.__GAME.state;
-    g2.gold = 0; g2.units = []; g2.baseHp = 1;
-    E.startCombat(g2);
-    return { phase: g2.phase, hp: g2.baseHp };
+    const g = G.state;
+    g.gold = 0; g.units = []; g.baseHp = 1;
+    E.startCombat(g);
+    return { phase: g.phase, hp: g.baseHp };
   })()`);
   check('可构造失败场景（空阵容 1 血）', fail.phase === 'combat' && fail.hp === 1, JSON.stringify(fail));
 
   let dead = null;
   for (let i = 0; i < 90; i++) {
-    dead = await evalJS(`(() => { const g = window.__GAME.state; return { phase: g.phase, hp: g.baseHp, over: g.over, win: g.win, leaks: g.stats.leaks, title: (document.querySelector('#overlay h2')||{}).textContent || '' }; })()`);
+    dead = await evalJS(`(() => { const g = window.__GAME.state; return { phase: g.phase, hp: g.baseHp, over: g.over, win: g.win, leaks: g.stats.leaks, title: (document.querySelector('#overlay h2') || {}).textContent || '' }; })()`);
     if (dead.over) break;
     await sleep(500);
   }
@@ -212,10 +209,14 @@ async function main() {
   check('重开回到第 1 波满血布防', restart.phase === 'prep' && restart.hp === 15 && restart.round === 1 && restart.units === 0 && !restart.over, JSON.stringify(restart));
 
   /* ---------- 4. 规则浮层与窄屏布局 ---------- */
-  const rulesOpen = await evalJS(`(() => { document.querySelector('#btnRules').click(); const o = document.querySelector('#overlay'); return { show: o.classList.contains('show'), hasTable: !!o.querySelector('table'), modal: window.__GAME.ui.modal }; })()`);
+  const rulesOpen = await evalJS(`(() => {
+    document.querySelector('#btnRules').click();
+    const o = document.querySelector('#overlay');
+    return { show: o.classList.contains('show'), hasTable: !!o.querySelector('table'), modal: window.__GAME.ui.modal };
+  })()`);
   check('规则浮层可打开且含数值表', rulesOpen.show && rulesOpen.hasTable && rulesOpen.modal === 'rules', JSON.stringify(rulesOpen));
   await shot('05-rules.png');
-  /* 关闭规则：第 1 波未购买会回到"开始"浮层，再点开始进入棋盘 */
+  /* 关闭规则：第 1 波未购买会回到「开始」浮层，再点开始进入棋盘 */
   await evalJS(`document.querySelector('#mClose').click(); true`);
   await sleep(200);
   await evalJS(`(() => { const b = document.querySelector('#mStart'); if (b) b.click(); return true; })()`);
@@ -226,8 +227,7 @@ async function main() {
   const narrow = await evalJS(`(() => {
     const cv = document.getElementById('cv');
     const r = cv.getBoundingClientRect();
-    const shop = document.querySelectorAll('#shop .card').length;
-    return { cvW: Math.round(r.width), cvH: Math.round(r.height), ratio: +(r.width / r.height).toFixed(3), shop, overflowX: document.documentElement.scrollWidth > window.innerWidth + 1 };
+    return { cvW: Math.round(r.width), cvH: Math.round(r.height), ratio: +(r.width / r.height).toFixed(3), shop: document.querySelectorAll('#shop .card').length, overflowX: document.documentElement.scrollWidth > window.innerWidth + 1 };
   })()`);
   check('窄屏不裁切（画布保持 1.923 比例、无横向溢出）', narrow.ratio > 1.85 && narrow.ratio < 2.0 && !narrow.overflowX, JSON.stringify(narrow));
   check('窄屏商店仍有 4 张卡', narrow.shop === 4, narrow.shop);
