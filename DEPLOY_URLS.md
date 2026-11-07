@@ -23,6 +23,7 @@
 | 02-mini-games | 迷你超市（mini-mart） | https://fish1544.github.io/project/02-mini-games/mini-mart/ |
 | 02-mini-games | 霓虹贪吃蛇（neon-snake） | https://fish1544.github.io/project/02-mini-games/neon-snake/ |
 | 02-mini-games | 星陨幸存者（starfall-survivors） | https://fish1544.github.io/project/02-mini-games/starfall-survivors/export/web/ |
+| 02-mini-games | 合成防线（merge-defense） | https://fish1544.github.io/project/02-mini-games/merge-defense/ |
 
 ## 待构建 / 不可静态部署
 

@@ -25,6 +25,7 @@ AI 助手在此创建 / 整理文件时会自动读取并遵守 [AGENTS.md](./AG
 | `neon-snake` | 霓虹贪吃蛇 · NEON SNAKE | 霓虹风贪吃蛇 | 直接打开 `index.html` |
 | `frozen-reincarnation` | 凛冬轮回 · 独自求生 v3.0 | 冰雪末世生活模拟（参考《我独自生活 2.0》）：体力制日常/地点导航/五维养成/主线任务/末日终端/低保救济/大寒潮结局/轮回继承 | 直接打开 `index.html` |
 | `starfall-survivors` | 星陨幸存者 · Survivors-like v0.3 | 肉鸽割草：AI 生成荒原场景（平铺地面/视差星尘/装饰物）+ 三敌种 + 波次难度曲线 + 升级三选一（稀有度卡片）+ 全新 UI（主题/暗角/低血警示/结算评价）；32 项无头测试，Web + Android APK 双端 | 打开 `export/web/index.html` 或线上链接 |
+| `merge-defense` | 合成防线 · Merge Defense v1.0（已发布 [线上版](https://fish1544.github.io/project/02-mini-games/merge-defense/)） | 合成 + 防守最小可玩版：30 秒布防 / 60 秒自动交战、10 格两路棋盘、同型同级合成 L5、4 种单位 + 4 种敌人、10 波难度曲线；33 项规则自检 + 21 项浏览器走查 + 数值模拟 | 直接打开 `index.html`，或打开线上链接 |
 
 ## 🎨 03-designs
 
