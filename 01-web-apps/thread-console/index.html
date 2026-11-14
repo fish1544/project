@@ -1995,7 +1995,8 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     var laneId = slot.getAttribute('data-lane');
     var card = e.target.closest('.save');
     var beforeId = null;
-    if (card && !card.classList.contains('dragging')) {
+    if (card && card.classList.contains('dragging')) return;
+    if (card) {
       var r = card.getBoundingClientRect();
       if (e.clientY <= r.top + r.height / 2) {
         beforeId = card.getAttribute('data-id');
