@@ -297,6 +297,14 @@ select option{background:var(--ink);color:var(--txt)}
 
 .save[draggable="true"]{cursor:grab}
 
+.save.dragging{opacity:.4;cursor:grabbing}
+
+.save::before{content:'';position:absolute;display:none;left:-2px;right:-2px;height:3px;background:var(--dim2);pointer-events:none}
+
+.save.drop-t::before{display:block;top:-3px}
+
+.save.drop-b::before{display:block;bottom:-3px}
+
 .save .tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px}
 
 .save .tag{font-size:9px;letter-spacing:.1em;padding:1px 5px;border:1px solid currentColor;color:var(--dim)}
@@ -855,7 +863,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <input id="fileInput" type="file" accept=".json,application/json" class="sr" aria-label="选择备份文件">
 
-      <p class="cmd">清缓存或换浏览器会丢；重要时先导出。快捷键：看板里拖拽可换槽。</p>
+      <p class="cmd">清缓存或换浏览器会丢；重要时先导出。拖拽卡片可换槽，也能在同槽内调顺序。</p>
 
     </section>
 
@@ -1910,51 +1918,99 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
 
 
-  /* ---------- 拖拽换槽 ---------- */
+  /* ---------- 拖拽换槽 / 排序 ---------- */
 
-  document.getElementById('lanes').addEventListener('dragstart', function(e){
+  var dragId = null;
+  var dropMark = null;
 
+  function clearMark(){
+    if (dropMark) { dropMark.classList.remove('drop-t', 'drop-b'); dropMark = null; }
+  }
+
+  function moveThread(id, laneId, beforeId){
+    var arr = state.threads;
+    var from = -1, i;
+    for (i = 0; i < arr.length; i++) { if (arr[i].id === id) { from = i; break; } }
+    if (from < 0) return null;
+    var t = arr[from];
+    var oldLane = t.lane;
+    arr.splice(from, 1);
+    t.lane = laneId;
+    var at = arr.length;
+    if (beforeId && beforeId !== id) {
+      for (i = 0; i < arr.length; i++) { if (arr[i].id === beforeId) { at = i; break; } }
+    } else {
+      var lastSame = -1;
+      for (i = 0; i < arr.length; i++) { if (arr[i].lane === laneId) lastSame = i; }
+      at = lastSame < 0 ? arr.length : lastSame + 1;
+    }
+    arr.splice(at, 0, t);
+    save(); renderAll();
+    return oldLane === laneId ? 'sort' : laneId;
+  }
+
+  var lanesEl = document.getElementById('lanes');
+
+  lanesEl.addEventListener('dragstart', function(e){
     var card = e.target.closest('.save');
-
     if (!card) return;
-
-    e.dataTransfer.setData('text/plain', card.getAttribute('data-id'));
-
+    dragId = card.getAttribute('data-id');
+    e.dataTransfer.setData('text/plain', dragId);
     e.dataTransfer.effectAllowed = 'move';
-
+    card.classList.add('dragging');
   });
 
-  document.getElementById('lanes').addEventListener('dragover', function(e){
-
-    if (e.target.closest('.slot')) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
-
+  lanesEl.addEventListener('dragend', function(){
+    var c = lanesEl.querySelector('.save.dragging');
+    if (c) c.classList.remove('dragging');
+    clearMark();
+    dragId = null;
   });
 
-  document.getElementById('lanes').addEventListener('drop', function(e){
-
+  lanesEl.addEventListener('dragover', function(e){
     var slot = e.target.closest('.slot');
-
-    if (!slot) return;
-
+    if (!slot) { clearMark(); return; }
     e.preventDefault();
-
-    var id = e.dataTransfer.getData('text/plain');
-
-    var t = state.threads.filter(function(x){ return x.id === id; })[0];
-
-    if (!t) return;
-
-    var target = slot.getAttribute('data-lane');
-
-    if (t.lane === target) return;
-
-    t.lane = target;
-
-    save(); renderAll(); toast('已挪到' + laneOf(target).label);
-
+    e.dataTransfer.dropEffect = 'move';
+    var card = e.target.closest('.save');
+    if (!card || card.classList.contains('dragging')) { clearMark(); return; }
+    var r = card.getBoundingClientRect();
+    var below = e.clientY > r.top + r.height / 2;
+    var want = below ? 'drop-b' : 'drop-t';
+    if (card === dropMark && card.classList.contains(want)) return;
+    clearMark();
+    card.classList.add(want);
+    dropMark = card;
   });
 
+  lanesEl.addEventListener('dragleave', function(e){
+    var slot = e.target.closest('.slot');
+    if (slot && !slot.contains(e.relatedTarget)) clearMark();
+  });
 
+  lanesEl.addEventListener('drop', function(e){
+    var slot = e.target.closest('.slot');
+    if (!slot || !dragId) return;
+    e.preventDefault();
+    var laneId = slot.getAttribute('data-lane');
+    var card = e.target.closest('.save');
+    var beforeId = null;
+    if (card && !card.classList.contains('dragging')) {
+      var r = card.getBoundingClientRect();
+      if (e.clientY <= r.top + r.height / 2) {
+        beforeId = card.getAttribute('data-id');
+      } else {
+        var sib = card.nextElementSibling;
+        while (sib && !sib.classList.contains('save')) sib = sib.nextElementSibling;
+        beforeId = sib ? sib.getAttribute('data-id') : null;
+      }
+    }
+    clearMark();
+    var res = moveThread(dragId, laneId, beforeId);
+    dragId = null;
+    if (!res) return;
+    toast(res === 'sort' ? '顺序已调整' : '已挪到' + laneOf(res).label);
+  });
 
   /* ---------- 碎片槽 ---------- */
 
