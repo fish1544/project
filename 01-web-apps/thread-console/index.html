@@ -433,6 +433,12 @@ select option{background:var(--ink);color:var(--txt)}
 
 .hist-item dd{font-size:11px;color:var(--txt);line-height:1.55;word-break:break-word}
 
+.hist-item .hacts{display:flex;gap:4px;margin-top:7px}
+
+.hist-item .hacts button{flex:1 1 0;min-height:34px;font-size:10px;padding:3px 4px}
+
+.hist-item .hacts .btn-del.arm{border-color:var(--coral);color:var(--coral);background:var(--armbg)}
+
 
 
 /* ============ 系统菜单 SYSTEM ============ */
@@ -747,6 +753,8 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
         <div class="rec-acts">
 
           <button type="button" id="revSave">SAVE RECORD</button>
+
+          <button type="button" id="revCancel" hidden style="flex:0 0 auto;padding:0 14px;border-color:var(--edge2);color:var(--dim)">取消修改</button>
 
         </div>
 
@@ -1590,6 +1598,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   }
 
+  var editingReviewId = null;
+  var armRevTimer = null;
+
   function renderHist(){
 
     var host = document.getElementById('histList');
@@ -1618,7 +1629,10 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       h += '<dt>下一动作</dt><dd>' + (r.next ? esc(r.next) : '—') + '</dd>';
 
-      h += '</dl></div>';
+      h += '</dl><div class="hacts">' +
+           '<button type="button" data-ract="edit" data-rid="' + r.id + '">改</button>' +
+           '<button type="button" class="btn-del" data-ract="del" data-rid="' + r.id + '">删</button>' +
+           '</div></div>';
 
     });
 
@@ -2185,6 +2199,53 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
 
 
+  /* ---------- 既往记录 改 / 删 ---------- */
+
+  document.getElementById('histList').addEventListener('click', function(e){
+    var btn = e.target.closest('button');
+    if (!btn) return;
+    var rid = btn.getAttribute('data-rid');
+    var act = btn.getAttribute('data-ract');
+    var rev = state.reviews.filter(function(x){ return x.id === rid; })[0];
+    if (!rev) return;
+    if (act === 'edit') {
+      document.getElementById('revOut').value = rev.out || '';
+      document.getElementById('revBlock').value = rev.block || '';
+      document.getElementById('revNext').value = rev.next || '';
+      editingReviewId = rev.id;
+      document.getElementById('revSave').textContent = '保存修改';
+      document.getElementById('revCancel').hidden = false;
+      var box = document.getElementById('revOut');
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      box.focus({ preventScroll: true });
+      toast('已载入 ' + rev.date + ' 的记录');
+    } else if (act === 'del') {
+      if (!btn.classList.contains('arm')) {
+        btn.classList.add('arm');
+        btn.textContent = '再点';
+        clearTimeout(armRevTimer);
+        armRevTimer = setTimeout(function(){
+          btn.classList.remove('arm');
+          btn.textContent = '删';
+        }, 3000);
+        return;
+      }
+      state.reviews = state.reviews.filter(function(x){ return x.id !== rid; });
+      save(); renderAll();
+      toast('记录已删除');
+    }
+  });
+
+  document.getElementById('revCancel').addEventListener('click', function(){
+    editingReviewId = null;
+    document.getElementById('revOut').value = '';
+    document.getElementById('revBlock').value = '';
+    document.getElementById('revNext').value = '';
+    document.getElementById('revSave').textContent = 'SAVE RECORD';
+    this.hidden = true;
+    toast('已取消修改');
+  });
+
   /* ---------- 复盘 ---------- */
 
   document.getElementById('revSave').addEventListener('click', function(){
@@ -2196,6 +2257,20 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     var next = document.getElementById('revNext').value.trim();
 
     if (!out && !block && !next) { toast('至少写一条再保存'); return; }
+
+    if (editingReviewId) {
+      var rev = state.reviews.filter(function(x){ return x.id === editingReviewId; })[0];
+      if (rev) { rev.out = out; rev.block = block; rev.next = next; }
+      editingReviewId = null;
+      document.getElementById('revSave').textContent = 'SAVE RECORD';
+      document.getElementById('revCancel').hidden = true;
+      save(); renderAll();
+      document.getElementById('revOut').value = '';
+      document.getElementById('revBlock').value = '';
+      document.getElementById('revNext').value = '';
+      toast('记录已更新');
+      return;
+    }
 
     var gap = daysAgo(state.lastReview);
 
