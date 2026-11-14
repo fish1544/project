@@ -16,6 +16,7 @@ AI 助手在此创建 / 整理文件时会自动读取并遵守 [AGENTS.md](./AG
 | `liangli-energy-tracker` | 亮力能量管理 · 减脂健身追踪 | 标准 NestJS + Vite 独立可部署项目：体重/体脂/热量/训练计划追踪 | `npm install` 后 `npm run dev` |
 | `step-sync-tool` | 刷步工具（已发布 [线上版](https://fish1544.github.io/project/01-web-apps/step-sync-tool/)） | 手机端适配的免费在线刷步工具，自动随机安全步数，朋友打开即用 | 直接打开 `index.html`，或打开线上链接 |
 | `aigc-nav` | AIGC 工具导航（已发布 [线上版](https://fish1544.github.io/project/01-web-apps/aigc-nav/)） | 收录 367 款 AI 工具、16 个分类（写作/图像/视频/办公/设计/对话/音乐/智能体/开发等），复古像素风，Tab 切换、全局搜索、点击直达官网 | 直接打开 `index.html` |
+| `aitime-clone` | 爱时间 · 复刻版 | 逐帧还原「爱时间 v9.9.14」安卓 App：时间记录/统计/环形·门形·双环图表/目标/习惯/我的/设置等 20+ 屏；纯前端零依赖、localStorage 存档、内置 CDP 无头验收与 24 项交互测试 | 直接打开 `index.html` |
 
 ## 🎮 02-mini-games
 
