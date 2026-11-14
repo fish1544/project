@@ -20,6 +20,7 @@ _tmp/
 _tmp_github/
 **/_tmp/
 **/_shots/
+**/_backup/
 **/.cache/
 
 # ===== 系统 / 编辑器 =====
