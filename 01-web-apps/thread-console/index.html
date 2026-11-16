@@ -895,7 +895,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <label for="fName">线程名</label>
 
-      <input id="fName" type="text" maxlength="40" placeholder="例：《凛冬轮回》核心循环">
+      <input id="fName" type="text" maxlength="40" placeholder="例：核心玩法第一版">
 
     </div>
 
@@ -927,23 +927,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <label for="fProj">属于哪个项目</label>
 
-      <select id="fProj">
+      <input id="fProj" type="text" maxlength="32" list="projList" placeholder="例：项目 A · 主线，或留空">
 
-        <option value="">未分配</option>
-
-        <option value="frozen-godot">凛冬余烬 · Godot</option>
-
-        <option value="frozen-unity">凛冬余烬 · Unity</option>
-
-        <option value="element-rogue">ElementRogue · Unity</option>
-
-        <option value="merge-defense">Merge Defense · Unity</option>
-
-        <option value="roguelike-core">RoguelikeCore · Unity</option>
-
-        <option value="stack-cannon-td">StackCannonTD · Unity</option>
-
-      </select>
+      <datalist id="projList"></datalist>
 
     </div>
 
@@ -951,7 +937,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <label for="fAi">在跑它的 AI</label>
 
-      <input id="fAi" type="text" maxlength="24" list="aiList" placeholder="例：Claude / trae / 豆包">
+      <input id="fAi" type="text" maxlength="24" list="aiList" placeholder="例：工具名 / 模型名">
 
       <datalist id="aiList">
 
@@ -1018,7 +1004,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   ];
 
-  var state = { threads:[], ideas:[], reviews:[], lastReview:null, quotas:[] };
+  var state = { threads:[], ideas:[], reviews:[], lastReview:null, quotas:[], projects:[] };
 
   var editingId = null, pendingIdeaId = null, pendingLane = 'active', armTimer = null;
 
@@ -1168,7 +1154,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
           lastReview: obj.lastReview || null,
 
-          quotas: Array.isArray(obj.quotas) ? obj.quotas.map(normQuota) : seedQuotas()
+          quotas: Array.isArray(obj.quotas) ? obj.quotas.map(normQuota) : seedQuotas(),
+
+          projects: Array.isArray(obj.projects) ? obj.projects.map(String) : []
 
         };
 
@@ -1203,6 +1191,10 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
       next: String(t.next || ''),
 
       mvp: String(t.mvp || ''),
+
+      proj: String(t.proj || ''),
+
+      ai: String(t.ai || ''),
 
       last: t.last || null
 
@@ -1240,23 +1232,13 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   function seedQuotas(){
 
-    var y = new Date().getFullYear();
-
-    function md(m, d){ return y + '-' + pad(m) + '-' + pad(d); }
-
     return [
 
-      { id: uid(), tool:'豆包', amount:null, date: md(11,14), type:'refresh', note:'11/14 刷新额度', done:false },
+      { id: uid(), tool:'示例工具 1', amount:null, date: shift(3), type:'refresh', note:'额度刷新日', done:false },
 
-      { id: uid(), tool:'trae', amount:100, date: md(11,14), type:'expire', note:'', done:false },
+      { id: uid(), tool:'示例工具 2', amount:100, date: shift(5), type:'expire', note:'', done:false },
 
-      { id: uid(), tool:'trae', amount:100, date: md(11,15), type:'expire', note:'', done:false },
-
-      { id: uid(), tool:'trae', amount:100, date: md(11,16), type:'expire', note:'', done:false },
-
-      { id: uid(), tool:'trae', amount:100, date: md(11,17), type:'expire', note:'', done:false },
-
-      { id: uid(), tool:'WorkBuddy', amount:1250, date: md(11,26), type:'expire', note:'', done:false }
+      { id: uid(), tool:'示例工具 3', amount:null, date: shift(12), type:'expire', note:'', done:false }
 
     ];
 
@@ -1276,51 +1258,27 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       threads: [
 
-        mk('《凛冬轮回》v0.4 核心循环', 'active',
+        mk('示例 · 核心玩法原型', 'active', '需求文档到第 2 版，经济闭环还没定', '', '', 1),
 
-           'PRD 到第 3 版，经济闭环还没定下来',
+        mk('示例 · 系统拆解笔记', 'active', '攒了 3 篇，还没成册', '', '', 2),
 
-           '写下每日结算的三条公式', '一周目可完整玩一遍', 1),
+        mk('示例 · 资格考试复习', 'active', '停在第三章，第四章没动', '', '', 11),
 
-        mk('游戏系统策划作品集', 'active',
+        mk('示例 · 语音链路', 'maint', 'SDK 例程能跑，链路还没接', '', '', 6),
 
-           '拆解笔记攒了 4 篇，还没成册',
+        mk('示例 · 数值曲线', 'maint', '曲线在 demo 里，没做回归', '', '', 4),
 
-           '把《Townsmen》那篇整理成 1 页结构', '3 篇成册、可发出去', 2),
+        mk('示例 · 站点改版', 'frozen', '停在一堆截图和想法', '', '', 21),
 
-        mk('概率论 + 线代补考', 'active',
-
-           '概率论停在第三章，线代没动',
-
-           '做完第三章课后 5 道题', '两门都过线', 11),
-
-        mk('宇树机器狗「星语」', 'maint',
-
-           'SDK 例程能跑，语音链路还没接',
-
-           '跑通一次 ASR 回调', '单条指令能巡线', 6),
-
-        mk('Merge Defense 数值曲线', 'maint',
-
-           '10 波曲线在 demo 里，没做回归',
-
-           '跑一轮数值模拟脚本', '曲线 v1.1 定稿', 4),
-
-        mk('AI 工具导航站改版', 'frozen',
-
-           '停在一堆截图和想法', '', '换一套视觉稿', 21),
-
-        mk('四级词汇站修复', 'frozen',
-
-           '本地能开，手机端样式错位', '', '手机端可用', 26)
+        mk('示例 · 移动端样式修复', 'frozen', '本地能开，手机端样式错位', '', '', 26)
 
       ],
 
       ideas: [
 
-        { id: uid(), text: '给《凛冬轮回》写一份玩家可见的更新日志', created: shift(-2) },
+        { id: uid(), text: '给示例项目写一份对外可见的更新日志', created: shift(-2) },
 
-        { id: uid(), text: '把游戏拆解做成可复用的提问清单', created: shift(-5) }
+        { id: uid(), text: '把拆解笔记做成可复用的提问清单', created: shift(-5) }
 
       ],
 
@@ -1488,16 +1446,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
 
 
-  var PROJ = {
-    'frozen-godot': { label: '凛冬余烬 · Godot' },
-    'frozen-unity': { label: '凛冬余烬 · Unity' },
-    'element-rogue': { label: 'ElementRogue · Unity' },
-    'merge-defense': { label: 'Merge Defense · Unity' },
-    'roguelike-core': { label: 'RoguelikeCore · Unity' },
-    'stack-cannon-td': { label: 'StackCannonTD · Unity' }
-  };
-
-  function projLabel(id){ return PROJ[id] ? PROJ[id].label : id; }
+  function projLabel(id){ return id || ''; }
 
   function threadCard(t){
 
@@ -2147,6 +2096,20 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     document.getElementById('fProj').value = t.proj || '';
 
+    var dl = document.getElementById('projList');
+
+    dl.innerHTML = '';
+
+    var seen = {};
+
+    (state.projects || []).forEach(function(n){ if (n && !seen[n]) { seen[n] = 1; var o2 = document.createElement('option'); o2.value = n; dl.appendChild(o2); } });
+
+    state.threads.forEach(function(x){
+
+      if (x.proj && !seen[x.proj]) { seen[x.proj] = 1; var op = document.createElement('option'); op.value = x.proj; dl.appendChild(op); }
+
+    });
+
     document.getElementById('fAi').value = t.ai || '';
 
     pendingLane = t.lane || 'active';
@@ -2396,7 +2359,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
           lastReview: obj.lastReview || null,
 
-          quotas: Array.isArray(obj.quotas) ? obj.quotas.map(normQuota) : []
+          quotas: Array.isArray(obj.quotas) ? obj.quotas.map(normQuota) : [],
+
+          projects: Array.isArray(obj.projects) ? obj.projects.map(String) : []
 
         };
 
