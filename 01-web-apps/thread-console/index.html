@@ -343,6 +343,8 @@ select option{background:var(--ink);color:var(--txt)}
 
 .save .nx .k{display:none}
 
+.save .ln.blk .k{color:var(--warn);letter-spacing:.1em}
+
 .save .mvp{font-size:9.5px;color:var(--dim2);margin-top:4px;letter-spacing:.04em}
 
 .save .pj{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:9.5px;color:var(--dim2);margin-top:5px;letter-spacing:.04em}
@@ -570,6 +572,10 @@ select option{background:var(--ink);color:var(--txt)}
 .sheet .f{position:relative;margin-top:9px}
 
 .sheet .f label{display:block;font-size:10px;color:var(--dim);letter-spacing:.1em;margin-bottom:3px}
+
+.sheet .frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+@media(max-width:520px){.sheet .frow{grid-template-columns:1fr}}
 
 .seg{display:flex;gap:5px}
 
@@ -941,31 +947,55 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     </div>
 
-    <div class="f">
+    <div class="frow">
 
-      <label for="fStep">现在卡在第几步</label>
+      <div class="f">
 
-      <input id="fStep" type="text" maxlength="120" placeholder="例：文档到第 3 版，数值还没定">
+        <label for="fStep">阶段</label>
+
+        <input id="fStep" type="text" maxlength="120" placeholder="例：S4">
+
+      </div>
+
+      <div class="f">
+
+        <label for="fProj">项目</label>
+
+        <input id="fProj" type="text" maxlength="32" placeholder="例：项目 A，留空也行" autocomplete="off">
+
+        <div class="sug" id="sugProj"></div>
+
+      </div>
 
     </div>
 
     <div class="f">
 
-      <label for="fProj">项目</label>
+      <label for="fBlock">卡在哪</label>
 
-      <input id="fProj" type="text" maxlength="32" placeholder="例：项目 A，留空也行" autocomplete="off">
-
-      <div class="sug" id="sugProj"></div>
+      <input id="fBlock" type="text" maxlength="90" placeholder="例：首屏入口 A/B 还没拍板">
 
     </div>
 
-    <div class="f">
+    <div class="frow">
 
-      <label for="fAi">在跑的 AI</label>
+      <div class="f">
 
-      <input id="fAi" type="text" maxlength="24" placeholder="例：工具名 / 模型名" autocomplete="off">
+        <label for="fNext">下一步</label>
 
-      <div class="sug" id="sugAi"></div>
+        <input id="fNext" type="text" maxlength="90" placeholder="例：补证据，副标题改 14px">
+
+      </div>
+
+      <div class="f">
+
+        <label for="fAi">在跑的 AI</label>
+
+        <input id="fAi" type="text" maxlength="24" placeholder="例：工具名 / 模型名" autocomplete="off">
+
+        <div class="sug" id="sugAi"></div>
+
+      </div>
 
     </div>
 
@@ -1246,6 +1276,8 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       step: String(t.step || ''),
 
+      block: String(t.block || ''),
+
       next: String(t.next || ''),
 
       mvp: String(t.mvp || ''),
@@ -1306,9 +1338,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   function seed(){
 
-    function mk(name, lane, step, next, mvp, ago){
+    function mk(name, lane, step, block, next, ago){
 
-      return { id: uid(), name: name, lane: lane, step: step, next: next, mvp: mvp, last: shift(-ago) };
+      return { id: uid(), name: name, lane: lane, step: step, block: block, next: next, mvp: '', last: shift(-ago) };
 
     }
 
@@ -1316,19 +1348,19 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       threads: [
 
-        mk('示例 · 核心玩法原型', 'active', '文档到第 2 版，数值还没定', '', '', 1),
+        mk('示例 · 核心玩法原型', 'active', 'S4', '首屏入口 A/B 还没拍板', '统一下发字号口径', 1),
 
-        mk('示例 · 系统拆解笔记', 'active', '攒了 3 篇，没成册', '', '', 2),
+        mk('示例 · 系统拆解笔记', 'active', 'S3', '未过自测，截图还没补', '补证据，副标题改 14px', 2),
 
-        mk('示例 · 资格考试复习', 'active', '停在第三章，第四章没翻开', '', '', 11),
+        mk('示例 · 资格考试复习', 'active', 'S2 未启动', '停在第三章，第四章没翻开', '先读第四章，再做题', 11),
 
-        mk('示例 · 语音链路', 'maint', 'SDK 例子能跑，语音链路没通', '', '', 6),
+        mk('示例 · 语音链路', 'maint', 'S3', 'SDK 例子能跑，链路没通', '等它回 R2 的结论', 6),
 
-        mk('示例 · 数值曲线', 'maint', '曲线在 demo 里，回归没做', '', '', 4),
+        mk('示例 · 数值曲线', 'maint', 'S2 未启动', '曲线在 demo 里，回归没做', '下发通用提示词', 4),
 
-        mk('示例 · 站点改版', 'frozen', '一堆截图，还没动手', '', '', 21),
+        mk('示例 · 站点改版', 'frozen', 'S1', '一堆截图，还没动手', '', 21),
 
-        mk('示例 · 移动端样式修复', 'frozen', '本地能开，手机端错位', '', '', 26)
+        mk('示例 · 移动端样式修复', 'frozen', 'S1 阻塞', '本地能开，手机端错位', '先修依赖，跑通构建', 26)
 
       ],
 
@@ -1550,7 +1582,11 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
 
 
-    if (t.step) h += '<div class="ln"><span class="k">现在</span>' + esc(t.step) + '</div>';
+    if (t.step) h += '<div class="ln"><span class="k">阶段</span>' + esc(t.step) + '</div>';
+
+    if (t.block) h += '<div class="ln blk"><span class="k">卡在</span>' + esc(t.block) + '</div>';
+
+    if (t.next) h += '<div class="nx">' + esc(t.next) + '</div>';
 
     if (t.proj) h += '<div class="pj">' + esc(projLabel(t.proj)) + (t.ai ? '<em>' + esc(t.ai) + '</em>' : '') + '</div>';
 
@@ -2172,6 +2208,10 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     document.getElementById('fProj').value = t.proj || '';
 
+    document.getElementById('fBlock').value = t.block || '';
+
+    document.getElementById('fNext').value = t.next || '';
+
     document.getElementById('fAi').value = t.ai || '';
 
     pendingLane = t.lane || 'active';
@@ -2316,6 +2356,10 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       step: document.getElementById('fStep').value.trim(),
 
+      block: document.getElementById('fBlock').value.trim(),
+
+      next: document.getElementById('fNext').value.trim(),
+
       proj: document.getElementById('fProj').value,
 
       ai: document.getElementById('fAi').value.trim()
@@ -2328,7 +2372,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       var t = state.threads.filter(function(x){ return x.id === editingId; })[0];
 
-      if (t) { t.name = data.name; t.lane = data.lane; t.step = data.step; t.proj = data.proj; t.ai = data.ai; }
+      if (t) { t.name = data.name; t.lane = data.lane; t.step = data.step; t.block = data.block; t.next = data.next; t.proj = data.proj; t.ai = data.ai; }
 
     } else {
 
@@ -2336,7 +2380,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
         id: uid(), name: data.name, lane: data.lane, step: data.step,
 
-        proj: data.proj, ai: data.ai, next: '', mvp: '', last: today()
+        block: data.block, next: data.next, proj: data.proj, ai: data.ai, mvp: '', last: today()
 
       });
 
