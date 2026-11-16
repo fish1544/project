@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>线程工作台 · 个人成长总控面</title>
+<title>线程工作台</title>
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230f0f18'/%3E%3Crect x='3' y='6' width='2' height='6' fill='%23ffd84d'/%3E%3Crect x='6' y='4' width='2' height='8' fill='%235ff2b0'/%3E%3Crect x='9' y='2' width='2' height='10' fill='%235ff2b0'/%3E%3Crect x='12' y='7' width='2' height='5' fill='%23ff7b6b'/%3E%3C/svg%3E">
 
@@ -650,7 +650,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     </nav>
 
-    <div class="rail-note">一次只进一个槽。掌控感来自「我知道每条线在第几步」。</div>
+    <div class="rail-note">激活区最多 3 条。塞不下就先挪一条出去。</div>
 
   </aside>
 
@@ -678,11 +678,11 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
         <div class="ib-h"><span>INBOX · 碎片槽</span><span id="pool-count">0 条</span></div>
 
-        <div class="ib-sub">冒出来的念头先落这儿，不当场开工。复盘时再决定升为线程或删掉。</div>
+        <div class="ib-sub">想到什么先记一行，别当场开工。复盘时再看要不要升成线程。</div>
 
         <div class="ib-add">
 
-          <input id="ideaInput" type="text" placeholder="一个还没动手的想法…" maxlength="120" aria-label="新增碎片想法">
+          <input id="ideaInput" type="text" placeholder="记一句还没动手的事" maxlength="120" aria-label="新增碎片想法">
 
           <button type="button" id="ideaAdd">落槽</button>
 
@@ -726,7 +726,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
           <label for="revOut">这两周实际产出了什么</label>
 
-          <span class="qhint">能被别人看到的东西：文档、提交、题目、原型。没有就写“没有”。</span>
+          <span class="qhint">写能拿给别人看的：文档、提交、题目、原型。没有就写“没有”。</span>
 
           <textarea id="revOut" rows="3"></textarea>
 
@@ -736,7 +736,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
           <label for="revBlock">什么卡住了我</label>
 
-          <span class="qhint">写具体的那一下：找不到素材、开不了头、环境报错。</span>
+          <span class="qhint">写卡在哪一下。找不到素材、开不了头、环境报错，都算。</span>
 
           <textarea id="revBlock" rows="3"></textarea>
 
@@ -746,7 +746,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
           <label for="revNext">下一个最小动作</label>
 
-          <span class="qhint">30 分钟内能干完的一件事，用动词开头。</span>
+          <span class="qhint">30 分钟内能做完的一件事，开头用动词。</span>
 
           <textarea id="revNext" rows="2"></textarea>
 
@@ -857,7 +857,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
           <button type="button" class="th" data-theme="sky"><i style="background:#d2dfed"></i>天蓝</button>
           <button type="button" class="th" data-theme="lilac"><i style="background:#ddd2ed"></i>丁香</button>
         </div>
-        <p class="cmd" style="margin-top:8px">只换页面底色，面板与三池色不动；选完即时生效，下次打开还在。</p>
+        <p class="cmd" style="margin-top:8px">只换页面底色，面板和色块不动。选完立刻生效，下次打开还在。</p>
 
       </div>
 
@@ -875,7 +875,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <input id="fileInput" type="file" accept=".json,application/json" class="sr" aria-label="选择备份文件">
 
-      <p class="cmd">清缓存或换浏览器会丢；重要时先导出。拖拽卡片可换槽，也能在同槽内调顺序。</p>
+      <p class="cmd">清缓存或换浏览器会丢，要紧的先导出。卡片能拖着换槽，同槽里也能调顺序。</p>
 
     </section>
 
@@ -919,15 +919,15 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <label for="fStep">现在卡在第几步</label>
 
-      <input id="fStep" type="text" maxlength="120" placeholder="例：PRD 到第 3 版，经济闭环还没定">
+      <input id="fStep" type="text" maxlength="120" placeholder="例：文档到第 3 版，数值还没定">
 
     </div>
 
     <div class="f">
 
-      <label for="fProj">属于哪个项目</label>
+      <label for="fProj">项目</label>
 
-      <input id="fProj" type="text" maxlength="32" list="projList" placeholder="例：项目 A · 主线，或留空">
+      <input id="fProj" type="text" maxlength="32" list="projList" placeholder="例：项目 A，留空也行">
 
       <datalist id="projList"></datalist>
 
@@ -935,7 +935,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     <div class="f">
 
-      <label for="fAi">在跑它的 AI</label>
+      <label for="fAi">在跑的 AI</label>
 
       <input id="fAi" type="text" maxlength="24" list="aiList" placeholder="例：工具名 / 模型名">
 
@@ -996,11 +996,11 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   var LANES = [
 
-    { id:'active', code:'SLOT 1', label:'激活区', hint:'真正在推 · 上限 3 条 · 一次只进一个', cap:3, stale:7 },
+    { id:'active', code:'SLOT 1', label:'激活区', hint:'在推的线，最多 3 条', cap:3, stale:7 },
 
-    { id:'maint',  code:'SLOT 2', label:'维护区', hint:'只保最低动作 · 上限 5 条', cap:5, stale:14 },
+    { id:'maint',  code:'SLOT 2', label:'维护区', hint:'维持最低动作，最多 5 条', cap:5, stale:14 },
 
-    { id:'frozen', code:'SLOT 3', label:'封存区', hint:'冻结 · 不算负债', cap:0, stale:0 }
+    { id:'frozen', code:'SLOT 3', label:'封存区', hint:'冻起来，不算欠账', cap:0, stale:0 }
 
   ];
 
@@ -1258,27 +1258,27 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       threads: [
 
-        mk('示例 · 核心玩法原型', 'active', '需求文档到第 2 版，经济闭环还没定', '', '', 1),
+        mk('示例 · 核心玩法原型', 'active', '文档到第 2 版，数值还没定', '', '', 1),
 
-        mk('示例 · 系统拆解笔记', 'active', '攒了 3 篇，还没成册', '', '', 2),
+        mk('示例 · 系统拆解笔记', 'active', '攒了 3 篇，没成册', '', '', 2),
 
-        mk('示例 · 资格考试复习', 'active', '停在第三章，第四章没动', '', '', 11),
+        mk('示例 · 资格考试复习', 'active', '停在第三章，第四章没翻开', '', '', 11),
 
-        mk('示例 · 语音链路', 'maint', 'SDK 例程能跑，链路还没接', '', '', 6),
+        mk('示例 · 语音链路', 'maint', 'SDK 例子能跑，语音链路没通', '', '', 6),
 
-        mk('示例 · 数值曲线', 'maint', '曲线在 demo 里，没做回归', '', '', 4),
+        mk('示例 · 数值曲线', 'maint', '曲线在 demo 里，回归没做', '', '', 4),
 
-        mk('示例 · 站点改版', 'frozen', '停在一堆截图和想法', '', '', 21),
+        mk('示例 · 站点改版', 'frozen', '一堆截图，还没动手', '', '', 21),
 
-        mk('示例 · 移动端样式修复', 'frozen', '本地能开，手机端样式错位', '', '', 26)
+        mk('示例 · 移动端样式修复', 'frozen', '本地能开，手机端错位', '', '', 26)
 
       ],
 
       ideas: [
 
-        { id: uid(), text: '给示例项目写一份对外可见的更新日志', created: shift(-2) },
+        { id: uid(), text: '写一份能发给别人的更新日志', created: shift(-2) },
 
-        { id: uid(), text: '把拆解笔记做成可复用的提问清单', created: shift(-5) }
+        { id: uid(), text: '把拆解笔记整理成提问清单', created: shift(-5) }
 
       ],
 
@@ -1524,7 +1524,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (!state.ideas.length) {
 
-      host.innerHTML = '<div class="empty" style="flex:1 1 100%">还没有碎片。想到就写一行，别开工。</div>';
+      host.innerHTML = '<div class="empty" style="flex:1 1 100%">还没有碎片。想到就写一行，先别开工。</div>';
 
       return;
 
@@ -1576,7 +1576,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (!list.length) {
 
-      host.innerHTML = '<li>激活区是空的。先回看板挑一条线。</li>';
+      host.innerHTML = '<li>激活区是空的。回看板挑一条先。</li>';
 
       return;
 
@@ -1606,7 +1606,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (!state.reviews.length) {
 
-      host.innerHTML = '<div class="empty" style="margin:9px">还没有记录。写完第一次就有了。</div>';
+      host.innerHTML = '<div class="empty" style="margin:9px">还没有记录。写完第一条就出现在这儿。</div>';
 
       return;
 
@@ -1755,7 +1755,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (!state.quotas.length) {
 
-      host.innerHTML = '<div class="empty" style="margin:9px">BACKPACK EMPTY · 上面填一行，钉上去。</div>';
+      host.innerHTML = '<div class="empty" style="margin:9px">背包空的。在上面填一行，钉上去。</div>';
 
       return;
 
