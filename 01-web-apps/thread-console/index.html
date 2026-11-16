@@ -583,6 +583,18 @@ select option{background:var(--ink);color:var(--txt)}
 
 .sheet .frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
+.sheet .lab{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:3px}
+
+.sheet .lab label{margin:0}
+
+.engpick{display:flex;gap:4px}
+
+.engpick button{min-height:20px;font-size:9px;padding:1px 6px;border-color:var(--edge2);color:var(--dim2);
+
+  box-shadow:none;letter-spacing:.06em}
+
+.engpick button.on{border-color:var(--gold);color:var(--gold);background:var(--selon)}
+
 @media(max-width:520px){.sheet .frow{grid-template-columns:1fr}}
 
 .seg{display:flex;gap:5px}
@@ -967,7 +979,17 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <div class="f">
 
-        <label for="fProj">项目</label>
+        <div class="lab"><label for="fProj">项目</label>
+
+          <div class="engpick" id="fEngine">
+
+            <button type="button" data-eng="godot">Godot</button>
+
+            <button type="button" data-eng="unity">Unity</button>
+
+          </div>
+
+        </div>
 
         <input id="fProj" type="text" maxlength="32" placeholder="例：项目 A，留空也行" autocomplete="off">
 
@@ -1292,6 +1314,8 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       proj: String(t.proj || ''),
 
+      engine: t.engine === 'godot' || t.engine === 'unity' ? t.engine : (/unity/i.test((t.proj || '') + ' ' + (t.name || '')) ? 'unity' : (/godot/i.test((t.proj || '') + ' ' + (t.name || '')) ? 'godot' : '')),
+
       ai: String(t.ai || ''),
 
       last: t.last || null
@@ -1550,9 +1574,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     var s = (t.proj || '') + ' ' + (t.name || '');
 
-    if (/godot/i.test(s)) return { k:'godot', label:'Godot' };
+    if (t.engine === 'godot' || (!t.engine && /godot/i.test(s))) return { k:'godot', label:'Godot' };
 
-    if (/unity/i.test(s)) return { k:'unity', label:'Unity' };
+    if (t.engine === 'unity' || (!t.engine && /unity/i.test(s))) return { k:'unity', label:'Unity' };
 
     return null;
 
@@ -2232,6 +2256,10 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     document.getElementById('fProj').value = t.proj || '';
 
+    pendingEngine = t.engine || '';
+
+    paintEngine();
+
     document.getElementById('fBlock').value = t.block || '';
 
     document.getElementById('fNext').value = t.next || '';
@@ -2249,6 +2277,32 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     setTimeout(function(){ document.getElementById('fName').focus(); }, 60);
 
   }
+
+  var pendingEngine = '';
+
+  function paintEngine(){
+
+    document.querySelectorAll('#fEngine button').forEach(function(b){
+
+      b.classList.toggle('on', b.getAttribute('data-eng') === pendingEngine);
+
+    });
+
+  }
+
+  document.querySelectorAll('#fEngine button').forEach(function(b){
+
+    b.addEventListener('click', function(){
+
+      var k = b.getAttribute('data-eng');
+
+      pendingEngine = pendingEngine === k ? '' : k;
+
+      paintEngine();
+
+    });
+
+  });
 
   function paintLane(){
 
@@ -2386,7 +2440,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       proj: document.getElementById('fProj').value,
 
-      ai: document.getElementById('fAi').value.trim()
+      ai: document.getElementById('fAi').value.trim(),
+
+      engine: pendingEngine
 
     };
 
@@ -2396,7 +2452,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       var t = state.threads.filter(function(x){ return x.id === editingId; })[0];
 
-      if (t) { t.name = data.name; t.lane = data.lane; t.step = data.step; t.block = data.block; t.next = data.next; t.proj = data.proj; t.ai = data.ai; }
+      if (t) { t.name = data.name; t.lane = data.lane; t.step = data.step; t.block = data.block; t.next = data.next; t.proj = data.proj; t.ai = data.ai; t.engine = data.engine; }
 
     } else {
 
@@ -2404,7 +2460,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
         id: uid(), name: data.name, lane: data.lane, step: data.step,
 
-        block: data.block, next: data.next, proj: data.proj, ai: data.ai, mvp: '', last: today()
+        block: data.block, next: data.next, proj: data.proj, ai: data.ai, engine: data.engine, mvp: '', last: today()
 
       });
 
