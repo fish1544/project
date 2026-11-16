@@ -1032,6 +1032,32 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   function uid(){ return Math.random().toString(36).slice(2, 9); }
 
+  var _mid = null, _midAt = 0;
+
+  function midnight(){
+
+    var now = Date.now();
+
+    if (!_mid || now - _midAt > 60000) { var n = new Date(); _mid = new Date(n.getFullYear(), n.getMonth(), n.getDate()); _midAt = now; }
+
+    return _mid;
+
+  }
+
+  var _dayCache = {};
+
+  function setHTML(el, h){
+
+    if (!el) return;
+
+    if (el.__h === h) return;
+
+    el.__h = h;
+
+    el.innerHTML = h;
+
+  }
+
 
 
   function daysAgo(s){
@@ -1046,7 +1072,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (isNaN(d.getTime())) return null;
 
-    var n = new Date(), t = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+    var t = midnight();
 
     var diff = Math.round((t - d) / 86400000);
 
@@ -1066,7 +1092,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (isNaN(d.getTime())) return null;
 
-    var n = new Date(), t = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+    var t = midnight();
 
     return Math.round((d - t) / 86400000);
 
@@ -1132,13 +1158,35 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
 
 
-  function save(){
+  var saveT = null, savePend = false;
+
+  function flushSave(){
+
+    saveT = null;
+
+    if (!savePend) return;
+
+    savePend = false;
 
     try { localStorage.setItem(KEY, JSON.stringify(state)); }
 
     catch (e) { toast('保存失败：浏览器存储不可用'); }
 
   }
+
+  function save(){
+
+    savePend = true;
+
+    if (saveT) return;
+
+    saveT = setTimeout(flushSave, 120);
+
+  }
+
+  document.addEventListener('visibilitychange', function(){ if (document.hidden) flushSave(); });
+
+  window.addEventListener('pagehide', flushSave);
 
   function load(){
 
@@ -1346,7 +1394,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     }
 
-    document.getElementById('railBatt').innerHTML = batt;
+    setHTML(document.getElementById('railBatt'), batt);
 
 
 
@@ -1398,7 +1446,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     h += '<div class="st' + (!state.lastReview || d >= 14 ? ' alert' : '') + '"><span class="k">复盘</span><span class="v">' + rev + '</span></div>';
 
-    document.getElementById('stats').innerHTML = h;
+    setHTML(document.getElementById('stats'), h);
 
 
 
@@ -1450,7 +1498,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     });
 
-    host.innerHTML = html;
+    setHTML(host, html);
 
   }
 
@@ -1534,7 +1582,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (!state.ideas.length) {
 
-      host.innerHTML = '<div class="empty" style="flex:1 1 100%">还没有碎片。想到就写一行，先别开工。</div>';
+      setHTML(host, '<div class="empty" style="flex:1 1 100%">还没有碎片。想到就写一行，先别开工。</div>');
 
       return;
 
@@ -1552,7 +1600,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     });
 
-    host.innerHTML = h;
+    setHTML(host, h);
 
   }
 
@@ -1586,7 +1634,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (!list.length) {
 
-      host.innerHTML = '<li>激活区是空的。回看板挑一条先。</li>';
+      setHTML(host, '<li>激活区是空的。回看板挑一条先。</li>');
 
       return;
 
@@ -1601,7 +1649,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     });
 
-    host.innerHTML = h;
+    setHTML(host, h);
 
   }
 
@@ -1616,7 +1664,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (!state.reviews.length) {
 
-      host.innerHTML = '<div class="empty" style="margin:9px">还没有记录。写完第一条就出现在这儿。</div>';
+      setHTML(host, '<div class="empty" style="margin:9px">还没有记录。写完第一条就出现在这儿。</div>');
 
       return;
 
@@ -1643,7 +1691,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     });
 
-    host.innerHTML = h;
+    setHTML(host, h);
 
   }
 
@@ -1765,7 +1813,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (!state.quotas.length) {
 
-      host.innerHTML = '<div class="empty" style="margin:9px">背包空的。在上面填一行，钉上去。</div>';
+      setHTML(host, '<div class="empty" style="margin:9px">背包空的。在上面填一行，钉上去。</div>');
 
       return;
 
@@ -1815,25 +1863,35 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     });
 
-    host.innerHTML = h;
+    setHTML(host, h);
 
   }
 
 
 
+  var dirty = { board:true, review:true, quota:true };
+
+  function shown(id){ var el = document.getElementById(id); return !!(el && !el.hidden); }
+
   function renderAll(){
 
     renderRail();
 
-    renderLanes();
+    if (shown('viewBoard')) { renderLanes(); renderIdeas(); dirty.board = false; } else dirty.board = true;
 
-    renderIdeas();
+    if (shown('viewReview')) { renderSnapshot(); renderHist(); dirty.review = false; } else dirty.review = true;
 
-    renderSnapshot();
+    if (shown('viewQuota')) { renderQuota(); dirty.quota = false; } else dirty.quota = true;
 
-    renderHist();
+  }
 
-    renderQuota();
+  function renderView(v){
+
+    if (v === 'board' && dirty.board) { renderLanes(); renderIdeas(); dirty.board = false; }
+
+    else if (v === 'review' && dirty.review) { renderSnapshot(); renderHist(); dirty.review = false; }
+
+    else if (v === 'quota' && dirty.quota) { renderQuota(); dirty.quota = false; }
 
   }
 
@@ -1859,7 +1917,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       document.getElementById('viewData').hidden = v !== 'data';
 
-      if (v === 'review') renderSnapshot();
+      renderView(v);
 
     });
 
@@ -1988,6 +2046,17 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     dragId = null;
   });
 
+  var dragFrame = false;
+
+  function markDrop(card, y){
+    var r = card.getBoundingClientRect();
+    var want = y > r.top + r.height / 2 ? 'drop-b' : 'drop-t';
+    if (card === dropMark && card.classList.contains(want)) return;
+    clearMark();
+    card.classList.add(want);
+    dropMark = card;
+  }
+
   lanesEl.addEventListener('dragover', function(e){
     var slot = e.target.closest('.slot');
     if (!slot) { clearMark(); return; }
@@ -1995,13 +2064,10 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     e.dataTransfer.dropEffect = 'move';
     var card = e.target.closest('.save');
     if (!card || card.classList.contains('dragging')) { clearMark(); return; }
-    var r = card.getBoundingClientRect();
-    var below = e.clientY > r.top + r.height / 2;
-    var want = below ? 'drop-b' : 'drop-t';
-    if (card === dropMark && card.classList.contains(want)) return;
-    clearMark();
-    card.classList.add(want);
-    dropMark = card;
+    if (dragFrame) return;
+    dragFrame = true;
+    var y = e.clientY;
+    requestAnimationFrame(function(){ dragFrame = false; markDrop(card, y); });
   });
 
   lanesEl.addEventListener('dragleave', function(e){
