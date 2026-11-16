@@ -561,7 +561,7 @@ select option{background:var(--ink);color:var(--txt)}
 
 }
 
-@media(min-width:760px){.sheet-wrap{align-items:center;padding:18px}.sheet{box-shadow:6px 6px 0 var(--shadow)}}
+@media(min-width:760px){.sheet-wrap{padding:18px}.sheet-wrap.on{align-items:center}.sheet{box-shadow:6px 6px 0 var(--shadow)}}
 
 .sheet h2{font-size:12px;letter-spacing:.16em;color:var(--gold)}
 
@@ -585,7 +585,7 @@ select option{background:var(--ink);color:var(--txt)}
 
 .sheet-acts .save:hover{border-color:var(--mint);color:var(--mint)}
 
-.sug{position:absolute;left:0;right:0;top:calc(100% - 2px);z-index:75;display:none;max-height:156px;overflow:auto;
+.sug{position:absolute;left:0;right:0;top:calc(100% - 2px);z-index:75;display:none;max-height:124px;overflow:auto;
 
   background:var(--ink);border:2px solid var(--gold);box-shadow:3px 3px 0 var(--shadow)}
 
@@ -2193,6 +2193,14 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
       });
 
       panel.classList.add('on');
+
+      var box = inp.getBoundingClientRect();
+
+      var sh = document.querySelector('.sheet').getBoundingClientRect();
+
+      panel.style.top = ''; panel.style.bottom = '';
+
+      if (!sh.height || box.bottom + panel.offsetHeight > sh.bottom - 6) { panel.style.top = 'auto'; panel.style.bottom = 'calc(100% - 2px)'; }
 
     }
 
