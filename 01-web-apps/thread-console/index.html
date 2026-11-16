@@ -1264,7 +1264,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
         state = {
 
-          threads: obj.threads.map(normThread),
+          threads: fillEngines(obj.threads.map(normThread)),
 
           ideas: Array.isArray(obj.ideas) ? obj.ideas : [],
 
@@ -1570,15 +1570,37 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   function projLabel(id){ return id || ''; }
 
+  function guessEngine(text){
+
+    if (/godot/i.test(text)) return 'godot';
+
+    if (/unity|u3d/i.test(text)) return 'unity';
+
+    return '';
+
+  }
+
   function engineOf(t){
 
-    var s = (t.proj || '') + ' ' + (t.name || '');
+    var e = t.engine || guessEngine((t.proj || '') + ' ' + (t.name || ''));
 
-    if (t.engine === 'godot' || (!t.engine && /godot/i.test(s))) return { k:'godot', label:'Godot' };
+    if (e === 'godot') return { k:'godot', label:'Godot' };
 
-    if (t.engine === 'unity' || (!t.engine && /unity/i.test(s))) return { k:'unity', label:'Unity' };
+    if (e === 'unity') return { k:'unity', label:'Unity' };
 
     return null;
+
+  }
+
+  function fillEngines(list){
+
+    var byProj = {};
+
+    list.forEach(function(t){ if (t.proj && t.engine) byProj[t.proj] = t.engine; });
+
+    list.forEach(function(t){ if (!t.engine && t.proj && byProj[t.proj]) t.engine = byProj[t.proj]; });
+
+    return list;
 
   }
 
@@ -2256,7 +2278,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     document.getElementById('fProj').value = t.proj || '';
 
-    pendingEngine = t.engine || '';
+    enginePicked = false;
+
+    pendingEngine = t.engine || guessEngine((t.proj || '') + ' ' + (t.name || ''));
 
     paintEngine();
 
@@ -2280,6 +2304,8 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   var pendingEngine = '';
 
+  var enginePicked = false;
+
   function paintEngine(){
 
     document.querySelectorAll('#fEngine button').forEach(function(b){
@@ -2295,6 +2321,8 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     b.addEventListener('click', function(){
 
       var k = b.getAttribute('data-eng');
+
+      enginePicked = true;
 
       pendingEngine = pendingEngine === k ? '' : k;
 
@@ -2398,6 +2426,20 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   }
 
+  document.getElementById('fProj').addEventListener('input', function(){
+
+    if (enginePicked) return;
+
+    var g = guessEngine(this.value);
+
+    if (!g) return;
+
+    pendingEngine = g;
+
+    paintEngine();
+
+  });
+
   bindSug('fProj', 'sugProj', sugProjList);
 
   bindSug('fAi', 'sugAi', sugAiList);
@@ -2442,7 +2484,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       ai: document.getElementById('fAi').value.trim(),
 
-      engine: pendingEngine
+      engine: pendingEngine || guessEngine(document.getElementById('fProj').value)
 
     };
 
@@ -2619,7 +2661,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
         state = {
 
-          threads: obj.threads.map(normThread),
+          threads: fillEngines(obj.threads.map(normThread)),
 
           ideas: Array.isArray(obj.ideas) ? obj.ideas : [],
 
