@@ -359,6 +359,20 @@ select option{background:var(--ink);color:var(--txt)}
 
 .save .pj em{font-style:normal;padding:1px 5px;border:1px solid currentColor;color:var(--dim)}
 
+.save .gen{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
+
+.save .gen span{font-size:9px;letter-spacing:.06em;line-height:15px;padding:0 4px;
+
+  border:1px solid var(--edge2);color:var(--dim2);font-family:var(--num)}
+
+.genpick{display:flex;flex-wrap:wrap;gap:5px}
+
+.genpick button{min-height:26px;font-size:10px;padding:2px 7px;border-color:var(--edge2);
+
+  color:var(--dim2);box-shadow:none;letter-spacing:.04em}
+
+.genpick button.on{border-color:var(--gold);color:var(--gold);background:var(--selon)}
+
 .save .acts{display:flex;gap:4px;margin-top:7px}
 
 .save .acts button{flex:1 1 0;min-height:38px;font-size:10px;padding:3px 4px}
@@ -1001,6 +1015,14 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     <div class="f">
 
+      <label>分类</label>
+
+      <div class="genpick" id="fGenres"></div>
+
+    </div>
+
+    <div class="f">
+
       <label for="fBlock">卡在哪</label>
 
       <input id="fBlock" type="text" maxlength="90" placeholder="例：首屏入口 A/B 还没拍板">
@@ -1313,6 +1335,8 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
       mvp: String(t.mvp || ''),
 
       proj: String(t.proj || ''),
+
+      genres: Array.isArray(t.genres) ? t.genres.map(String).filter(function(x){ return !!x; }).slice(0, 8) : [],
 
       engine: t.engine === 'godot' || t.engine === 'unity' ? t.engine : (/unity/i.test((t.proj || '') + ' ' + (t.name || '')) ? 'unity' : (/godot/i.test((t.proj || '') + ' ' + (t.name || '')) ? 'godot' : '')),
 
@@ -1659,6 +1683,12 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     if (t.next) h += '<div class="nx">' + esc(t.next) + '</div>';
 
     if (t.proj) h += '<div class="pj">' + esc(projLabel(t.proj)) + (t.ai ? '<em>' + esc(t.ai) + '</em>' : '') + '</div>';
+
+    if (t.genres && t.genres.length) h += '<div class="gen">' + t.genres.map(function(g){
+
+      return '<span>' + esc(g) + '</span>';
+
+    }).join('') + '</div>';
 
     h += '<div class="acts">';
 
@@ -2278,6 +2308,10 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     document.getElementById('fProj').value = t.proj || '';
 
+    pendingGenres = (t.genres || []).slice();
+
+    paintGenres();
+
     enginePicked = false;
 
     pendingEngine = t.engine || guessEngine((t.proj || '') + ' ' + (t.name || ''));
@@ -2299,6 +2333,48 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     sheetWrap.classList.add('on');
 
     setTimeout(function(){ document.getElementById('fName').focus(); }, 60);
+
+  }
+
+  var GENRES = ['Roguelike','Roguelite','塔防','合成','卡牌','策略','模拟经营','养成','RPG','动作','射击','解谜','平台跳跃','开放世界','MMO','多人'];
+
+  var pendingGenres = [];
+
+  (function(){
+
+    var host = document.getElementById('fGenres');
+
+    host.innerHTML = GENRES.map(function(g){
+
+      return '<button type="button" data-gen="' + g + '">' + g + '</button>';
+
+    }).join('');
+
+    host.addEventListener('click', function(e){
+
+      var b = e.target.closest('button');
+
+      if (!b) return;
+
+      var g = b.getAttribute('data-gen');
+
+      var i = pendingGenres.indexOf(g);
+
+      if (i >= 0) pendingGenres.splice(i, 1); else pendingGenres.push(g);
+
+      paintGenres();
+
+    });
+
+  })();
+
+  function paintGenres(){
+
+    document.querySelectorAll('#fGenres button').forEach(function(b){
+
+      b.classList.toggle('on', pendingGenres.indexOf(b.getAttribute('data-gen')) >= 0);
+
+    });
 
   }
 
@@ -2484,6 +2560,8 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       ai: document.getElementById('fAi').value.trim(),
 
+      genres: pendingGenres.slice(),
+
       engine: pendingEngine || guessEngine(document.getElementById('fProj').value)
 
     };
@@ -2494,7 +2572,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       var t = state.threads.filter(function(x){ return x.id === editingId; })[0];
 
-      if (t) { t.name = data.name; t.lane = data.lane; t.step = data.step; t.block = data.block; t.next = data.next; t.proj = data.proj; t.ai = data.ai; t.engine = data.engine; }
+      if (t) { t.name = data.name; t.lane = data.lane; t.step = data.step; t.block = data.block; t.next = data.next; t.proj = data.proj; t.ai = data.ai; t.engine = data.engine; t.genres = data.genres; }
 
     } else {
 
@@ -2502,7 +2580,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
         id: uid(), name: data.name, lane: data.lane, step: data.step,
 
-        block: data.block, next: data.next, proj: data.proj, ai: data.ai, engine: data.engine, mvp: '', last: today()
+        block: data.block, next: data.next, proj: data.proj, ai: data.ai, engine: data.engine, genres: data.genres, mvp: '', last: today()
 
       });
 
