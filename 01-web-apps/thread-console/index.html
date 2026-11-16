@@ -345,6 +345,10 @@ select option{background:var(--ink);color:var(--txt)}
 
 .save .mvp{font-size:9.5px;color:var(--dim2);margin-top:4px;letter-spacing:.04em}
 
+.save .pj{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:9.5px;color:var(--dim2);margin-top:5px;letter-spacing:.04em}
+
+.save .pj em{font-style:normal;padding:1px 5px;border:1px solid currentColor;color:var(--dim)}
+
 .save .acts{display:flex;gap:4px;margin-top:7px}
 
 .save .acts button{flex:1 1 0;min-height:38px;font-size:10px;padding:3px 4px}
@@ -921,17 +925,51 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     <div class="f">
 
-      <label for="fNext">下一个 30 分钟能做完的动作</label>
+      <label for="fProj">属于哪个项目</label>
 
-      <input id="fNext" type="text" maxlength="120" placeholder="例：写下每日结算的三条公式">
+      <select id="fProj">
+
+        <option value="">未分配</option>
+
+        <option value="frozen-godot">凛冬余烬 · Godot</option>
+
+        <option value="frozen-unity">凛冬余烬 · Unity</option>
+
+        <option value="element-rogue">ElementRogue · Unity</option>
+
+        <option value="merge-defense">Merge Defense · Unity</option>
+
+        <option value="roguelike-core">RoguelikeCore · Unity</option>
+
+        <option value="stack-cannon-td">StackCannonTD · Unity</option>
+
+      </select>
 
     </div>
 
     <div class="f">
 
-      <label for="fMvp">MVP-1（最小可落地版本）</label>
+      <label for="fAi">在跑它的 AI</label>
 
-      <input id="fMvp" type="text" maxlength="80" placeholder="例：可玩一周目的原型">
+      <input id="fAi" type="text" maxlength="24" list="aiList" placeholder="例：Claude / trae / 豆包">
+
+      <datalist id="aiList">
+
+        <option value="Claude"></option>
+
+        <option value="trae"></option>
+
+        <option value="豆包"></option>
+
+        <option value="WorkBuddy"></option>
+
+        <option value="ChatGPT"></option>
+
+        <option value="Cursor"></option>
+
+        <option value="Codex"></option>
+
+      </datalist>
 
     </div>
 
@@ -1450,6 +1488,17 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
 
 
+  var PROJ = {
+    'frozen-godot': { label: '凛冬余烬 · Godot' },
+    'frozen-unity': { label: '凛冬余烬 · Unity' },
+    'element-rogue': { label: 'ElementRogue · Unity' },
+    'merge-defense': { label: 'Merge Defense · Unity' },
+    'roguelike-core': { label: 'RoguelikeCore · Unity' },
+    'stack-cannon-td': { label: 'StackCannonTD · Unity' }
+  };
+
+  function projLabel(id){ return PROJ[id] ? PROJ[id].label : id; }
+
   function threadCard(t){
 
     var stale = isStale(t);
@@ -1496,9 +1545,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (t.step) h += '<div class="ln"><span class="k">现在</span>' + esc(t.step) + '</div>';
 
-    h += '<div class="nx">' + (t.next ? esc(t.next) : '还没写，点“改”补一个') + '</div>';
-
-    if (t.mvp) h += '<div class="mvp">MVP-1 · ' + esc(t.mvp) + '</div>';
+    if (t.proj) h += '<div class="pj">' + esc(projLabel(t.proj)) + (t.ai ? '<em>' + esc(t.ai) + '</em>' : '') + '</div>';
 
     h += '<div class="acts">';
 
@@ -1590,7 +1637,8 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     list.forEach(function(x){
 
-      h += '<li><b>' + esc(x.name) + '</b> · ' + esc(x.age) + '<br>NEXT：' + (x.next ? esc(x.next) : '未填') + '</li>';
+      h += '<li><b>' + esc(x.name) + '</b> · ' + esc(x.age) + '<br>' +
+           (x.proj ? '项目：' + esc(projLabel(x.proj)) : (x.next ? 'NEXT：' + esc(x.next) : '未填')) + '</li>';
 
     });
 
@@ -2071,7 +2119,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       pendingIdeaId = id;
 
-      openSheet({ name: it.text, lane: 'active', step: '', next: '', mvp: '', last: null });
+      openSheet({ name: it.text, lane: 'active', step: '', proj: '', ai: '', next: '', mvp: '', last: null });
 
     } else {
 
@@ -2097,9 +2145,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     document.getElementById('fStep').value = t.step || '';
 
-    document.getElementById('fNext').value = t.next || '';
+    document.getElementById('fProj').value = t.proj || '';
 
-    document.getElementById('fMvp').value = t.mvp || '';
+    document.getElementById('fAi').value = t.ai || '';
 
     pendingLane = t.lane || 'active';
 
@@ -2161,9 +2209,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       step: document.getElementById('fStep').value.trim(),
 
-      next: document.getElementById('fNext').value.trim(),
+      proj: document.getElementById('fProj').value,
 
-      mvp: document.getElementById('fMvp').value.trim()
+      ai: document.getElementById('fAi').value.trim()
 
     };
 
@@ -2173,7 +2221,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       var t = state.threads.filter(function(x){ return x.id === editingId; })[0];
 
-      if (t) { t.name = data.name; t.lane = data.lane; t.step = data.step; t.next = data.next; t.mvp = data.mvp; }
+      if (t) { t.name = data.name; t.lane = data.lane; t.step = data.step; t.proj = data.proj; t.ai = data.ai; }
 
     } else {
 
@@ -2181,7 +2229,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
         id: uid(), name: data.name, lane: data.lane, step: data.step,
 
-        next: data.next, mvp: data.mvp, last: today()
+        proj: data.proj, ai: data.ai, next: '', mvp: '', last: today()
 
       });
 
