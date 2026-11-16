@@ -549,7 +549,17 @@ select option{background:var(--ink);color:var(--txt)}
 
 .sheet-wrap.on{display:flex;align-items:flex-end;justify-content:center}
 
-.sheet{width:100%;max-width:560px;background:var(--frame);border:3px solid var(--gold);padding:13px;max-height:92vh;overflow:auto;box-shadow:0 -6px 0 var(--shadow)}
+.sheet{width:100%;max-width:560px;background:var(--frame);border:3px solid var(--gold);padding:13px;box-shadow:0 -6px 0 var(--shadow)}
+
+@media(max-height:700px){.sheet{max-height:88vh;overflow:auto}}
+
+@media(min-width:760px){
+
+  .sheet .f input{font-size:13.5px;padding:7px 9px}
+
+  .sheet .seg button{min-height:36px}
+
+}
 
 @media(min-width:760px){.sheet-wrap{align-items:center;padding:18px}.sheet{box-shadow:6px 6px 0 var(--shadow)}}
 
@@ -557,7 +567,7 @@ select option{background:var(--ink);color:var(--txt)}
 
 .sheet h2::before{content:'>> ';color:var(--mint)}
 
-.sheet .f{margin-top:9px}
+.sheet .f{position:relative;margin-top:9px}
 
 .sheet .f label{display:block;font-size:10px;color:var(--dim);letter-spacing:.1em;margin-bottom:3px}
 
@@ -574,6 +584,22 @@ select option{background:var(--ink);color:var(--txt)}
 .sheet-acts .save{border-color:var(--mint);color:var(--mint);background:var(--okbg)}
 
 .sheet-acts .save:hover{border-color:var(--mint);color:var(--mint)}
+
+.sug{position:absolute;left:0;right:0;top:calc(100% - 2px);z-index:75;display:none;max-height:156px;overflow:auto;
+
+  background:var(--ink);border:2px solid var(--gold);box-shadow:3px 3px 0 var(--shadow)}
+
+.sug.on{display:block}
+
+.sug button{display:block;width:100%;min-height:28px;padding:4px 10px;text-align:left;font-size:12px;letter-spacing:.04em;
+
+  color:var(--dim);background:transparent;border:0;border-top:1px solid var(--edge2);box-shadow:none}
+
+.sug button:first-child{border-top:0}
+
+.sug button:hover{background:var(--selon);color:var(--gold);border-color:transparent}
+
+.sug button:active{transform:none;box-shadow:none}
 
 
 
@@ -927,9 +953,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <label for="fProj">项目</label>
 
-      <input id="fProj" type="text" maxlength="32" list="projList" placeholder="例：项目 A，留空也行">
+      <input id="fProj" type="text" maxlength="32" placeholder="例：项目 A，留空也行" autocomplete="off">
 
-      <datalist id="projList"></datalist>
+      <div class="sug" id="sugProj"></div>
 
     </div>
 
@@ -937,25 +963,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <label for="fAi">在跑的 AI</label>
 
-      <input id="fAi" type="text" maxlength="24" list="aiList" placeholder="例：工具名 / 模型名">
+      <input id="fAi" type="text" maxlength="24" placeholder="例：工具名 / 模型名" autocomplete="off">
 
-      <datalist id="aiList">
-
-        <option value="Claude"></option>
-
-        <option value="trae"></option>
-
-        <option value="豆包"></option>
-
-        <option value="WorkBuddy"></option>
-
-        <option value="ChatGPT"></option>
-
-        <option value="Cursor"></option>
-
-        <option value="Codex"></option>
-
-      </datalist>
+      <div class="sug" id="sugAi"></div>
 
     </div>
 
@@ -2096,20 +2106,6 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     document.getElementById('fProj').value = t.proj || '';
 
-    var dl = document.getElementById('projList');
-
-    dl.innerHTML = '';
-
-    var seen = {};
-
-    (state.projects || []).forEach(function(n){ if (n && !seen[n]) { seen[n] = 1; var o2 = document.createElement('option'); o2.value = n; dl.appendChild(o2); } });
-
-    state.threads.forEach(function(x){
-
-      if (x.proj && !seen[x.proj]) { seen[x.proj] = 1; var op = document.createElement('option'); op.value = x.proj; dl.appendChild(op); }
-
-    });
-
     document.getElementById('fAi').value = t.ai || '';
 
     pendingLane = t.lane || 'active';
@@ -2139,6 +2135,80 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     b.addEventListener('click', function(){ pendingLane = b.getAttribute('data-lane'); paintLane(); });
 
   });
+
+  function sugProjList(){
+
+    var seen = {}, out = [];
+
+    (state.projects || []).concat(state.threads.map(function(x){ return x.proj; })).forEach(function(n){
+
+      if (n && !seen[n]) { seen[n] = 1; out.push(n); }
+
+    });
+
+    return out;
+
+  }
+
+  function sugAiList(){
+
+    var seen = {}, out = [];
+
+    ['Claude','trae','豆包','WorkBuddy','ChatGPT','Cursor','Codex'].concat(state.threads.map(function(x){ return x.ai; })).forEach(function(n){
+
+      if (n && !seen[n]) { seen[n] = 1; out.push(n); }
+
+    });
+
+    return out;
+
+  }
+
+  function bindSug(inputId, panelId, getList){
+
+    var inp = document.getElementById(inputId), panel = document.getElementById(panelId);
+
+    function paint(){
+
+      var q = inp.value.trim().toLowerCase();
+
+      var items = getList().filter(function(n){ return !q ? n.toLowerCase() !== '' : n.toLowerCase().indexOf(q) === 0; });
+
+      items = items.filter(function(n){ return n.toLowerCase() !== q; });
+
+      panel.innerHTML = '';
+
+      if (!items.length) { panel.classList.remove('on'); return; }
+
+      items.slice(0, 6).forEach(function(n){
+
+        var b = document.createElement('button');
+
+        b.type = 'button'; b.textContent = n;
+
+        b.addEventListener('mousedown', function(e){ e.preventDefault(); inp.value = n; panel.classList.remove('on'); });
+
+        panel.appendChild(b);
+
+      });
+
+      panel.classList.add('on');
+
+    }
+
+    inp.addEventListener('focus', paint);
+
+    inp.addEventListener('input', paint);
+
+    inp.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Enter') panel.classList.remove('on'); });
+
+    inp.addEventListener('blur', function(){ setTimeout(function(){ panel.classList.remove('on'); }, 130); });
+
+  }
+
+  bindSug('fProj', 'sugProj', sugProjList);
+
+  bindSug('fAi', 'sugAi', sugAiList);
 
   function closeSheet(){
 
