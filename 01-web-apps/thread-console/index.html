@@ -2404,7 +2404,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (i >= 0) pendingGenres.splice(i, 1); else pendingGenres.push(g);
 
-    paintGenres();
+    b.classList.toggle('on', i < 0);
 
   });
 
