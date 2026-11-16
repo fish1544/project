@@ -313,6 +313,14 @@ select option{background:var(--ink);color:var(--txt)}
 
 .save .tag.frz{color:var(--dim)}
 
+.save .eng{margin-left:auto;font-size:9px;letter-spacing:.1em;padding:1px 5px;border:1px solid var(--edge2);
+
+  color:var(--dim2);font-family:var(--num)}
+
+.save .eng.godot{color:var(--mint);border-color:var(--mint)}
+
+.save .eng.unity{color:var(--gold);border-color:var(--gold)}
+
 .save .nm{font-size:12.5px;line-height:1.45;word-break:break-word}
 
 .save.urgent .nm{color:var(--warn)}
@@ -1538,6 +1546,18 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   function projLabel(id){ return id || ''; }
 
+  function engineOf(t){
+
+    var s = (t.proj || '') + ' ' + (t.name || '');
+
+    if (/godot/i.test(s)) return { k:'godot', label:'Godot' };
+
+    if (/unity/i.test(s)) return { k:'unity', label:'Unity' };
+
+    return null;
+
+  }
+
   function threadCard(t){
 
     var stale = isStale(t);
@@ -1549,6 +1569,10 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     h += '<div class="tags"><span class="tag' + (stale ? ' hot' : '') + '">' + ageText(t.last) + '</span>';
 
     if (t.lane === 'frozen') h += '<span class="tag frz">封存</span>';
+
+    var eng = engineOf(t);
+
+    if (eng) h += '<span class="eng ' + eng.k + '">' + eng.label + '</span>';
 
     h += '</div>';
 
