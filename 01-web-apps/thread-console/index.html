@@ -379,6 +379,10 @@ select option{background:var(--ink);color:var(--txt)}
 
 .genpick .genin{width:82px;min-height:26px;font-size:11px;padding:2px 6px}
 
+.genpick .gdel{margin-left:4px;padding:0 1px;font-size:10px;line-height:1;color:var(--dim)}
+
+.genpick .gdel:hover{color:var(--coral)}
+
 .save .acts{display:flex;gap:4px;margin-top:7px}
 
 .save .acts button{flex:1 1 0;min-height:38px;font-size:10px;padding:3px 4px}
@@ -2368,7 +2372,11 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       var on = pendingGenres.indexOf(g) >= 0;
 
-      return '<button type="button" data-gen="' + esc(g) + '"' + (on ? ' class="on"' : '') + '>' + esc(g) + '</button>';
+      var custom = (state.genres || []).indexOf(g) >= 0;
+
+      var del = custom ? '<span class="gdel" data-del="' + esc(g) + '" title="删掉这个分类">×</span>' : '';
+
+      return '<button type="button" data-gen="' + esc(g) + '"' + (on ? ' class="on"' : '') + (custom ? ' data-custom="1" title="双击改名"' : '') + '>' + esc(g) + del + '</button>';
 
     }).join('');
 
@@ -2381,6 +2389,10 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
   document.getElementById('fGenres').addEventListener('click', function(e){
 
     if (e.target.closest('[data-genadd]')) { startGenreAdd(); return; }
+
+    var del = e.target.closest('[data-del]');
+
+    if (del) { delGenre(del.getAttribute('data-del')); return; }
 
     var b = e.target.closest('button');
 
@@ -2395,6 +2407,100 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     paintGenres();
 
   });
+
+  document.getElementById('fGenres').addEventListener('dblclick', function(e){
+
+    var b = e.target.closest('button');
+
+    if (!b || b.getAttribute('data-custom') !== '1') return;
+
+    renameGenre(b.getAttribute('data-gen'));
+
+  });
+
+  function delGenre(g){
+
+    state.genres = (state.genres || []).filter(function(x){ return x !== g; });
+
+    state.threads.forEach(function(t){
+
+      if (Array.isArray(t.genres)) t.genres = t.genres.filter(function(x){ return x !== g; });
+
+    });
+
+    pendingGenres = pendingGenres.filter(function(x){ return x !== g; });
+
+    save(); renderAll(); paintGenres();
+
+    toast('已删掉「' + g + '」');
+
+  }
+
+  function renameGenre(oldName){
+
+    var host = document.getElementById('fGenres');
+
+    var input = document.createElement('input');
+
+    input.type = 'text';
+
+    input.maxLength = 12;
+
+    input.className = 'genin';
+
+    input.value = oldName;
+
+    host.appendChild(input);
+
+    input.focus();
+
+    input.select();
+
+    var done = false;
+
+    function commit(ok){
+
+      if (done) return;
+
+      done = true;
+
+      var v = input.value.trim().slice(0, 12);
+
+      input.remove();
+
+      if (!ok || !v || v === oldName || GENRES.indexOf(v) >= 0) { paintGenres(); return; }
+
+      state.genres = (state.genres || []).map(function(x){ return x === oldName ? v : x; });
+
+      state.threads.forEach(function(t){
+
+        if (!Array.isArray(t.genres)) return;
+
+        t.genres = t.genres.map(function(x){ return x === oldName ? v : x; });
+
+        t.genres = t.genres.filter(function(x, i){ return t.genres.indexOf(x) === i; });
+
+      });
+
+      pendingGenres = pendingGenres.map(function(x){ return x === oldName ? v : x; });
+
+      save(); renderAll(); paintGenres();
+
+      toast('已改成「' + v + '」');
+
+    }
+
+    input.addEventListener('keydown', function(ev){
+
+      if (ev.key === 'Enter') { ev.preventDefault(); commit(true); }
+
+      else if (ev.key === 'Escape') { ev.preventDefault(); commit(false); }
+
+    });
+
+    input.addEventListener('blur', function(){ commit(true); });
+
+  }
 
   function startGenreAdd(){
 
