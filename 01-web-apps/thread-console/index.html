@@ -373,6 +373,12 @@ select option{background:var(--ink);color:var(--txt)}
 
 .genpick button.on{border-color:var(--gold);color:var(--gold);background:var(--selon)}
 
+.genpick .genadd{min-width:26px;padding:2px 0;border-style:dashed;color:var(--dim2)}
+
+.genpick .genadd:hover{color:var(--gold);border-color:var(--gold)}
+
+.genpick .genin{width:82px;min-height:26px;font-size:11px;padding:2px 6px}
+
 .save .acts{display:flex;gap:4px;margin-top:7px}
 
 .save .acts button{flex:1 1 0;min-height:38px;font-size:10px;padding:3px 4px}
@@ -1096,7 +1102,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   ];
 
-  var state = { threads:[], ideas:[], reviews:[], lastReview:null, quotas:[], projects:[] };
+  var state = { threads:[], ideas:[], reviews:[], lastReview:null, quotas:[], projects:[], genres:[] };
 
   var editingId = null, pendingIdeaId = null, pendingLane = 'active', armTimer = null;
 
@@ -1296,7 +1302,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
           quotas: Array.isArray(obj.quotas) ? obj.quotas.map(normQuota) : seedQuotas(),
 
-          projects: Array.isArray(obj.projects) ? obj.projects.map(String) : []
+          projects: Array.isArray(obj.projects) ? obj.projects.map(String) : [],
+
+          genres: Array.isArray(obj.genres) ? obj.genres.map(String) : []
 
         };
 
@@ -2340,41 +2348,107 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   var pendingGenres = [];
 
-  (function(){
+  function genreSet(){
 
-    var host = document.getElementById('fGenres');
+    var base = GENRES.slice();
 
-    host.innerHTML = GENRES.map(function(g){
+    (state.genres || []).forEach(function(g){ if (base.indexOf(g) < 0) base.push(g); });
 
-      return '<button type="button" data-gen="' + g + '">' + g + '</button>';
+    pendingGenres.forEach(function(g){ if (base.indexOf(g) < 0) base.push(g); });
 
-    }).join('');
+    return base;
 
-    host.addEventListener('click', function(e){
-
-      var b = e.target.closest('button');
-
-      if (!b) return;
-
-      var g = b.getAttribute('data-gen');
-
-      var i = pendingGenres.indexOf(g);
-
-      if (i >= 0) pendingGenres.splice(i, 1); else pendingGenres.push(g);
-
-      paintGenres();
-
-    });
-
-  })();
+  }
 
   function paintGenres(){
 
-    document.querySelectorAll('#fGenres button').forEach(function(b){
+    var host = document.getElementById('fGenres');
 
-      b.classList.toggle('on', pendingGenres.indexOf(b.getAttribute('data-gen')) >= 0);
+    var html = genreSet().map(function(g){
+
+      var on = pendingGenres.indexOf(g) >= 0;
+
+      return '<button type="button" data-gen="' + esc(g) + '"' + (on ? ' class="on"' : '') + '>' + esc(g) + '</button>';
+
+    }).join('');
+
+    html += '<button type="button" class="genadd" data-genadd="1" title="加一个分类">+</button>';
+
+    host.innerHTML = html;
+
+  }
+
+  document.getElementById('fGenres').addEventListener('click', function(e){
+
+    if (e.target.closest('[data-genadd]')) { startGenreAdd(); return; }
+
+    var b = e.target.closest('button');
+
+    var g = b && b.getAttribute('data-gen');
+
+    if (!g) return;
+
+    var i = pendingGenres.indexOf(g);
+
+    if (i >= 0) pendingGenres.splice(i, 1); else pendingGenres.push(g);
+
+    paintGenres();
+
+  });
+
+  function startGenreAdd(){
+
+    var host = document.getElementById('fGenres');
+
+    var input = document.createElement('input');
+
+    input.type = 'text';
+
+    input.maxLength = 12;
+
+    input.className = 'genin';
+
+    input.placeholder = '新分类';
+
+    host.appendChild(input);
+
+    input.focus();
+
+    var done = false;
+
+    function commit(ok){
+
+      if (done) return;
+
+      done = true;
+
+      var v = input.value.trim().slice(0, 12);
+
+      input.remove();
+
+      if (!ok || !v) { paintGenres(); return; }
+
+      if (!Array.isArray(state.genres)) state.genres = [];
+
+      if (GENRES.indexOf(v) < 0 && state.genres.indexOf(v) < 0) state.genres.push(v);
+
+      if (pendingGenres.indexOf(v) < 0) pendingGenres.push(v);
+
+      save();
+
+      paintGenres();
+
+    }
+
+    input.addEventListener('keydown', function(ev){
+
+      if (ev.key === 'Enter') { ev.preventDefault(); commit(true); }
+
+      else if (ev.key === 'Escape') { ev.preventDefault(); commit(false); }
 
     });
+
+    input.addEventListener('blur', function(){ commit(true); });
 
   }
 
@@ -2749,7 +2823,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
           quotas: Array.isArray(obj.quotas) ? obj.quotas.map(normQuota) : [],
 
-          projects: Array.isArray(obj.projects) ? obj.projects.map(String) : []
+          projects: Array.isArray(obj.projects) ? obj.projects.map(String) : [],
+
+          genres: Array.isArray(obj.genres) ? obj.genres.map(String) : []
 
         };
 
