@@ -547,6 +547,28 @@ select option{background:var(--ink);color:var(--txt)}
 
 .sumchip b{color:var(--mint);font-weight:400}
 
+
+
+/* 窄屏：标题瘦一圈，三个工具合计挤在同一行，放不下就横向滑 */
+
+@media(max-width:560px){
+
+  .view-h{padding:6px 0 8px;gap:6px}
+
+  .view-h h1{font-size:13px;letter-spacing:.12em}
+
+  .view-h .vsub{font-size:9px}
+
+  .sum{flex-wrap:nowrap;justify-content:flex-start;margin-left:0;width:100%;gap:4px;
+
+    overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+
+  .sum::-webkit-scrollbar{display:none}
+
+  .sumchip{flex:0 0 auto;padding:2px 6px;font-size:9px;white-space:nowrap}
+
+}
+
 .qa-row{background:var(--frame);border:2px solid var(--edge2);box-shadow:3px 3px 0 var(--shadow);padding:9px;display:grid;gap:6px}
 
 @media(min-width:760px){.qa-row{grid-template-columns:1.3fr .6fr 1fr .8fr auto;align-items:center}}
