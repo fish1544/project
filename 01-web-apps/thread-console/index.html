@@ -563,17 +563,19 @@ select option{background:var(--ink);color:var(--txt)}
 
 .items .ih span:last-child{color:var(--dim);letter-spacing:.06em}
 
-.it{display:grid;gap:4px 10px;padding:8px 9px;border-bottom:1px dashed var(--gridbg)}
+.it{display:grid;gap:2px 9px;padding:5px 8px;margin:6px 8px 0;border:2px solid var(--edge2);
 
-.it:last-child{border-bottom:0}
+  box-shadow:2px 2px 0 var(--shadow);background:var(--frame)}
+
+.it:last-child{margin-bottom:8px}
 
 @media(min-width:620px){.it{grid-template-columns:minmax(0,1.4fr) auto auto;align-items:center}}
 
-.it.urgent{background:var(--warnbg)}
+.it.urgent{background:var(--warnbg);border-color:var(--coral)}
 
-.it.soon{box-shadow:inset 3px 0 0 var(--gold)}
+.it.soon{border-color:var(--gold)}
 
-.it.later{box-shadow:inset 3px 0 0 var(--edge2)}
+.it.later{border-color:var(--edge2)}
 
 .it.done{opacity:.45}
 
@@ -581,7 +583,7 @@ select option{background:var(--ink);color:var(--txt)}
 
 .it .tool{font-size:12px;font-weight:400;color:var(--txt);word-break:break-word}
 
-.it .amt{font-size:14px;color:var(--gold);white-space:nowrap}
+.it .amt{font-size:12.5px;color:var(--gold);white-space:nowrap}
 
 .it .due{font-size:9.5px;letter-spacing:.06em;color:var(--dim);white-space:nowrap}
 
@@ -593,13 +595,13 @@ select option{background:var(--ink);color:var(--txt)}
 
 .it .due.soft{color:var(--warn)}
 
-.it .acts{display:flex;gap:4px}
+.it .acts{display:flex;gap:3px}
 
-.it .acts button{min-height:34px;font-size:9.5px;padding:3px 7px}
+.it .acts button{min-height:26px;font-size:9px;padding:2px 6px}
 
 .it .acts .btn-del.arm{border-color:var(--coral);color:var(--coral);background:var(--armbg)}
 
-.it .note{font-size:9.5px;color:var(--dim)}
+.it .note{font-size:9px;color:var(--dim);line-height:1.4}
 
 
 
@@ -724,7 +726,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     <div class="rail-top">
 
-      <div class="ttl">THREAD<br>SAVE</div>
+      <div class="ttl">线程<br>工作台</div>
 
       <div class="dt" id="railDate"></div>
 
@@ -732,7 +734,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     <div class="rail-batt">
 
-      <span class="bl">SLOTS</span>
+      <span class="bl">槽位</span>
 
       <div class="batt" id="railBatt"></div>
 
@@ -766,7 +768,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <div class="view-h">
 
-        <h1>SAVE SLOTS</h1>
+        <h1>看板</h1>
 
         <span class="vsub" id="boardMeta"></span>
 
@@ -778,7 +780,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <div class="inbox">
 
-        <div class="ib-h"><span>INBOX · 碎片槽</span><span id="pool-count">0 条</span></div>
+        <div class="ib-h"><span>碎片槽</span><span id="pool-count">0 条</span></div>
 
         <div class="ib-sub">想到什么先记一行，别当场开工。复盘时再看要不要升成线程。</div>
 
@@ -804,7 +806,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <div class="view-h">
 
-        <h1>ROUND RECORD</h1>
+        <h1>复盘 · 两周一页</h1>
 
         <span class="vsub" id="revDate"></span>
 
@@ -814,13 +816,13 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <div class="rec">
 
-        <div class="rec-h"><span>STAGE 1 · 线程快照</span><span class="r">自动带出</span></div>
+        <div class="rec-h"><span>线程快照</span><span class="r">自动带出</span></div>
 
         <ul class="snap" id="snapList"></ul>
 
 
 
-        <div class="rec-h" style="margin-top:8px"><span>STAGE 2 · 三个问题</span><span class="r">约 20 分钟</span></div>
+        <div class="rec-h" style="margin-top:8px"><span>三个问题</span><span class="r">约 20 分钟</span></div>
 
 
 
@@ -858,7 +860,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
         <div class="rec-acts">
 
-          <button type="button" id="revSave">SAVE RECORD</button>
+          <button type="button" id="revSave">存这一页</button>
 
           <button type="button" id="revCancel" hidden style="flex:0 0 auto;padding:0 14px;border-color:var(--edge2);color:var(--dim)">取消修改</button>
 
@@ -870,7 +872,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <div class="hist">
 
-        <div class="rec-h"><span>ARCHIVE · 既往记录</span><span class="r" id="histCount"></span></div>
+        <div class="rec-h"><span>既往记录</span><span class="r" id="histCount"></span></div>
 
         <div id="histList"></div>
 
@@ -886,7 +888,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <div class="view-h">
 
-        <h1>ITEMS · 额度</h1>
+        <h1>额度</h1>
 
         <span class="vsub" id="quotaMeta"></span>
 
@@ -922,7 +924,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <div class="items">
 
-        <div class="ih"><span>BACKPACK</span><span>过期前用完</span></div>
+        <div class="ih"><span>额度清单</span><span>过期前用完</span></div>
 
         <div id="tickets"></div>
 
@@ -938,7 +940,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       <div class="view-h">
 
-        <h1>SYSTEM</h1>
+        <h1>系统</h1>
 
         <span class="vsub">全部数据存在本机浏览器</span>
 
@@ -1124,11 +1126,11 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   var LANES = [
 
-    { id:'active', code:'SLOT 1', label:'激活区', hint:'在推的线，最多 3 条', cap:3, stale:7 },
+    { id:'active', code:'01', label:'激活区', hint:'在推的线，最多 3 条', cap:3, stale:7 },
 
-    { id:'maint',  code:'SLOT 2', label:'维护区', hint:'维持最低动作，最多 5 条', cap:5, stale:14 },
+    { id:'maint',  code:'02', label:'维护区', hint:'维持最低动作，最多 5 条', cap:5, stale:14 },
 
-    { id:'frozen', code:'SLOT 3', label:'封存区', hint:'冻起来，不算欠账', cap:0, stale:0 }
+    { id:'frozen', code:'03', label:'封存区', hint:'冻起来，不算欠账', cap:0, stale:0 }
 
   ];
 
@@ -1578,7 +1580,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     document.getElementById('boardMeta').textContent =
 
-      'ACTIVE ' + c.active + ' · STALLED ' + c.stale + ' · ' + today();
+      '激活 ' + c.active + ' · 停滞 ' + c.stale + ' · ' + today();
 
     document.getElementById('revDate').textContent = today();
 
@@ -1612,7 +1614,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       if (!list.length) {
 
-        html += '<div class="empty">EMPTY SLOT</div>';
+        html += '<div class="empty">空着</div>';
 
       } else {
 
@@ -1819,7 +1821,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     list.forEach(function(x){
 
       h += '<li><b>' + esc(x.name) + '</b> · ' + esc(x.age) + '<br>' +
-           (x.proj ? '项目：' + esc(projLabel(x.proj)) : (x.next ? 'NEXT：' + esc(x.next) : '未填')) + '</li>';
+           (x.proj ? '项目：' + esc(projLabel(x.proj)) : (x.next ? '下一步：' + esc(x.next) : '未填')) + '</li>';
 
     });
 
@@ -2894,7 +2896,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     document.getElementById('revOut').value = '';
     document.getElementById('revBlock').value = '';
     document.getElementById('revNext').value = '';
-    document.getElementById('revSave').textContent = 'SAVE RECORD';
+    document.getElementById('revSave').textContent = '存这一页';
     this.hidden = true;
     toast('已取消修改');
   });
@@ -2915,7 +2917,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
       var rev = state.reviews.filter(function(x){ return x.id === editingReviewId; })[0];
       if (rev) { rev.out = out; rev.block = block; rev.next = next; }
       editingReviewId = null;
-      document.getElementById('revSave').textContent = 'SAVE RECORD';
+      document.getElementById('revSave').textContent = '存这一页';
       document.getElementById('revCancel').hidden = true;
       save(); renderAll();
       document.getElementById('revOut').value = '';
