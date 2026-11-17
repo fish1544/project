@@ -221,7 +221,15 @@ select option{background:var(--ink);color:var(--txt)}
 
 /* ============ 视图头 ============ */
 
-.view-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.view-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;
+
+  position:sticky;top:0;z-index:6;padding:8px 0 7px;
+
+  background-color:var(--bg);
+
+  background-image:repeating-linear-gradient(to bottom, var(--scan) 0 1px, transparent 1px 4px)}
+
+.view-h.stuck{box-shadow:0 2px 0 var(--edge2)}
 
 .view-h h1{font-size:15px;letter-spacing:.18em;color:var(--gold)}
 
@@ -2016,6 +2024,38 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
   }
 
 
+
+  (function(){
+
+    var heads = Array.prototype.slice.call(document.querySelectorAll('.view-h'));
+
+    var raf = false;
+
+    function upd(){
+
+      raf = false;
+
+      heads.forEach(function(h){
+
+        h.classList.toggle('stuck', h.getBoundingClientRect().top <= 1);
+
+      });
+
+    }
+
+    window.addEventListener('scroll', function(){
+
+      if (raf) return;
+
+      raf = true;
+
+      requestAnimationFrame(upd);
+
+    }, { passive:true });
+
+    upd();
+
+  })();
 
   var dirty = { board:true, review:true, quota:true };
 
