@@ -541,7 +541,7 @@ select option{background:var(--ink);color:var(--txt)}
 
 /* ============ 额度 ITEMS ============ */
 
-.sum{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.sum{display:flex;flex-wrap:wrap;gap:5px;margin-left:auto;justify-content:flex-end;align-self:center}
 
 .sumchip{border:2px solid var(--edge);background:var(--card);padding:3px 7px;font-size:10px;color:var(--dim)}
 
@@ -890,13 +890,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
         <h1>额度</h1>
 
-        <span class="vsub" id="quotaMeta"></span>
+        <div class="sum" id="quotaSum"></div>
 
       </div>
-
-
-
-      <div class="sum" id="quotaSum"></div>
 
 
 
@@ -1126,11 +1122,11 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
   var LANES = [
 
-    { id:'active', code:'01', label:'激活区', hint:'在推的线，最多 3 条', cap:3, stale:7 },
+    { id:'active', code:'01', label:'激活区', hint:'在推的线，最多 3 条；3 天没动自动下沉', cap:3, stale:3, next:'maint' },
 
-    { id:'maint',  code:'02', label:'维护区', hint:'维持最低动作，最多 5 条', cap:5, stale:14 },
+    { id:'maint',  code:'02', label:'维护区', hint:'维持最低动作，最多 5 条；5 天没动自动封存', cap:5, stale:5, next:'frozen' },
 
-    { id:'frozen', code:'03', label:'封存区', hint:'冻起来，不算欠账', cap:0, stale:0 }
+    { id:'frozen', code:'03', label:'封存区', hint:'冻起来，不算欠账', cap:0, stale:0, next:'' }
 
   ];
 
@@ -1249,6 +1245,52 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
     var d = daysAgo(t.last);
 
     return d !== null && d > lane.stale;
+
+  }
+
+
+
+  function autoDemote(){
+
+    var counts = { active:0, maint:0, frozen:0 };
+
+    state.threads.forEach(function(t){ if (counts[t.lane] != null) counts[t.lane]++; });
+
+    var moved = [];
+
+    state.threads.forEach(function(t){
+
+      var lane = laneOf(t.lane);
+
+      var guard = 0;
+
+      while (lane && lane.next && lane.stale && guard++ < 3) {
+
+        var d = daysAgo(t.last);
+
+        if (d === null || d <= lane.stale) break;
+
+        var next = laneOf(lane.next);
+
+        if (next && next.cap && counts[next.id] >= next.cap) break;
+
+        if (counts[t.lane] != null) counts[t.lane]--;
+
+        if (counts[next.id] != null) counts[next.id]++;
+
+        t.lane = next.id;
+
+        moved.push(t.name + '→' + next.label);
+
+        lane = next;
+
+      }
+
+    });
+
+    if (moved.length) { save(); toast(moved.slice(0, 3).join('、') + (moved.length > 3 ? ' 等 ' : ' ') + moved.length + ' 条久没动，已自动往下沉'); }
+
+    return moved.length;
 
   }
 
@@ -1943,28 +1985,6 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     var live = state.quotas.filter(function(q){ return !q.done; });
 
-    var band = { 3:0, 5:0, 7:0 };
-
-    live.forEach(function(q){
-
-      var d = daysUntil(q.date);
-
-      if (d === null || d < 0) return;
-
-      if (d <= 3) band[3]++;
-
-      if (d <= 5) band[5]++;
-
-      if (d <= 7) band[7]++;
-
-    });
-
-    document.getElementById('quotaMeta').textContent =
-
-      state.quotas.length + ' 张 · 3天 ' + band[3] + ' · 5天 ' + band[5] + ' · 7天 ' + band[7];
-
-
-
     var map = {}, order = [];
 
     live.forEach(function(q){
@@ -2039,11 +2059,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       h += '<div class="acts">';
 
-      h += '<button type="button" data-qact="used">' + (q.done ? '恢复' : '用完') + '</button>';
+      h += '<button type="button" class="btn-del" data-qact="del">用完</button>';
 
       h += '<button type="button" data-qact="edit">改</button>';
-
-      h += '<button type="button" class="btn-del" data-qact="del">删</button>';
 
       h += '</div>';
 
@@ -3011,7 +3029,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
         };
 
-        save(); renderAll(); toast('已恢复备份');
+        autoDemote(); save(); renderAll(); toast('已恢复备份');
 
       } catch (err) {
 
@@ -3149,9 +3167,9 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (act === 'used') {
 
-      q.done = !q.done;
+      state.quotas = state.quotas.filter(function(x){ return x.id !== id; });
 
-      save(); renderAll(); toast(q.done ? '已标记用完' : '已恢复为在用');
+      save(); renderAll(); toast('用完了，票据拿掉了');
 
     } else if (act === 'edit') {
 
@@ -3181,7 +3199,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
         qArmTimer = setTimeout(function(){
 
-          if (btn) { btn.classList.remove('arm'); btn.textContent = '删'; }
+          if (btn) { btn.classList.remove('arm'); btn.textContent = '用完'; }
 
         }, 3000);
 
@@ -3191,7 +3209,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
       state.quotas = state.quotas.filter(function(x){ return x.id !== id; });
 
-      save(); renderAll(); toast('票据已删除');
+      save(); renderAll(); toast('用完了，票据拿掉了');
 
     }
 
@@ -3248,6 +3266,8 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
 
   load();
+
+  autoDemote();
 
   renderAll();
 
