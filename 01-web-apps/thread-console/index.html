@@ -561,6 +561,10 @@ select option{background:var(--ink);color:var(--txt)}
 
 .it.urgent{background:var(--warnbg)}
 
+.it.soon{box-shadow:inset 3px 0 0 var(--gold)}
+
+.it.later{box-shadow:inset 3px 0 0 var(--edge2)}
+
 .it.done{opacity:.45}
 
 .it .nmrow{display:flex;align-items:center;gap:7px;min-width:0}
@@ -574,6 +578,10 @@ select option{background:var(--ink);color:var(--txt)}
 .it .due.hot{color:var(--coral)}
 
 .it .due.fresh{color:var(--mint)}
+
+.it .due.warm{color:var(--gold)}
+
+.it .due.soft{color:var(--warn)}
 
 .it .acts{display:flex;gap:4px}
 
@@ -1867,6 +1875,10 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (d <= 3) return 'urgent';
 
+    if (d <= 5) return 'soon';
+
+    if (d <= 7) return 'later';
+
     return '';
 
   }
@@ -1899,11 +1911,13 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (d < 0) return '';
 
-    if (d <= 1) return ' hot';
+    if (d <= 3) return ' hot';
 
     if (q.type === 'refresh') return ' fresh';
 
-    if (d <= 7) return ' hot';
+    if (d <= 5) return ' warm';
+
+    if (d <= 7) return ' soft';
 
     return '';
 
@@ -1917,17 +1931,25 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     var live = state.quotas.filter(function(q){ return !q.done; });
 
-    var soon = live.filter(function(q){
+    var band = { 3:0, 5:0, 7:0 };
+
+    live.forEach(function(q){
 
       var d = daysUntil(q.date);
 
-      return d !== null && d >= 0 && d <= 7;
+      if (d === null || d < 0) return;
 
-    }).length;
+      if (d <= 3) band[3]++;
+
+      if (d <= 5) band[5]++;
+
+      if (d <= 7) band[7]++;
+
+    });
 
     document.getElementById('quotaMeta').textContent =
 
-      state.quotas.length + ' 张 · 7 天内 ' + soon + ' 张';
+      state.quotas.length + ' 张 · 3天 ' + band[3] + ' · 5天 ' + band[5] + ' · 7天 ' + band[7];
 
 
 
