@@ -627,6 +627,22 @@ select option{background:var(--ink);color:var(--txt)}
 
 
 
+@media(max-width:619px){
+
+  .it{grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:3px 8px}
+
+  .it .nmrow{grid-template-columns:78px minmax(0,1fr);gap:8px}
+
+  .it .due{grid-column:1;grid-row:2;min-width:0;text-align:left}
+
+  .it .acts{grid-column:2;grid-row:1;gap:4px}
+
+  .it .acts button{min-height:32px;padding:2px 7px;font-size:9px}
+
+}
+
+
+
 /* ============ 编辑面板 ============ */
 
 .sheet-wrap{position:fixed;inset:0;z-index:60;display:none;background:rgba(5,5,10,.82)}
