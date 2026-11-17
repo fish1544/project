@@ -221,9 +221,9 @@ select option{background:var(--ink);color:var(--txt)}
 
 /* ============ 视图头 ============ */
 
-.view-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;
+.view-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:0;
 
-  position:sticky;top:0;z-index:6;padding:8px 0 7px;
+  position:sticky;top:0;z-index:6;padding:8px 0 10px;
 
   background-color:var(--bg);
 
@@ -261,7 +261,9 @@ select option{background:var(--ink);color:var(--txt)}
 
 .slot.over{background:var(--warnbg)}
 
-.slot-bar{display:flex;align-items:center;justify-content:space-between;gap:6px;
+.slot-bar{display:flex;align-items:center;justify-content:space-between;gap:6px;position:sticky;
+
+  top:var(--headh,44px);z-index:4;
 
   padding:6px 9px;background:var(--panel2);border-bottom:2px solid var(--edge);font-size:10.5px;letter-spacing:.14em}
 
@@ -3236,6 +3238,22 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
   load();
 
   renderAll();
+
+  function syncHeadh(){
+
+    var h = document.querySelector('.view-h');
+
+    if (!h) return;
+
+    document.documentElement.style.setProperty('--headh', h.offsetHeight + 'px');
+
+  }
+
+  syncHeadh();
+
+  window.addEventListener('resize', syncHeadh);
+
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncHeadh);
 
 })();
 
