@@ -365,15 +365,15 @@ select option{background:var(--ink);color:var(--txt)}
 
 .save .mvp{font-size:9.5px;color:var(--dim2);margin-top:4px;letter-spacing:.04em}
 
-.save .pj{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:9.5px;color:var(--dim2);margin-top:5px;letter-spacing:.04em}
-
-.save .pj em{font-style:normal;padding:1px 5px;border:1px solid currentColor;color:var(--dim)}
-
 .save .gen{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
 
 .save .gen span{font-size:9px;letter-spacing:.06em;line-height:15px;padding:0 4px;
 
   border:1px solid var(--edge2);color:var(--dim2);font-family:var(--num)}
+
+.save .gen b.ait{font-weight:400;font-size:9px;letter-spacing:.08em;line-height:15px;padding:0 5px;
+
+  border:1px solid var(--gold);color:var(--gold);background:var(--selon);font-family:var(--num)}
 
 .genpick{display:flex;flex-wrap:wrap;gap:5px}
 
@@ -1834,13 +1834,17 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
     if (t.next) h += '<div class="nx">' + esc(t.next) + '</div>';
 
-    if (t.proj) h += '<div class="pj">' + esc(projLabel(t.proj)) + (t.ai ? '<em>' + esc(t.ai) + '</em>' : '') + '</div>';
+    if (t.ai || (t.genres && t.genres.length)) {
 
-    if (t.genres && t.genres.length) h += '<div class="gen">' + t.genres.map(function(g){
+      var meta = [];
 
-      return '<span>' + esc(g) + '</span>';
+      if (t.ai) meta.push('<b class="ait">' + esc(t.ai) + '</b>');
 
-    }).join('') + '</div>';
+      if (t.genres && t.genres.length) t.genres.forEach(function(g){ meta.push('<span>' + esc(g) + '</span>'); });
+
+      h += '<div class="gen">' + meta.join('') + '</div>';
+
+    }
 
     h += '<div class="acts">';
 
