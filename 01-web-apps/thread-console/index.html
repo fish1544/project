@@ -553,11 +553,43 @@ select option{background:var(--ink);color:var(--txt)}
 
 @media(max-width:560px){
 
-  .view-h{padding:6px 0 8px;gap:6px}
+  /* 侧栏压成一段：标题一行、七项统计折行、四个入口一行，正文尽快露出来 */
 
-  .view-h h1{font-size:13px;letter-spacing:.12em}
+  .rail{padding:0 8px 7px;margin-bottom:8px}
 
-  .view-h .vsub{font-size:9px}
+  .rail-top{align-items:center;padding:6px 0 5px}
+
+  .rail-top .ttl{font-size:11.5px;letter-spacing:.1em}
+
+  .rail-top .ttl br{display:none}
+
+  .rail-top .dt{font-size:9.5px}
+
+  .rail-batt{display:none}
+
+  .stats{display:flex;flex-wrap:wrap;gap:1px 10px;padding:2px 0 2px}
+
+  .st{padding:0;font-size:10px;gap:4px}
+
+  .st .k{min-width:0}
+
+  .st .segm{display:none}
+
+  .st .v{margin-left:0;font-size:10px}
+
+  .nav{gap:4px;margin-top:6px;flex-wrap:nowrap}
+
+  .nav button{flex:1 1 0;min-height:36px;font-size:10.5px;padding:0 2px}
+
+  .rail-note{display:none}
+
+  .view-h{padding:4px 0 5px;gap:4px}
+
+  .view-h h1{font-size:12.5px;letter-spacing:.1em}
+
+  .view-h h1::before{font-size:11px;margin-right:5px}
+
+  .view-h .vsub{font-size:9px;letter-spacing:.04em;white-space:normal;text-align:right;min-width:0}
 
   .sum{flex-wrap:nowrap;justify-content:flex-start;margin-left:0;width:100%;gap:4px;
 
@@ -565,7 +597,7 @@ select option{background:var(--ink);color:var(--txt)}
 
   .sum::-webkit-scrollbar{display:none}
 
-  .sumchip{flex:0 0 auto;padding:2px 6px;font-size:9px;white-space:nowrap}
+  .sumchip{flex:0 0 auto;padding:1px 6px;font-size:8.5px;line-height:1.7;white-space:nowrap}
 
 }
 
@@ -976,7 +1008,7 @@ if(_t&&/^(cream|blossom|peach|butter|sage|mint|sky|lilac)$/.test(_t)){document.d
 
         <h1>系统</h1>
 
-        <span class="vsub">全部数据存在本机浏览器</span>
+        <span class="vsub">数据只在本机</span>
 
       </div>
 
